@@ -38,7 +38,7 @@ namespace Swarmer.Services
 			await File.AppendAllTextAsync(LogFile, $"{logText}\n\n");
 
 			Embed exceptionEmbed = _helper.ExceptionEmbed(logMessage);
-			_ = await _swarmerInfoChannel.SendMessageAsync(embed: exceptionEmbed);
+			await _swarmerInfoChannel.SendMessageAsync(embed: exceptionEmbed);
 		}
 	}
 }
