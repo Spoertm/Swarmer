@@ -14,7 +14,7 @@ namespace Swarmer.Helpers
 {
 	public class Helper
 	{
-		private const string _activeStreamsFilePath = "Models/ActiveStreams.json";
+		private readonly string _activeStreamsFilePath = Path.Combine(AppContext.BaseDirectory, "Models", "ActiveStreams.json");
 		private readonly TwitchAPI _api;
 		private readonly Regex _exceptionRegex = new("(?<=   )at.+\n?", RegexOptions.Compiled);
 
@@ -56,7 +56,7 @@ namespace Swarmer.Helpers
 				.Build();
 		}
 
-		public static List<ActiveStream> DeserializeActiveStreams()
+		public List<ActiveStream> DeserializeActiveStreams()
 		{
 			if (!File.Exists(_activeStreamsFilePath))
 				return new();
@@ -109,7 +109,7 @@ namespace Swarmer.Helpers
 			}
 		}
 
-		public static void SerializeActiveStreams(List<ActiveStream> activeStreams)
+		public void SerializeActiveStreams(List<ActiveStream> activeStreams)
 		{
 			File.WriteAllText(_activeStreamsFilePath, JsonConvert.SerializeObject(activeStreams, Formatting.Indented));
 		}

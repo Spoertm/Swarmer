@@ -31,7 +31,7 @@ namespace Swarmer
 		{
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
-			_config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync("Models/Config.json")) ?? throw new InvalidOperationException("Error reading config file.");
+			_config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Models", "Config.json"))) ?? throw new InvalidOperationException("Error reading config file.");
 
 			_client = new(new()
 			{

@@ -21,7 +21,7 @@ namespace Swarmer.Services
 		private readonly Helper _helper;
 		private readonly TwitchAPI _api;
 		private readonly DiscordSocketClient _client;
-		private readonly List<ActiveStream> _activeStreams = Helper.DeserializeActiveStreams();
+		private readonly List<ActiveStream> _activeStreams;
 
 		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, TwitchAPI api)
 		{
@@ -29,6 +29,8 @@ namespace Swarmer.Services
 			_helper = helper;
 			_api = api;
 			_client = client;
+
+			_activeStreams = _helper.DeserializeActiveStreams();
 
 			foreach (ulong notifChannelId in _config.NotifChannelIds)
 			{
@@ -79,7 +81,7 @@ namespace Swarmer.Services
 				_activeStreams.Remove(activeStream);
 			}
 
-			Helper.SerializeActiveStreams(_activeStreams);
+			_helper.SerializeActiveStreams(_activeStreams);
 		}
 	}
 }
