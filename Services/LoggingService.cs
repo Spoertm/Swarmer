@@ -12,19 +12,17 @@ namespace Swarmer.Services
 	public class LoggingService
 	{
 		private readonly SocketTextChannel _swarmerInfoChannel;
-		private readonly Config _config;
 		private readonly Helper _helper;
 
 		public LoggingService(DiscordSocketClient client, CommandService commands, Config config, Helper helper)
 		{
-			_config = config;
 			_helper = helper;
 			LogDirectory = Path.Combine(AppContext.BaseDirectory, "Logs");
 
 			client.Log += LogAsync;
 			commands.Log += LogAsync;
 
-			_swarmerInfoChannel = (client.GetChannel(_config.SwarmerInfoChannelId) as SocketTextChannel)!;
+			_swarmerInfoChannel = (client.GetChannel(config.SwarmerInfoChannelId) as SocketTextChannel)!;
 		}
 
 		private string LogDirectory { get; }

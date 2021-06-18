@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Swarmer.Helpers;
 using Swarmer.Models;
 using Swarmer.Services;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -17,9 +18,9 @@ namespace Swarmer
 {
 	public static class Program
 	{
-		private static DiscordSocketClient _client;
-		private static CommandService _commands;
-		private static Config _config;
+		private static DiscordSocketClient _client = null!;
+		private static CommandService _commands = null!;
+		private static Config _config = null!;
 
 		private static void Main(string[] args)
 		{
@@ -30,7 +31,7 @@ namespace Swarmer
 		{
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
-			_config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync("Models/Config.json"));
+			_config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync("Models/Config.json")) ?? throw new InvalidOperationException("Error reading config file.");
 
 			_client = new(new()
 			{
