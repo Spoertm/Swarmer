@@ -1,0 +1,85 @@
+﻿using Discord;
+using Discord.Rest;
+using Discord.WebSocket;
+using Swarmer.Helpers;
+using Swarmer.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using TwitchLib.Api;
+using TwitchLib.Api.Helix.Models.Streams.GetStreams;
+
+namespace Swarmer.Services
+{
+	public class EmbedUpdateBackgroundService : AbstractBackgroundService
+	{
+		private const string _devilDaggersId = "490905";
+		private readonly Config _config;
+		private readonly Dictionary<ulong, SocketTextChannel> _notifChannels = new();
+		private readonly Helper _helper;
+		private readonly TwitchAPI _api;
+		private readonly DiscordSocketClient _client;
+		private readonly List<ActiveStream> _activeStreams = Helper.DeserializeActiveStreams();
+
+		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, TwitchAPI api)
+		{
+			_config = config;
+			_helper = helper;
+			_api = api;
+			_client = client;
+
+			foreach (ulong notifChannelId in _config.NotifChannelIds)
+			{
+				if (client.GetChannel(notifChannelId) is SocketTextChannel socketTextChannel)
+					_notifChannels.Add(notifChannelId, socketTextChannel);
+			}
+		}
+
+		protected override TimeSpan Interval => TimeSpan.FromMinutes(2);
+
+		protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
+		{
+			_api.Settings.ClientId = _config.ClientId;
+			_api.Settings.AccessToken = _config.AccessToken;
+			Stream[] twitchStreams = (await _api.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new()
+				{
+					_devilDaggersId,
+				}))
+				.Streams;
+
+			foreach (Stream stream in twitchStreams)
+			{
+				if (_activeStreams.Exists(s => s.StreamId == stream.Id))
+					continue;
+
+				foreach (SocketTextChannel channel in _notifChannels.Values)
+				{
+					RestUserMessage msg = await channel.SendMessageAsync(embed: await _helper.GetOnlineStreamEmbedAsync(stream));
+					_activeStreams.Add(new(channel.Id, stream.Id, stream.UserId, msg.Id));
+				}
+			}
+
+			for (int i = _activeStreams.Count - 1; i >= 0; i--)
+			{
+				ActiveStream activeStream = _activeStreams[i];
+				Stream? matchingTwitchStream = Array.Find(twitchStreams, ts => ts.Id == activeStream.StreamId);
+				if (matchingTwitchStream is not null)
+					continue;
+
+				if (_notifChannels.ContainsKey(activeStream.DiscordChannelId) &&
+					_client.GetChannel(activeStream.DiscordChannelId) is not null &&
+					await _notifChannels[activeStream.DiscordChannelId].GetMessageAsync(activeStream.DiscordMessageId) is IUserMessage msgToBeEdited)
+				{
+					Embed newEmbed = await _helper.GetOfflineEmbedAsync(msgToBeEdited.Embeds.First(), activeStream.UserId);
+					await msgToBeEdited.ModifyAsync(m => m.Embed = newEmbed);
+				}
+
+				_activeStreams.Remove(activeStream);
+			}
+
+			Helper.SerializeActiveStreams(_activeStreams);
+		}
+	}
+}
