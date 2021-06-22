@@ -36,7 +36,7 @@ namespace Swarmer.Helpers
 				.WithDescription("🔴 Live| " + twitchStream.Title)
 				.WithThumbnailUrl(GetProperUrl(twitchStream.ThumbnailUrl))
 				.WithAuthor(twitchStream.UserName, iconUrl, "https://twitch.tv/" + twitchStream.UserName)
-				.WithColor(1)
+				.WithColor(6570404)
 				.Build();
 		}
 
