@@ -28,7 +28,7 @@ namespace Swarmer.Services
 		private string LogDirectory { get; }
 		private string LogFile => Path.Combine(LogDirectory, $"{DateTime.UtcNow:yyyy-MM-dd}.txt");
 
-		private async Task LogAsync(LogMessage logMessage)
+		public async Task LogAsync(LogMessage logMessage)
 		{
 			Directory.CreateDirectory(LogDirectory);
 

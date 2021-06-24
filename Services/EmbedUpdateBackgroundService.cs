@@ -22,7 +22,8 @@ namespace Swarmer.Services
 		private readonly DiscordSocketClient _client;
 		private readonly List<ActiveStream> _activeStreams;
 
-		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, TwitchAPI api)
+		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, TwitchAPI api, LoggingService loggingService)
+            : base(loggingService)
 		{
 			_helper = helper;
 			_api = api;
