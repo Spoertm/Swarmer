@@ -22,7 +22,6 @@ namespace Swarmer
 		private static DiscordSocketClient _client = null!;
 		private static CommandService _commands = null!;
 		private static Config _config = null!;
-		private static IHost _host = null!;
 		public static CancellationTokenSource Source { get; } = new();
 
 		private static void Main(string[] args)
@@ -72,7 +71,7 @@ namespace Swarmer
 		{
 			_client.Ready -= OnReadyAsync;
 
-			_host = Host.CreateDefaultBuilder()
+			IHost host = Host.CreateDefaultBuilder()
 				.ConfigureServices(services =>
 					services.AddSingleton(_client)
 						.AddSingleton(_config)
@@ -85,11 +84,11 @@ namespace Swarmer
 						.AddHostedService<EmbedUpdateBackgroundService>())
 				.Build();
 
-			_host.Services.GetService(typeof(MessageHandlerService));
-			_host.Services.GetService(typeof(LoggingService));
+			host.Services.GetService(typeof(MessageHandlerService));
+			host.Services.GetService(typeof(LoggingService));
 
-			await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
-			Task.Run(async () => await _host.RunAsync(Source.Token), Source.Token);
+			await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), host.Services);
+			Task.Run(async () => await host.RunAsync(Source.Token), Source.Token);
 		}
 	}
 }
