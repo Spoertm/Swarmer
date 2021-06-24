@@ -56,7 +56,7 @@ namespace Swarmer
 			{
 				await Task.Delay(-1, Source.Token);
 			}
-			catch (TaskCanceledException ex)
+			catch (TaskCanceledException)
 			{
 				await _client.StopAsync();
 				Thread.Sleep(1000);
