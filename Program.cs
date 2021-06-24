@@ -11,6 +11,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using TwitchLib.Api;
 
@@ -22,6 +23,7 @@ namespace Swarmer
 		private static CommandService _commands = null!;
 		private static Config _config = null!;
 		private static IHost _host = null!;
+		public static CancellationTokenSource Source { get; } = new();
 
 		private static void Main(string[] args)
 		{
@@ -49,9 +51,22 @@ namespace Swarmer
 			await _client.SetGameAsync("Devil Daggers");
 
 			_client.Ready += OnReadyAsync;
+			try
+			{
+				await Task.Delay(-1, Source.Token);
+			}
+			catch (TaskCanceledException ex)
+			{
+				await _client.StopAsync();
+				Thread.Sleep(1000);
+				await _client.LogoutAsync();
+			}
+			finally
+			{
+				Source.Dispose();
+			}
 
-			await _host.RunAsync();
-			await Task.Delay(-1);
+			Environment.Exit(0);
 		}
 
 		private static async Task OnReadyAsync()
@@ -75,6 +90,7 @@ namespace Swarmer
 			_host.Services.GetService(typeof(LoggingService));
 
 			await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
+			Task.Run(async () => await _host.RunAsync(Source.Token), Source.Token);
 		}
 	}
 }
