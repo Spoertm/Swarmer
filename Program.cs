@@ -21,6 +21,7 @@ namespace Swarmer
 		private static DiscordSocketClient _client = null!;
 		private static CommandService _commands = null!;
 		private static Config _config = null!;
+		private static IHost _host = null!;
 
 		private static void Main(string[] args)
 		{
@@ -49,6 +50,7 @@ namespace Swarmer
 
 			_client.Ready += OnReadyAsync;
 
+			await _host.RunAsync();
 			await Task.Delay(-1);
 		}
 
@@ -56,7 +58,10 @@ namespace Swarmer
 		{
 			_client.Ready -= OnReadyAsync;
 
-			IHost host = Host.CreateDefaultBuilder()
+			if (_client.GetChannel(_config.SwarmerActiveStreamsChannelId) is null)
+				throw new("ActiveStreams channel is null.");
+
+			_host = Host.CreateDefaultBuilder()
 				.ConfigureServices(services =>
 					services.AddSingleton(_client)
 						.AddSingleton(_config)
@@ -68,11 +73,10 @@ namespace Swarmer
 						.AddHostedService<EmbedUpdateBackgroundService>())
 				.Build();
 
-			host.Services.GetService(typeof(MessageHandlerService));
-			host.Services.GetService(typeof(LoggingService));
+			_host.Services.GetService(typeof(MessageHandlerService));
+			_host.Services.GetService(typeof(LoggingService));
 
-			await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), host.Services);
-			await host.RunAsync();
+			await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
 		}
 	}
 }
