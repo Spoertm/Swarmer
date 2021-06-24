@@ -21,7 +21,6 @@ namespace Swarmer.Services
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			Console.WriteLine("In ExecuteTaskAsync...");
 			while (!stoppingToken.IsCancellationRequested)
 			{
 				try
@@ -37,7 +36,7 @@ namespace Swarmer.Services
 					await Task.Delay(Interval, stoppingToken);
 			}
 
-			await _loggingService.LogAsync(new(LogSeverity.Warning, "AbstractBackgroundService", string.Empty));
+			await _loggingService.LogAsync(new(LogSeverity.Warning, "AbstractBackgroundService", "Service cancelled."));
 		}
 	}
 }
