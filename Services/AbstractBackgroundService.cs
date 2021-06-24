@@ -21,6 +21,8 @@ namespace Swarmer.Services
 				if (Interval.TotalMilliseconds > 0)
 					await Task.Delay(Interval, stoppingToken);
 			}
+
+			throw new("Background service stopped.");
 		}
 	}
 }
