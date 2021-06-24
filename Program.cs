@@ -35,12 +35,12 @@ namespace Swarmer
 
 			_client = new(new()
 			{
-				LogLevel = LogSeverity.Error,
+				LogLevel = LogSeverity.Warning,
 			});
 
 			_commands = new(new()
 			{
-				LogLevel = LogSeverity.Error,
+				LogLevel = LogSeverity.Warning,
 			});
 
 			await _client.LoginAsync(TokenType.Bot, _config!.BotToken);
