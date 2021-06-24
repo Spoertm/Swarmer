@@ -9,5 +9,6 @@
 		public string Prefix { get; set; }
 		public string ReactionEmote { get; set; }
 		public ulong SwarmerInfoChannelId { get; set; }
+		public ulong SwarmerActiveStreamsChannelId { get; set; }
 	}
 }
