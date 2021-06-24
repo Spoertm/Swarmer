@@ -6,7 +6,6 @@ using Swarmer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TwitchLib.Api;
@@ -19,14 +18,16 @@ namespace Swarmer.Services
 		private const string _devilDaggersId = "490905";
 		private readonly Dictionary<ulong, SocketTextChannel> _notifChannels = new();
 		private readonly Helper _helper;
+		private readonly EmbedHelper _embedHelper;
 		private readonly TwitchAPI _api;
 		private readonly DiscordSocketClient _client;
 		private readonly List<ActiveStream> _activeStreams;
 
-		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, TwitchAPI api, LoggingService loggingService)
-            : base(loggingService)
+		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, EmbedHelper embedHelper, TwitchAPI api, LoggingService loggingService)
+			: base(loggingService)
 		{
 			_helper = helper;
+			_embedHelper = embedHelper;
 			_api = api;
 			_api.Settings.ClientId = config.ClientId;
 			_api.Settings.AccessToken = config.AccessToken;
@@ -58,7 +59,7 @@ namespace Swarmer.Services
 
 				foreach (SocketTextChannel channel in _notifChannels.Values)
 				{
-					RestUserMessage msg = await channel.SendMessageAsync(embed: await _helper.GetOnlineStreamEmbedAsync(stream));
+					RestUserMessage msg = await channel.SendMessageAsync(embed: await _embedHelper.GetOnlineStreamEmbedAsync(stream));
 					_activeStreams.Add(new(channel.Id, stream.Id, stream.UserId, msg.Id));
 				}
 			}
@@ -74,7 +75,7 @@ namespace Swarmer.Services
 					_client.GetChannel(activeStream.DiscordChannelId) is not null &&
 					await _notifChannels[activeStream.DiscordChannelId].GetMessageAsync(activeStream.DiscordMessageId) is IUserMessage msgToBeEdited)
 				{
-					Embed newEmbed = await _helper.GetOfflineEmbedAsync(msgToBeEdited.Embeds.First(), activeStream.UserId);
+					Embed newEmbed = await _embedHelper.GetOfflineEmbedAsync(msgToBeEdited.Embeds.First(), activeStream.UserId);
 					await msgToBeEdited.ModifyAsync(m => m.Embed = newEmbed);
 				}
 
