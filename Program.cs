@@ -44,7 +44,7 @@ namespace Swarmer
 				LogLevel = LogSeverity.Warning,
 			});
 
-			await _client.LoginAsync(TokenType.Bot, _config!.BotToken);
+			await _client.LoginAsync(TokenType.Bot, _config.BotToken);
 			await _client.StartAsync();
 			await _client.SetGameAsync("Devil Daggers");
 
