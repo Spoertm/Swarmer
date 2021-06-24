@@ -16,7 +16,6 @@ namespace Swarmer.Services
 	public class EmbedUpdateBackgroundService : AbstractBackgroundService
 	{
 		private const string _devilDaggersId = "490905";
-		private readonly Config _config;
 		private readonly Dictionary<ulong, SocketTextChannel> _notifChannels = new();
 		private readonly Helper _helper;
 		private readonly TwitchAPI _api;
@@ -25,14 +24,15 @@ namespace Swarmer.Services
 
 		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, TwitchAPI api)
 		{
-			_config = config;
 			_helper = helper;
 			_api = api;
+			_api.Settings.ClientId = config.ClientId;
+			_api.Settings.AccessToken = config.AccessToken;
 			_client = client;
 
 			_activeStreams = _helper.DeserializeActiveStreams();
 
-			foreach (ulong notifChannelId in _config.NotifChannelIds)
+			foreach (ulong notifChannelId in config.NotifChannelIds)
 			{
 				if (client.GetChannel(notifChannelId) is SocketTextChannel socketTextChannel)
 					_notifChannels.Add(notifChannelId, socketTextChannel);
@@ -43,8 +43,6 @@ namespace Swarmer.Services
 
 		protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 		{
-			_api.Settings.ClientId = _config.ClientId;
-			_api.Settings.AccessToken = _config.AccessToken;
 			Stream[] twitchStreams = (await _api.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new()
 				{
 					_devilDaggersId,
