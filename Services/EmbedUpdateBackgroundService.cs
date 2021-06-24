@@ -37,8 +37,13 @@ namespace Swarmer.Services
 
 			foreach (ulong notifChannelId in config.NotifChannelIds)
 			{
-				if (client.GetChannel(notifChannelId) is SocketTextChannel socketTextChannel)
-					_notifChannels.Add(notifChannelId, socketTextChannel);
+				if (client.GetChannel(notifChannelId) is not SocketTextChannel socketTextChannel)
+				{
+					loggingService.LogAsync(new(LogSeverity.Error, "EmbedUpdateBackgroundService constructor", $"Notif channel with ID {notifChannelId} is null.")).GetAwaiter().GetResult();
+					throw new($"Notif channel with ID {notifChannelId} is null.");
+				}
+
+				_notifChannels.Add(notifChannelId, socketTextChannel);
 			}
 		}
 
