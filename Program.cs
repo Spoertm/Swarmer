@@ -58,9 +58,6 @@ namespace Swarmer
 		{
 			_client.Ready -= OnReadyAsync;
 
-			if (_client.GetChannel(_config.SwarmerActiveStreamsChannelId) is null)
-				throw new("ActiveStreams channel is null.");
-
 			_host = Host.CreateDefaultBuilder()
 				.ConfigureServices(services =>
 					services.AddSingleton(_client)

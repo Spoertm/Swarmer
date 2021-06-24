@@ -20,7 +20,8 @@ namespace Swarmer.Helpers
 
 		public Helper(Config config, DiscordSocketClient client, LoggingService loggingService)
 		{
-			_swarmerActiveStreamsChannel = (client.GetChannel(config.SwarmerActiveStreamsChannelId) as SocketTextChannel)!;
+			SocketTextChannel? activeStreamsChannel = client.GetChannel(config.SwarmerActiveStreamsChannelId) as SocketTextChannel;
+			_swarmerActiveStreamsChannel = activeStreamsChannel ?? throw new("ActiveStreams channel is null.");
 			_loggingService = loggingService;
 		}
 
