@@ -39,6 +39,7 @@ namespace Swarmer
 			_client = new(new()
 			{
 				LogLevel = LogSeverity.Warning,
+				ExclusiveBulkDelete = true,
 			});
 
 			_commands = new(new()
