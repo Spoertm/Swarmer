@@ -33,10 +33,7 @@ namespace Swarmer.Helpers
 				.FirstOrDefault();
 
 			if (latestAttachment is null)
-			{
-				await _loggingService.LogAsync(new(LogSeverity.Error, "DeserializerActiveStreams()", "File in the latest message in ActiveStreams channel is null."));
-				throw new("File in the latest message in ActiveStreams channel is null.");
-			}
+				return new();
 
 			using HttpClient httpClient = new();
 			string activeStreamsJson = await httpClient.GetStringAsync(latestAttachment.Url);
