@@ -78,7 +78,8 @@ namespace Swarmer.Services
 
 				if (_notifChannels.ContainsKey(activeStream.DiscordChannelId) &&
 					_client.GetChannel(activeStream.DiscordChannelId) is not null &&
-					await _notifChannels[activeStream.DiscordChannelId].GetMessageAsync(activeStream.DiscordMessageId) is IUserMessage msgToBeEdited)
+					await _notifChannels[activeStream.DiscordChannelId].GetMessageAsync(activeStream.DiscordMessageId) is IUserMessage msgToBeEdited &&
+					!msgToBeEdited.Embeds.First().Description.StartsWith("⚫ Offline"))
 				{
 					Embed newEmbed = await _embedHelper.GetOfflineEmbedAsync(msgToBeEdited.Embeds.First(), activeStream.UserId);
 					await msgToBeEdited.ModifyAsync(m => m.Embed = newEmbed);
