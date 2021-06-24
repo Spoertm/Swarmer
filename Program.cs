@@ -66,8 +66,6 @@ namespace Swarmer
 			{
 				Source.Dispose();
 			}
-
-			Environment.Exit(0);
 		}
 
 		private static async Task OnReadyAsync()
