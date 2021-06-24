@@ -6,6 +6,7 @@ using Swarmer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TwitchLib.Api;
@@ -31,7 +32,7 @@ namespace Swarmer.Services
 			_api.Settings.AccessToken = config.AccessToken;
 			_client = client;
 
-			_activeStreams = _helper.DeserializeActiveStreams();
+			_activeStreams = _helper.DeserializeActiveStreams().Result;
 
 			foreach (ulong notifChannelId in config.NotifChannelIds)
 			{
@@ -80,7 +81,7 @@ namespace Swarmer.Services
 				_activeStreams.Remove(activeStream);
 			}
 
-			_helper.SerializeActiveStreams(_activeStreams);
+			await _helper.SerializeAndUpdateActiveStreams(_activeStreams);
 		}
 	}
 }

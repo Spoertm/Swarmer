@@ -1,9 +1,13 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using Swarmer.Models;
+using Swarmer.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TwitchLib.Api;
@@ -16,11 +20,15 @@ namespace Swarmer.Helpers
 	{
 		private readonly string _activeStreamsFilePath = Path.Combine(AppContext.BaseDirectory, "Models", "ActiveStreams.json");
 		private readonly TwitchAPI _api;
+		private readonly SocketTextChannel _swarmerActiveStreamsChannel;
+		private readonly LoggingService _loggingService;
 		private readonly Regex _exceptionRegex = new("(?<=   )at.+\n?", RegexOptions.Compiled);
 
-		public Helper(TwitchAPI api)
+		public Helper(TwitchAPI api, Config config, DiscordSocketClient client, LoggingService loggingService)
 		{
 			_api = api;
+			_swarmerActiveStreamsChannel = (client.GetChannel(config.SwarmerActiveStreamsChannelId) as SocketTextChannel)!;
+			_loggingService = loggingService;
 		}
 
 		public async Task<Embed> GetOnlineStreamEmbedAsync(Stream twitchStream)
@@ -56,23 +64,37 @@ namespace Swarmer.Helpers
 				.Build();
 		}
 
-		public List<ActiveStream> DeserializeActiveStreams()
+		public async Task<List<ActiveStream>> DeserializeActiveStreams()
 		{
-			if (!File.Exists(_activeStreamsFilePath))
-				return new();
+			IAttachment? latestAttachment = (await _swarmerActiveStreamsChannel.GetMessagesAsync(1).FlattenAsync())
+				.FirstOrDefault()?
+				.Attachments
+				.FirstOrDefault();
 
-			string fileConent = File.ReadAllText(_activeStreamsFilePath);
-			if (string.IsNullOrWhiteSpace(fileConent))
-				return new();
+			if (latestAttachment is null)
+			{
+				await _loggingService.LogAsync(new(LogSeverity.Error, "DeserializerActiveStreams()", "File in the latest message in ActiveStreams channel is null."));
+				throw new("File in the latest message in ActiveStreams channel is null.");
+			}
 
+			using HttpClient httpClient = new();
+			string activeStreamsJson = await httpClient.GetStringAsync(latestAttachment.Url);
 			try
 			{
-				return JsonConvert.DeserializeObject<List<ActiveStream>>(fileConent);
+				await File.WriteAllTextAsync(_activeStreamsFilePath, activeStreamsJson);
+				List<ActiveStream>? activeStreams = JsonConvert.DeserializeObject<List<ActiveStream>>(activeStreamsJson);
+				return activeStreams ?? new();
 			}
 			catch
 			{
 				return new();
 			}
+		}
+
+		public async Task SerializeAndUpdateActiveStreams(List<ActiveStream> activeStreams)
+		{
+			await File.WriteAllTextAsync(_activeStreamsFilePath, JsonConvert.SerializeObject(activeStreams, Formatting.Indented));
+			await _swarmerActiveStreamsChannel.SendFileAsync(_activeStreamsFilePath, string.Empty);
 		}
 
 		public Embed ExceptionEmbed(LogMessage msg)
@@ -107,11 +129,6 @@ namespace Swarmer.Helpers
 				exceptionEmbed.AddField(exception.GetType().Name, string.IsNullOrEmpty(exception.Message) ? "No message." : exception.Message);
 				exception = exception.InnerException;
 			}
-		}
-
-		public void SerializeActiveStreams(List<ActiveStream> activeStreams)
-		{
-			File.WriteAllText(_activeStreamsFilePath, JsonConvert.SerializeObject(activeStreams, Formatting.Indented));
 		}
 
 		private static string GetProperUrl(string url)
