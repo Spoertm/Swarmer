@@ -49,7 +49,7 @@ namespace Swarmer.Helpers
 				.Users[0];
 
 			return new EmbedBuilder()
-				.WithDescription("⚫ Offline| " + oldEmbed.Description[9..])
+				.WithDescription("⚫ Offline| " + (oldEmbed.Description.Length >= 9 ? oldEmbed.Description[9..] : string.Empty))
 				.WithThumbnailUrl(GetProperUrl(twitchUser.OfflineImageUrl))
 				.WithAuthor(oldEmbed.Author!.Value.Name, oldEmbed.Author.Value.IconUrl, oldEmbed.Author.Value.Url)
 				.WithColor(1)
