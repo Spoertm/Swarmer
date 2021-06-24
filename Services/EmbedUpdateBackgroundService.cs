@@ -87,7 +87,8 @@ namespace Swarmer.Services
 				_activeStreams.Remove(activeStream);
 			}
 
-			await _helper.SerializeAndUpdateActiveStreams(_activeStreams);
+			if (_activeStreams.Count != 0)
+				await _helper.SerializeAndUpdateActiveStreams(_activeStreams);
 		}
 	}
 }
