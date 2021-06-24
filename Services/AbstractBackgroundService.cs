@@ -37,7 +37,7 @@ namespace Swarmer.Services
 					await Task.Delay(Interval, stoppingToken);
 			}
 
-			await _loggingService.LogAsync(new(LogSeverity., "AbstractBackgroundService", string.Empty));
+			await _loggingService.LogAsync(new(LogSeverity.Warning, "AbstractBackgroundService", string.Empty));
 		}
 	}
 }
