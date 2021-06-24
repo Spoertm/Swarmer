@@ -51,6 +51,7 @@ namespace Swarmer.Services
 
 		protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 		{
+			bool changed = false;
 			Stream[] twitchStreams = (await _api.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new()
 				{
 					_devilDaggersId,
@@ -62,6 +63,7 @@ namespace Swarmer.Services
 				if (_activeStreams.Exists(s => s.StreamId == stream.Id))
 					continue;
 
+				changed = true;
 				foreach (SocketTextChannel channel in _notifChannels.Values)
 				{
 					RestUserMessage msg = await channel.SendMessageAsync(embed: await _embedHelper.GetOnlineStreamEmbedAsync(stream));
@@ -86,9 +88,10 @@ namespace Swarmer.Services
 				}
 
 				_activeStreams.Remove(activeStream);
+				changed = true;
 			}
 
-			if (_activeStreams.Count != 0)
+			if (changed && _activeStreams.Count > 0)
 				await _helper.SerializeAndUpdateActiveStreams(_activeStreams);
 		}
 	}
