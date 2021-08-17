@@ -8,10 +8,10 @@
 
     <ItemGroup>
       <PackageReference Include="Discord.Net" Version="2.4.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-      <PackageReference Include="SonarAnalyzer.CSharp" Version="8.25.0.33663">
+      <PackageReference Include="SonarAnalyzer.CSharp" Version="8.27.0.35380">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
@@ -19,7 +19,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="TwitchLib.Api" Version="3.2.3" />
+      <PackageReference Include="TwitchLib.Api" Version="3.2.4" />
     </ItemGroup>
 
     <ItemGroup>
