@@ -4,6 +4,7 @@
 	{
 		public string BotToken { get; set; } = null!;
 		public string ClientId { get; set; } = null!;
+		public string ClientSecret { get; set; } = null!;
 		public string AccessToken { get; set; } = null!;
 		public ulong[] NotifChannelIds { get; set; } = null!;
 		public string Prefix { get; set; } = null!;
