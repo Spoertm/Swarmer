@@ -52,10 +52,7 @@ namespace Swarmer.Services
 		protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 		{
 			bool changed = false;
-			Stream[] twitchStreams = (await _api.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new()
-				{
-					_devilDaggersId,
-				}))
+			Stream[] twitchStreams = (await _api.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new() { _devilDaggersId }))
 				.Streams;
 
 			foreach (Stream stream in twitchStreams)

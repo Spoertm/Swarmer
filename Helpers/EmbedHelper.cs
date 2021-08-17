@@ -20,10 +20,7 @@ namespace Swarmer.Helpers
 
 		public async Task<Embed> GetOnlineStreamEmbedAsync(Stream twitchStream)
 		{
-			User twitchUser = (await _api.Helix.Users.GetUsersAsync(ids: new()
-				{
-					twitchStream.UserId,
-				}))
+			User twitchUser = (await _api.Helix.Users.GetUsersAsync(ids: new() { twitchStream.UserId }))
 				.Users[0];
 
 			string iconUrl = GetProperUrl(twitchUser.ProfileImageUrl);
@@ -37,10 +34,7 @@ namespace Swarmer.Helpers
 
 		public async Task<Embed> GetOfflineEmbedAsync(IEmbed oldEmbed, string userId)
 		{
-			User twitchUser = (await _api.Helix.Users.GetUsersAsync(ids: new()
-				{
-					userId,
-				}))
+			User twitchUser = (await _api.Helix.Users.GetUsersAsync(ids: new() { userId }))
 				.Users[0];
 
 			return new EmbedBuilder()
