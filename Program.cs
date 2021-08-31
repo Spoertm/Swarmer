@@ -35,7 +35,7 @@ namespace Swarmer
 
 			_config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Models", "Config.json"))) ?? throw new InvalidOperationException("Error reading config file.");
 
-			_client = new(new() { LogLevel = LogSeverity.Warning, ExclusiveBulkDelete = true });
+			_client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
 
 			_commands = new(new() { LogLevel = LogSeverity.Warning });
 
