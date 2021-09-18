@@ -2,7 +2,6 @@
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Swarmer.Models;
-using Swarmer.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,22 +11,22 @@ using System.Threading.Tasks;
 
 namespace Swarmer.Helpers
 {
-	public class Helper
+	public class DiscordHelper
 	{
 		private readonly string _activeStreamsFilePath = Path.Combine(AppContext.BaseDirectory, "Models", "ActiveStreams.json");
-		private readonly SocketTextChannel _swarmerActiveStreamsChannel;
-		private readonly LoggingService _loggingService;
+		private readonly SocketTextChannel _activeTwitchStreamsChannel;
+		private readonly HttpClient _httpClient = new();
+		private readonly DiscordSocketClient _socketClient;
 
-		public Helper(Config config, DiscordSocketClient client, LoggingService loggingService)
+		public DiscordHelper(Config config, DiscordSocketClient client)
 		{
-			SocketTextChannel? activeStreamsChannel = client.GetChannel(config.SwarmerActiveStreamsChannelId) as SocketTextChannel;
-			_swarmerActiveStreamsChannel = activeStreamsChannel ?? throw new("ActiveStreams channel is null.");
-			_loggingService = loggingService;
+			_socketClient = client;
+			_activeTwitchStreamsChannel = client.GetChannel(config.SwarmerActiveStreamsChannelId) as SocketTextChannel ?? throw new("ActiveStreams channel is null.");
 		}
 
 		public async Task<List<ActiveStream>> DeserializeActiveStreams()
 		{
-			IAttachment? latestAttachment = (await _swarmerActiveStreamsChannel.GetMessagesAsync(1).FlattenAsync())
+			IAttachment? latestAttachment = (await _activeTwitchStreamsChannel.GetMessagesAsync(1).FlattenAsync())
 				.FirstOrDefault()?
 				.Attachments
 				.FirstOrDefault();
@@ -35,8 +34,7 @@ namespace Swarmer.Helpers
 			if (latestAttachment is null)
 				return new();
 
-			using HttpClient httpClient = new();
-			string activeStreamsJson = await httpClient.GetStringAsync(latestAttachment.Url);
+			string activeStreamsJson = await _httpClient.GetStringAsync(latestAttachment.Url);
 			try
 			{
 				await File.WriteAllTextAsync(_activeStreamsFilePath, activeStreamsJson);
@@ -52,7 +50,13 @@ namespace Swarmer.Helpers
 		public async Task SerializeAndUpdateActiveStreams(List<ActiveStream> activeStreams)
 		{
 			await File.WriteAllTextAsync(_activeStreamsFilePath, JsonConvert.SerializeObject(activeStreams, Formatting.Indented));
-			await _swarmerActiveStreamsChannel.SendFileAsync(_activeStreamsFilePath, string.Empty);
+			await _activeTwitchStreamsChannel.SendFileAsync(_activeStreamsFilePath, string.Empty);
+		}
+
+		public SocketTextChannel GetTextChannel(ulong channelId)
+		{
+			SocketTextChannel channel = _socketClient.GetChannel(channelId) as SocketTextChannel ?? throw new($"Discord channel with ID {channelId} doesn't exist.");
+			return channel;
 		}
 	}
 }

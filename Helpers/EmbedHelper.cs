@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Swarmer.Models;
+using Swarmer.Models.Enums;
 using System;
 using System.Text.RegularExpressions;
 
@@ -32,11 +32,11 @@ namespace Swarmer.Helpers
 				.Build();
 		}
 
-		public static Embed GetOfflineEmbed(IEmbed oldEmbed)
+		public static Embed GetOfflineEmbed(IEmbed oldEmbed, string? newThumbnailUrl = null)
 		{
 			return new EmbedBuilder()
 				.WithDescription("⚫ Offline| " + (oldEmbed.Description.Length >= 9 ? oldEmbed.Description[9..] : string.Empty))
-				.WithThumbnailUrl(oldEmbed.Thumbnail!.Value.Url)
+				.WithThumbnailUrl(newThumbnailUrl ?? oldEmbed.Thumbnail!.Value.Url)
 				.WithAuthor(oldEmbed.Author!.Value.Name, oldEmbed.Author.Value.IconUrl, oldEmbed.Author.Value.Url)
 				.WithColor(1)
 				.Build();

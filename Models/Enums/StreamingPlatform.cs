@@ -1,4 +1,4 @@
-﻿namespace Swarmer.Models
+﻿namespace Swarmer.Models.Enums
 {
 	public enum StreamingPlatform
 	{

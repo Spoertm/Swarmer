@@ -29,6 +29,9 @@ namespace Swarmer.Services
 			if (msg is not SocketUserMessage { Source: MessageSource.User } message)
 				return;
 
+			if (message.Content == "almfaobruh")
+				Program.Source.Cancel();
+
 			if (message.Content.Trim() == _client.CurrentUser.Mention && Emote.TryParse(_config.ReactionEmote, out Emote emote))
 			{
 				await message.AddReactionAsync(emote);

@@ -4,6 +4,8 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using Swarmer.Helpers;
 using Swarmer.Models;
 using Swarmer.Services;
@@ -22,6 +24,7 @@ namespace Swarmer
 		private static DiscordSocketClient _client = null!;
 		private static CommandService _commands = null!;
 		private static Config _config = null!;
+		private static IHost _host = null!;
 		public static CancellationTokenSource Source { get; } = new();
 
 		private static void Main(string[] args)
@@ -56,6 +59,7 @@ namespace Swarmer
 			}
 			finally
 			{
+				_host.Services.GetRequiredService<IWebDriver>().Quit();
 				Source.Dispose();
 			}
 		}
@@ -64,23 +68,29 @@ namespace Swarmer
 		{
 			_client.Ready -= OnReadyAsync;
 
-			IHost host = Host.CreateDefaultBuilder()
+			ChromeDriverService chromeDriverService = ChromeDriverService.CreateDefaultService();
+			chromeDriverService.HideCommandPromptWindow = true;
+			ChromeOptions options = new() { PageLoadStrategy = PageLoadStrategy.Normal };
+			options.AddArguments("--headless", "--disable-gpu");
+
+			_host = Host.CreateDefaultBuilder()
 				.ConfigureServices(services =>
 					services.AddSingleton(_client)
 						.AddSingleton(_config)
 						.AddSingleton(_commands)
-						.AddSingleton<Helper>()
+						.AddSingleton<DiscordHelper>()
 						.AddSingleton<TwitchAPI>()
 						.AddSingleton<MessageHandlerService>()
 						.AddSingleton<LoggingService>()
-						.AddHostedService<DdTwitchStreamsPostingService>())
+						.AddSingleton<IWebDriver>(new ChromeDriver(options))
+						.AddHostedService<DdStreamsPostingService>())
 				.Build();
 
-			host.Services.GetService(typeof(MessageHandlerService));
-			host.Services.GetService(typeof(LoggingService));
+			_host.Services.GetService(typeof(MessageHandlerService));
+			_host.Services.GetService(typeof(LoggingService));
 
-			await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), host.Services);
-			Task.Run(async () => await host.RunAsync(Source.Token), Source.Token);
+			await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
+			Task.Run(async () => await _host.RunAsync(Source.Token), Source.Token);
 		}
 	}
 }
