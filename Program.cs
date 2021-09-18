@@ -73,7 +73,7 @@ namespace Swarmer
 						.AddSingleton<TwitchAPI>()
 						.AddSingleton<MessageHandlerService>()
 						.AddSingleton<LoggingService>()
-						.AddHostedService<EmbedUpdateBackgroundService>())
+						.AddHostedService<DdTwitchStreamsPostingService>())
 				.Build();
 
 			host.Services.GetService(typeof(MessageHandlerService));

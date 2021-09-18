@@ -13,7 +13,7 @@ using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 
 namespace Swarmer.Services
 {
-	public class EmbedUpdateBackgroundService : AbstractBackgroundService
+	public class DdTwitchStreamsPostingService : AbstractBackgroundService
 	{
 		private const string _devilDaggersId = "490905";
 		private readonly Dictionary<ulong, SocketTextChannel> _notifChannels = new();
@@ -22,7 +22,7 @@ namespace Swarmer.Services
 		private readonly DiscordSocketClient _client;
 		private readonly List<ActiveStream> _activeStreams;
 
-		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, TwitchAPI api, LoggingService loggingService)
+		public DdTwitchStreamsPostingService(Config config, DiscordSocketClient client, Helper helper, TwitchAPI api, LoggingService loggingService)
 			: base(loggingService)
 		{
 			_helper = helper;
