@@ -70,7 +70,6 @@ namespace Swarmer
 						.AddSingleton(_config)
 						.AddSingleton(_commands)
 						.AddSingleton<Helper>()
-						.AddSingleton<EmbedHelper>()
 						.AddSingleton<TwitchAPI>()
 						.AddSingleton<MessageHandlerService>()
 						.AddSingleton<LoggingService>()

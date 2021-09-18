@@ -1,51 +1,48 @@
 ﻿using Discord;
+using Swarmer.Models;
 using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using TwitchLib.Api;
-using TwitchLib.Api.Helix.Models.Streams.GetStreams;
-using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
 namespace Swarmer.Helpers
 {
-	public class EmbedHelper
+	public static class EmbedHelper
 	{
-		private readonly TwitchAPI _api;
-		private readonly Regex _exceptionRegex = new("(?<=   )at.+\n?", RegexOptions.Compiled);
+		private static readonly Regex _exceptionRegex = new("(?<=   )at.+\n?", RegexOptions.Compiled);
 
-		public EmbedHelper(TwitchAPI api)
+		public static Embed GetOnlineStreamEmbed(
+			string title,
+			string username,
+			string thumbnailUrl,
+			string avatarUrl,
+			string streamUrl,
+			StreamingPlatform platform)
 		{
-			_api = api;
-		}
+			uint accentColor = platform switch
+			{
+				StreamingPlatform.Twitch  => 6570404,
+				StreamingPlatform.YouTube => 16711680,
+				_                         => throw new ArgumentException($"Unsupported platform: {platform}"),
+			};
 
-		public async Task<Embed> GetOnlineStreamEmbedAsync(Stream twitchStream)
-		{
-			User twitchUser = (await _api.Helix.Users.GetUsersAsync(ids: new() { twitchStream.UserId }))
-				.Users[0];
-
-			string iconUrl = GetProperUrl(twitchUser.ProfileImageUrl);
 			return new EmbedBuilder()
-				.WithDescription("🔴 Live| " + twitchStream.Title)
-				.WithThumbnailUrl(GetProperUrl(twitchStream.ThumbnailUrl))
-				.WithAuthor(twitchStream.UserName, iconUrl, "https://twitch.tv/" + twitchStream.UserName)
-				.WithColor(6570404)
+				.WithDescription("🔴 Live| " + title)
+				.WithThumbnailUrl(thumbnailUrl)
+				.WithAuthor(username, avatarUrl, streamUrl)
+				.WithColor(accentColor)
 				.Build();
 		}
 
-		public async Task<Embed> GetOfflineEmbedAsync(IEmbed oldEmbed, string userId)
+		public static Embed GetOfflineEmbed(IEmbed oldEmbed)
 		{
-			User twitchUser = (await _api.Helix.Users.GetUsersAsync(ids: new() { userId }))
-				.Users[0];
-
 			return new EmbedBuilder()
 				.WithDescription("⚫ Offline| " + (oldEmbed.Description.Length >= 9 ? oldEmbed.Description[9..] : string.Empty))
-				.WithThumbnailUrl(GetProperUrl(twitchUser.OfflineImageUrl))
+				.WithThumbnailUrl(oldEmbed.Thumbnail!.Value.Url)
 				.WithAuthor(oldEmbed.Author!.Value.Name, oldEmbed.Author.Value.IconUrl, oldEmbed.Author.Value.Url)
 				.WithColor(1)
 				.Build();
 		}
 
-		public Embed ExceptionEmbed(LogMessage msg)
+		public static Embed ExceptionEmbed(LogMessage msg)
 		{
 			EmbedBuilder exceptionEmbed = new EmbedBuilder()
 				.WithTitle(msg.Exception?.GetType().Name ?? "Exception thrown")
@@ -63,7 +60,7 @@ namespace Swarmer.Helpers
 			return exceptionEmbed.Build();
 		}
 
-		private void FillExceptionEmbedBuilder(Exception? exception, EmbedBuilder exceptionEmbed)
+		private static void FillExceptionEmbedBuilder(Exception? exception, EmbedBuilder exceptionEmbed)
 		{
 			string? exString = exception?.ToString();
 			if (exString is not null)
@@ -78,8 +75,5 @@ namespace Swarmer.Helpers
 				exception = exception.InnerException;
 			}
 		}
-
-		private static string GetProperUrl(string url)
-			=> url.Replace("{height}", "1080").Replace("{width}", "1920");
 	}
 }

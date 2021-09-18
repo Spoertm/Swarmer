@@ -18,16 +18,14 @@ namespace Swarmer.Services
 		private const string _devilDaggersId = "490905";
 		private readonly Dictionary<ulong, SocketTextChannel> _notifChannels = new();
 		private readonly Helper _helper;
-		private readonly EmbedHelper _embedHelper;
 		private readonly TwitchAPI _api;
 		private readonly DiscordSocketClient _client;
 		private readonly List<ActiveStream> _activeStreams;
 
-		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, EmbedHelper embedHelper, TwitchAPI api, LoggingService loggingService)
+		public EmbedUpdateBackgroundService(Config config, DiscordSocketClient client, Helper helper, TwitchAPI api, LoggingService loggingService)
 			: base(loggingService)
 		{
 			_helper = helper;
-			_embedHelper = embedHelper;
 			_api = api;
 			_api.Settings.ClientId = config.ClientId;
 			_api.Settings.AccessToken = config.AccessToken;
@@ -63,7 +61,14 @@ namespace Swarmer.Services
 				changed = true;
 				foreach (SocketTextChannel channel in _notifChannels.Values)
 				{
-					RestUserMessage msg = await channel.SendMessageAsync(embed: await _embedHelper.GetOnlineStreamEmbedAsync(stream));
+					RestUserMessage msg = await channel.SendMessageAsync(embed: EmbedHelper.GetOnlineStreamEmbed(
+						stream.Title,
+						stream.UserName,
+						GetProperUrl(stream.ThumbnailUrl),
+						GetProperUrl(await GetProfileImageUrl(stream)),
+						"https://twitch.tv/" + stream.UserName,
+						StreamingPlatform.Twitch));
+
 					_activeStreams.Add(new(channel.Id, stream.Id, stream.UserId, msg.Id));
 				}
 			}
@@ -80,7 +85,7 @@ namespace Swarmer.Services
 					await _notifChannels[activeStream.DiscordChannelId].GetMessageAsync(activeStream.DiscordMessageId) is IUserMessage msgToBeEdited &&
 					!msgToBeEdited.Embeds.First().Description.StartsWith("⚫ Offline"))
 				{
-					Embed newEmbed = await _embedHelper.GetOfflineEmbedAsync(msgToBeEdited.Embeds.First(), activeStream.UserId);
+					Embed newEmbed = EmbedHelper.GetOfflineEmbed(msgToBeEdited.Embeds.First());
 					await msgToBeEdited.ModifyAsync(m => m.Embed = newEmbed);
 				}
 
@@ -91,5 +96,15 @@ namespace Swarmer.Services
 			if (changed && _activeStreams.Count > 0)
 				await _helper.SerializeAndUpdateActiveStreams(_activeStreams);
 		}
+
+		private async Task<string> GetProfileImageUrl(Stream stream)
+		{
+			return (await _api.Helix.Users.GetUsersAsync(ids: new() { stream.UserId }))
+				.Users[0]
+				.ProfileImageUrl;
+		}
+
+		private static string GetProperUrl(string url)
+			=> url.Replace("{height}", "1080").Replace("{width}", "1920");
 	}
 }

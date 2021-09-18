@@ -12,11 +12,9 @@ namespace Swarmer.Services
 	public class LoggingService
 	{
 		private readonly SocketTextChannel _swarmerInfoChannel;
-		private readonly EmbedHelper _embedHelper;
 
-		public LoggingService(DiscordSocketClient client, CommandService commands, Config config, EmbedHelper embedHelper)
+		public LoggingService(DiscordSocketClient client, CommandService commands, Config config)
 		{
-			_embedHelper = embedHelper;
 			LogDirectory = Path.Combine(AppContext.BaseDirectory, "Logs");
 
 			client.Log += LogAsync;
@@ -35,7 +33,7 @@ namespace Swarmer.Services
 			string logText = $"{DateTime.Now:hh:mm:ss} [{logMessage.Severity}] {logMessage.Source}: {logMessage.Exception?.ToString() ?? logMessage.Message}";
 			await File.AppendAllTextAsync(LogFile, $"{logText}\n\n");
 
-			Embed exceptionEmbed = _embedHelper.ExceptionEmbed(logMessage);
+			Embed exceptionEmbed = EmbedHelper.ExceptionEmbed(logMessage);
 			await _swarmerInfoChannel.SendMessageAsync(embed: exceptionEmbed);
 		}
 	}
