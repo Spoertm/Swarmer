@@ -82,7 +82,7 @@ namespace Swarmer
 						.AddSingleton<TwitchAPI>()
 						.AddSingleton<MessageHandlerService>()
 						.AddSingleton<LoggingService>()
-						.AddSingleton<IWebDriver>(new ChromeDriver(options))
+						.AddSingleton<IWebDriver>(new ChromeDriver(chromeDriverService, options))
 						.AddHostedService<DdStreamsPostingService>())
 				.Build();
 
