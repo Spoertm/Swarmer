@@ -1,12 +1,9 @@
 ﻿using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
-using OpenQA.Selenium;
 using Swarmer.Helpers;
 using Swarmer.Models;
-using Swarmer.Models.DTOs;
 using Swarmer.Models.Enums;
-using Swarmer.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +22,6 @@ namespace Swarmer.Services
 		private readonly DiscordHelper _discordHelper;
 		private readonly TwitchAPI _api;
 		private readonly DiscordSocketClient _client;
-		private readonly YoutubeStreamsFetcher _youtubeStreamsFetcher;
 		private readonly List<ActiveStream> _activeStreams;
 
 		public DdStreamsPostingService(
@@ -33,8 +29,7 @@ namespace Swarmer.Services
 			DiscordSocketClient client,
 			DiscordHelper discordHelper,
 			TwitchAPI api,
-			LoggingService loggingService,
-			IWebDriver driver)
+			LoggingService loggingService)
 			: base(loggingService)
 		{
 			_discordHelper = discordHelper;
@@ -42,7 +37,6 @@ namespace Swarmer.Services
 			_api.Settings.ClientId = config.ClientId;
 			_api.Settings.AccessToken = config.AccessToken;
 			_client = client;
-			_youtubeStreamsFetcher = new(driver);
 
 			_activeStreams = _discordHelper.DeserializeActiveStreams().Result;
 
@@ -55,62 +49,9 @@ namespace Swarmer.Services
 		protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 		{
 			bool twitchStreamsChanged = await CheckTwitchStreams();
-			bool youtubeStreamsChanged = await CheckYoutubeStreams();
 
-			if ((twitchStreamsChanged || youtubeStreamsChanged) && _activeStreams.Count > 0)
+			if (twitchStreamsChanged && _activeStreams.Count > 0)
 				await _discordHelper.SerializeAndUpdateActiveStreams(_activeStreams);
-		}
-
-		private async Task<bool> CheckYoutubeStreams()
-		{
-			bool changed = false;
-			YoutubeStream[] youtubeStreams = _youtubeStreamsFetcher.GetStreams();
-
-			for (int i = 0; i < youtubeStreams.Length; i++)
-			{
-				YoutubeStream stream = youtubeStreams[i];
-				if (_activeStreams.Exists(s => s.StreamId == stream.Username))
-					continue;
-
-				changed = true;
-				foreach (SocketTextChannel channel in _notifChannels.Values)
-				{
-					RestUserMessage msg = await channel.SendMessageAsync(embed: EmbedHelper.GetOnlineStreamEmbed(
-						stream.Title,
-						stream.Username,
-						stream.ThumbnailUrl,
-						stream.AvatarUrl,
-						stream.StreamUrl,
-						StreamingPlatform.YouTube));
-
-					_activeStreams.Add(new(channel.Id, stream.Username, stream.Username, msg.Id, StreamingPlatform.YouTube));
-				}
-			}
-
-			for (int i = _activeStreams.Count - 1; i >= 0; i--)
-			{
-				ActiveStream activeStream = _activeStreams[i];
-				if (activeStream.Platform != StreamingPlatform.YouTube)
-					continue;
-
-				YoutubeStream? matchingYoutubeStream = Array.Find(youtubeStreams, ts => ts.Username == activeStream.StreamId);
-				if (matchingYoutubeStream is not null)
-					continue;
-
-				if (_notifChannels.ContainsKey(activeStream.DiscordChannelId) &&
-					_client.GetChannel(activeStream.DiscordChannelId) is not null &&
-					await _notifChannels[activeStream.DiscordChannelId].GetMessageAsync(activeStream.DiscordMessageId) is IUserMessage msgToBeEdited &&
-					!msgToBeEdited.Embeds.First().Description.StartsWith("⚫ Offline"))
-				{
-					Embed newEmbed = EmbedHelper.GetOfflineEmbed(msgToBeEdited.Embeds.First());
-					await msgToBeEdited.ModifyAsync(m => m.Embed = newEmbed);
-				}
-
-				_activeStreams.Remove(activeStream);
-				changed = true;
-			}
-
-			return changed;
 		}
 
 		private async Task<bool> CheckTwitchStreams()

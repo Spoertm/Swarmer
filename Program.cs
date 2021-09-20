@@ -4,8 +4,6 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using Swarmer.Helpers;
 using Swarmer.Models;
 using Swarmer.Services;
@@ -59,7 +57,6 @@ namespace Swarmer
 			}
 			finally
 			{
-				_host.Services.GetRequiredService<IWebDriver>().Quit();
 				Source.Dispose();
 			}
 		}
@@ -67,11 +64,6 @@ namespace Swarmer
 		private static async Task OnReadyAsync()
 		{
 			_client.Ready -= OnReadyAsync;
-
-			ChromeDriverService chromeDriverService = ChromeDriverService.CreateDefaultService();
-			chromeDriverService.HideCommandPromptWindow = true;
-			ChromeOptions options = new() { PageLoadStrategy = PageLoadStrategy.Normal };
-			options.AddArguments("--headless", "--disable-gpu");
 
 			_host = Host.CreateDefaultBuilder()
 				.ConfigureServices(services =>
@@ -82,7 +74,6 @@ namespace Swarmer
 						.AddSingleton<TwitchAPI>()
 						.AddSingleton<MessageHandlerService>()
 						.AddSingleton<LoggingService>()
-						.AddSingleton<IWebDriver>(new ChromeDriver(chromeDriverService, options))
 						.AddHostedService<DdStreamsPostingService>())
 				.Build();
 
