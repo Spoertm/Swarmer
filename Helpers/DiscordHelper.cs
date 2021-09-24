@@ -54,9 +54,6 @@ namespace Swarmer.Helpers
 		}
 
 		public SocketTextChannel GetTextChannel(ulong channelId)
-		{
-			SocketTextChannel channel = _socketClient.GetChannel(channelId) as SocketTextChannel ?? throw new($"Discord channel with ID {channelId} doesn't exist.");
-			return channel;
-		}
+			=> _socketClient.GetChannel(channelId) as SocketTextChannel ?? throw new($"Discord channel with ID {channelId} doesn't exist.");
 	}
 }
