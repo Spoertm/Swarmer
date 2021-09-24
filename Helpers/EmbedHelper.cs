@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Swarmer.Models.Enums;
 using System;
 using System.Text.RegularExpressions;
 
@@ -14,21 +13,13 @@ namespace Swarmer.Helpers
 			string username,
 			string thumbnailUrl,
 			string avatarUrl,
-			string streamUrl,
-			StreamingPlatform platform)
+			string streamUrl)
 		{
-			uint accentColor = platform switch
-			{
-				StreamingPlatform.Twitch  => 6570404,
-				StreamingPlatform.YouTube => 16711680,
-				_                         => throw new ArgumentException($"Unsupported platform: {platform}"),
-			};
-
 			return new EmbedBuilder()
 				.WithDescription("🔴 Live| " + title)
 				.WithThumbnailUrl(thumbnailUrl)
 				.WithAuthor(username, avatarUrl, streamUrl)
-				.WithColor(accentColor)
+				.WithColor(6570404)
 				.Build();
 		}
 
@@ -74,6 +65,14 @@ namespace Swarmer.Helpers
 				exceptionEmbed.AddField(exception.GetType().Name, string.IsNullOrEmpty(exception.Message) ? "No message." : exception.Message);
 				exception = exception.InnerException;
 			}
+		}
+
+		public static Embed ActiveStreamsEmbed(string title, string description)
+		{
+			return new EmbedBuilder()
+				.WithTitle(title)
+				.WithDescription(description)
+				.Build();
 		}
 	}
 }

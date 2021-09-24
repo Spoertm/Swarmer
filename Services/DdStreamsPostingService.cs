@@ -3,7 +3,6 @@ using Discord.Rest;
 using Discord.WebSocket;
 using Swarmer.Helpers;
 using Swarmer.Models;
-using Swarmer.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +17,8 @@ namespace Swarmer.Services
 	public class DdStreamsPostingService : AbstractBackgroundService
 	{
 		private const string _devilDaggersId = "490905";
-		private readonly Dictionary<ulong, SocketTextChannel> _notifChannels = new();
+		private readonly SocketTextChannel _ddPalsNotifChannel;
+		private readonly SocketTextChannel _ddInfoNotifChannel;
 		private readonly DiscordHelper _discordHelper;
 		private readonly TwitchAPI _api;
 		private readonly DiscordSocketClient _client;
@@ -39,9 +39,8 @@ namespace Swarmer.Services
 			_client = client;
 
 			_activeStreams = _discordHelper.DeserializeActiveStreams().Result;
-
-			foreach (ulong notifChannelId in config.NotifChannelIds)
-				_notifChannels.Add(notifChannelId, _discordHelper.GetTextChannel(notifChannelId));
+			_ddPalsNotifChannel = _discordHelper.GetTextChannel(config.DdPalsNotifChannel);
+			_ddInfoNotifChannel = _discordHelper.GetTextChannel(config.DdInfoNotifChannel);
 		}
 
 		protected override TimeSpan Interval => TimeSpan.FromMinutes(2);
@@ -51,7 +50,7 @@ namespace Swarmer.Services
 			bool twitchStreamsChanged = await CheckTwitchStreams();
 
 			if (twitchStreamsChanged && _activeStreams.Count > 0)
-				await _discordHelper.SerializeAndUpdateActiveStreams(_activeStreams);
+				await _discordHelper.UpdateActiveStreams(_activeStreams);
 		}
 
 		private async Task<bool> CheckTwitchStreams()
@@ -66,38 +65,32 @@ namespace Swarmer.Services
 					continue;
 
 				changed = true;
-				foreach (SocketTextChannel channel in _notifChannels.Values)
-				{
-					RestUserMessage msg = await channel.SendMessageAsync(embed: EmbedHelper.GetOnlineStreamEmbed(
-						stream.Title,
-						stream.UserName,
-						GetProperUrl(stream.ThumbnailUrl),
-						GetProperUrl(await GetTwitchUserProperty(stream.UserId, u => u.ProfileImageUrl)),
-						"https://twitch.tv/" + stream.UserName,
-						StreamingPlatform.Twitch));
+				User twitchUser = (await _api.Helix.Users.GetUsersAsync(ids: new() { stream.UserId })).Users[0];
+				Embed streamEmbed = EmbedHelper.GetOnlineStreamEmbed(
+					stream.Title,
+					stream.UserName,
+					GetProperUrl(stream.ThumbnailUrl),
+					GetProperUrl(twitchUser.ProfileImageUrl),
+					"https://twitch.tv/" + stream.UserName);
 
-					_activeStreams.Add(new(channel.Id, stream.Id, stream.UserId, msg.Id, StreamingPlatform.Twitch));
-				}
+				RestUserMessage ddpalsMessage = await _ddPalsNotifChannel.SendMessageAsync(embed: streamEmbed);
+				RestUserMessage ddinfoMessage = await _ddInfoNotifChannel.SendMessageAsync(embed: streamEmbed);
+
+				_activeStreams.Add(new(stream.Id, stream.UserId, ddpalsMessage.Id, ddinfoMessage.Id, twitchUser.OfflineImageUrl));
 			}
 
 			for (int i = _activeStreams.Count - 1; i >= 0; i--)
 			{
 				ActiveStream activeStream = _activeStreams[i];
-				if (activeStream.Platform != StreamingPlatform.Twitch)
-					continue;
-
 				Stream? matchingTwitchStream = Array.Find(twitchStreams, ts => ts.Id == activeStream.StreamId);
 				if (matchingTwitchStream is not null)
 					continue;
 
-				if (_notifChannels.ContainsKey(activeStream.DiscordChannelId) &&
-					_client.GetChannel(activeStream.DiscordChannelId) is not null &&
-					await _notifChannels[activeStream.DiscordChannelId].GetMessageAsync(activeStream.DiscordMessageId) is IUserMessage msgToBeEdited &&
-					!msgToBeEdited.Embeds.First().Description.StartsWith("⚫ Offline"))
-				{
-					Embed newEmbed = EmbedHelper.GetOfflineEmbed(msgToBeEdited.Embeds.First(), await GetTwitchUserProperty(activeStream.UserId, u => u.OfflineImageUrl));
-					await msgToBeEdited.ModifyAsync(m => m.Embed = newEmbed);
-				}
+				IUserMessage? ddpalsStreamMsg = await _ddPalsNotifChannel.GetMessageAsync(activeStream.DdPalsMessageId) as IUserMessage;
+				IUserMessage? ddinfoStreamMsg = await _ddPalsNotifChannel.GetMessageAsync(activeStream.DdInfoMessageId) as IUserMessage;
+
+				await MakeStreamEmbedOfflineIfPossible(ddpalsStreamMsg, activeStream.OfflineThumbnailUrl);
+				await MakeStreamEmbedOfflineIfPossible(ddinfoStreamMsg, activeStream.OfflineThumbnailUrl);
 
 				_activeStreams.Remove(activeStream);
 				changed = true;
@@ -106,12 +99,13 @@ namespace Swarmer.Services
 			return changed;
 		}
 
-		private async Task<string> GetTwitchUserProperty(string userId, Func<User, string> propertySelector)
+		private static async Task MakeStreamEmbedOfflineIfPossible(IUserMessage? streamMessage, string offlineThumbnailUrl)
 		{
-			User user = (await _api.Helix.Users.GetUsersAsync(ids: new() { userId }))
-				.Users[0];
-
-			return propertySelector(user);
+			if (streamMessage is not null && !streamMessage.Embeds.First().Description.StartsWith("⚫ Offline"))
+			{
+				Embed newEmbed = EmbedHelper.GetOfflineEmbed(streamMessage.Embeds.First(), offlineThumbnailUrl);
+				await streamMessage.ModifyAsync(m => m.Embed = newEmbed);
+			}
 		}
 
 		private static string GetProperUrl(string url)

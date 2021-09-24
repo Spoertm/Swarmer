@@ -2,42 +2,41 @@
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Swarmer.Models;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Swarmer.Helpers
 {
 	public class DiscordHelper
 	{
-		private readonly string _activeStreamsFilePath = Path.Combine(AppContext.BaseDirectory, "Models", "ActiveStreams.json");
 		private readonly SocketTextChannel _activeTwitchStreamsChannel;
-		private readonly HttpClient _httpClient = new();
 		private readonly DiscordSocketClient _socketClient;
+		private readonly IUserMessage _latestActiveStreamsMessage;
 
 		public DiscordHelper(Config config, DiscordSocketClient client)
 		{
 			_socketClient = client;
 			_activeTwitchStreamsChannel = client.GetChannel(config.SwarmerActiveStreamsChannelId) as SocketTextChannel ?? throw new("ActiveStreams channel is null.");
+			if (_activeTwitchStreamsChannel.GetMessagesAsync(1).FlattenAsync().Result.FirstOrDefault() is IUserMessage latestActiveStreamsMessage)
+				_latestActiveStreamsMessage = latestActiveStreamsMessage;
+			else
+				_latestActiveStreamsMessage = _activeTwitchStreamsChannel.SendMessageAsync(embed: EmbedHelper.ActiveStreamsEmbed("Active DD streams", Format.Code("[]", "json"))).Result;
 		}
 
 		public async Task<List<ActiveStream>> DeserializeActiveStreams()
 		{
-			IAttachment? latestAttachment = (await _activeTwitchStreamsChannel.GetMessagesAsync(1).FlattenAsync())
+			string? activeStreamsJson = (await _activeTwitchStreamsChannel.GetMessagesAsync(1).FlattenAsync())
 				.FirstOrDefault()?
-				.Attachments
-				.FirstOrDefault();
+				.Embeds
+				.FirstOrDefault()?
+				.Description[8..^4];
 
-			if (latestAttachment is null)
+			if (string.IsNullOrWhiteSpace(activeStreamsJson))
 				return new();
 
-			string activeStreamsJson = await _httpClient.GetStringAsync(latestAttachment.Url);
 			try
 			{
-				await File.WriteAllTextAsync(_activeStreamsFilePath, activeStreamsJson);
 				List<ActiveStream>? activeStreams = JsonConvert.DeserializeObject<List<ActiveStream>>(activeStreamsJson);
 				return activeStreams ?? new();
 			}
@@ -47,10 +46,11 @@ namespace Swarmer.Helpers
 			}
 		}
 
-		public async Task SerializeAndUpdateActiveStreams(List<ActiveStream> activeStreams)
+		public async Task UpdateActiveStreams(List<ActiveStream> activeStreams)
 		{
-			await File.WriteAllTextAsync(_activeStreamsFilePath, JsonConvert.SerializeObject(activeStreams, Formatting.Indented));
-			await _activeTwitchStreamsChannel.SendFileAsync(_activeStreamsFilePath, string.Empty);
+			string serialisedStreams = JsonConvert.SerializeObject(activeStreams, Formatting.Indented);
+			Embed newEmbed = EmbedHelper.ActiveStreamsEmbed("Active DD streams", Format.Code(serialisedStreams, "json"));
+			await _latestActiveStreamsMessage.ModifyAsync(m => m.Embed = newEmbed);
 		}
 
 		public SocketTextChannel GetTextChannel(ulong channelId)
