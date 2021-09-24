@@ -21,12 +21,10 @@ namespace Swarmer.Services
 		private readonly SocketTextChannel _ddInfoNotifChannel;
 		private readonly DiscordHelper _discordHelper;
 		private readonly TwitchAPI _api;
-		private readonly DiscordSocketClient _client;
 		private readonly List<ActiveStream> _activeStreams;
 
 		public DdStreamsPostingService(
 			Config config,
-			DiscordSocketClient client,
 			DiscordHelper discordHelper,
 			TwitchAPI api,
 			LoggingService loggingService)
@@ -36,7 +34,6 @@ namespace Swarmer.Services
 			_api = api;
 			_api.Settings.ClientId = config.ClientId;
 			_api.Settings.AccessToken = config.AccessToken;
-			_client = client;
 
 			_activeStreams = _discordHelper.DeserializeActiveStreams().Result;
 			_ddPalsNotifChannel = _discordHelper.GetTextChannel(config.DdPalsNotifChannel);
