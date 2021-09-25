@@ -21,7 +21,7 @@ namespace Swarmer.Helpers
 			if (_activeTwitchStreamsChannel.GetMessagesAsync(1).FlattenAsync().Result.FirstOrDefault() is IUserMessage latestActiveStreamsMessage)
 				_latestActiveStreamsMessage = latestActiveStreamsMessage;
 			else
-				_latestActiveStreamsMessage = _activeTwitchStreamsChannel.SendMessageAsync(embed: EmbedHelper.ActiveStreamsEmbed("Active DD streams", Format.Code("[]", "json"))).Result;
+				_latestActiveStreamsMessage = _activeTwitchStreamsChannel.SendMessageAsync(embed: EmbedHelper.ActiveStreamsEmbed(Format.Code("[]", "json"))).Result;
 		}
 
 		public async Task<List<ActiveStream>> DeserializeActiveStreams()
@@ -49,7 +49,7 @@ namespace Swarmer.Helpers
 		public async Task UpdateActiveStreams(List<ActiveStream> activeStreams)
 		{
 			string serialisedStreams = JsonConvert.SerializeObject(activeStreams, Formatting.Indented);
-			Embed newEmbed = EmbedHelper.ActiveStreamsEmbed("Active DD streams", Format.Code(serialisedStreams, "json"));
+			Embed newEmbed = EmbedHelper.ActiveStreamsEmbed(Format.Code(serialisedStreams, "json"));
 			await _latestActiveStreamsMessage.ModifyAsync(m => m.Embed = newEmbed);
 		}
 

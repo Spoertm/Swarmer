@@ -67,10 +67,10 @@ namespace Swarmer.Helpers
 			}
 		}
 
-		public static Embed ActiveStreamsEmbed(string title, string description)
+		public static Embed ActiveStreamsEmbed(string description)
 		{
 			return new EmbedBuilder()
-				.WithTitle(title)
+				.WithTitle("Active DD streams")
 				.WithDescription(description)
 				.Build();
 		}
