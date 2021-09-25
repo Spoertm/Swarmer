@@ -84,7 +84,7 @@ namespace Swarmer.Services
 					continue;
 
 				IUserMessage? ddpalsStreamMsg = await _ddPalsNotifChannel.GetMessageAsync(activeStream.DdPalsMessageId) as IUserMessage;
-				IUserMessage? ddinfoStreamMsg = await _ddPalsNotifChannel.GetMessageAsync(activeStream.DdInfoMessageId) as IUserMessage;
+				IUserMessage? ddinfoStreamMsg = await _ddInfoNotifChannel.GetMessageAsync(activeStream.DdInfoMessageId) as IUserMessage;
 
 				await MakeStreamEmbedOfflineIfPossible(ddpalsStreamMsg, activeStream.OfflineThumbnailUrl);
 				await MakeStreamEmbedOfflineIfPossible(ddinfoStreamMsg, activeStream.OfflineThumbnailUrl);
