@@ -35,9 +35,7 @@ namespace Swarmer
 			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
 			_config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Models", "Config.json"))) ?? throw new InvalidOperationException("Error reading config file.");
-
 			_client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
-
 			_commands = new(new() { LogLevel = LogSeverity.Warning });
 
 			await _client.LoginAsync(TokenType.Bot, _config.BotToken);
@@ -51,9 +49,8 @@ namespace Swarmer
 			}
 			catch (TaskCanceledException)
 			{
-				await _client.StopAsync();
-				Thread.Sleep(1000);
 				await _client.LogoutAsync();
+				await _client.StopAsync();
 			}
 			finally
 			{
