@@ -45,8 +45,7 @@ namespace Swarmer.Services
 		protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 		{
 			bool twitchStreamsChanged = await CheckTwitchStreams();
-
-			if (twitchStreamsChanged && _activeStreams.Count > 0)
+			if (twitchStreamsChanged)
 				await _discordHelper.UpdateActiveStreams(_activeStreams);
 		}
 
