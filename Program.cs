@@ -15,70 +15,69 @@ using System.Threading;
 using System.Threading.Tasks;
 using TwitchLib.Api;
 
-namespace Swarmer
+namespace Swarmer;
+
+public static class Program
 {
-	public static class Program
+	private static DiscordSocketClient _client = null!;
+	private static CommandService _commands = null!;
+	private static Config _config = null!;
+	private static IHost _host = null!;
+	public static CancellationTokenSource Source { get; } = new();
+
+	private static void Main(string[] args)
 	{
-		private static DiscordSocketClient _client = null!;
-		private static CommandService _commands = null!;
-		private static Config _config = null!;
-		private static IHost _host = null!;
-		public static CancellationTokenSource Source { get; } = new();
+		RunBotAsync().GetAwaiter().GetResult();
+	}
 
-		private static void Main(string[] args)
+	private static async Task RunBotAsync()
+	{
+		CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+
+		_config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync(Config.ConfigPath)) ?? throw new InvalidOperationException("Error reading config file.");
+		_client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
+		_commands = new(new() { LogLevel = LogSeverity.Warning });
+
+		await _client.LoginAsync(TokenType.Bot, _config.BotToken);
+		await _client.StartAsync();
+		await _client.SetGameAsync("Devil Daggers");
+
+		_client.Ready += OnReadyAsync;
+		try
 		{
-			RunBotAsync().GetAwaiter().GetResult();
+			await Task.Delay(-1, Source.Token);
 		}
-
-		private static async Task RunBotAsync()
+		catch (TaskCanceledException)
 		{
-			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-
-			_config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Models", "Config.json"))) ?? throw new InvalidOperationException("Error reading config file.");
-			_client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
-			_commands = new(new() { LogLevel = LogSeverity.Warning });
-
-			await _client.LoginAsync(TokenType.Bot, _config.BotToken);
-			await _client.StartAsync();
-			await _client.SetGameAsync("Devil Daggers");
-
-			_client.Ready += OnReadyAsync;
-			try
-			{
-				await Task.Delay(-1, Source.Token);
-			}
-			catch (TaskCanceledException)
-			{
-				await _client.LogoutAsync();
-				await _client.StopAsync();
-			}
-			finally
-			{
-				Source.Dispose();
-			}
+			await _client.LogoutAsync();
+			await _client.StopAsync();
 		}
-
-		private static async Task OnReadyAsync()
+		finally
 		{
-			_client.Ready -= OnReadyAsync;
-
-			_host = Host.CreateDefaultBuilder()
-				.ConfigureServices(services =>
-					services.AddSingleton(_client)
-						.AddSingleton(_config)
-						.AddSingleton(_commands)
-						.AddSingleton<DiscordHelper>()
-						.AddSingleton<TwitchAPI>()
-						.AddSingleton<MessageHandlerService>()
-						.AddSingleton<LoggingService>()
-						.AddHostedService<DdStreamsPostingService>())
-				.Build();
-
-			_host.Services.GetService(typeof(MessageHandlerService));
-			_host.Services.GetService(typeof(LoggingService));
-
-			await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
-			Task.Run(async () => await _host.RunAsync(Source.Token), Source.Token);
+			Source.Dispose();
 		}
+	}
+
+	private static async Task OnReadyAsync()
+	{
+		_client.Ready -= OnReadyAsync;
+
+		_host = Host.CreateDefaultBuilder()
+			.ConfigureServices(services =>
+				services.AddSingleton(_client)
+					.AddSingleton(_config)
+					.AddSingleton(_commands)
+					.AddSingleton<DiscordHelper>()
+					.AddSingleton<TwitchAPI>()
+					.AddSingleton<MessageHandlerService>()
+					.AddSingleton<LoggingService>()
+					.AddHostedService<DdStreamsPostingService>())
+			.Build();
+
+		_host.Services.GetService(typeof(MessageHandlerService));
+		_host.Services.GetService(typeof(LoggingService));
+
+		await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
+		Task.Run(async () => await _host.RunAsync(Source.Token), Source.Token);
 	}
 }

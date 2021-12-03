@@ -4,39 +4,38 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Swarmer.Services
+namespace Swarmer.Services;
+
+public abstract class AbstractBackgroundService : BackgroundService
 {
-	public abstract class AbstractBackgroundService : BackgroundService
+	private readonly LoggingService _loggingService;
+
+	protected AbstractBackgroundService(LoggingService loggingService)
 	{
-		private readonly LoggingService _loggingService;
+		_loggingService = loggingService;
+	}
 
-		protected AbstractBackgroundService(LoggingService loggingService)
+	protected abstract TimeSpan Interval { get; }
+
+	protected abstract Task ExecuteTaskAsync(CancellationToken stoppingToken);
+
+	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+	{
+		while (!stoppingToken.IsCancellationRequested)
 		{
-			_loggingService = loggingService;
-		}
-
-		protected abstract TimeSpan Interval { get; }
-
-		protected abstract Task ExecuteTaskAsync(CancellationToken stoppingToken);
-
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-		{
-			while (!stoppingToken.IsCancellationRequested)
+			try
 			{
-				try
-				{
-					await ExecuteTaskAsync(stoppingToken);
-				}
-				catch (Exception exception)
-				{
-					await _loggingService.LogAsync(new(LogSeverity.Error, "AbstractBackgroundService", string.Empty, exception));
-				}
-
-				if (Interval.TotalMilliseconds > 0)
-					await Task.Delay(Interval, stoppingToken);
+				await ExecuteTaskAsync(stoppingToken);
+			}
+			catch (Exception exception)
+			{
+				await _loggingService.LogAsync(new(LogSeverity.Error, "AbstractBackgroundService", string.Empty, exception));
 			}
 
-			await _loggingService.LogAsync(new(LogSeverity.Warning, "AbstractBackgroundService", "Service cancelled."));
+			if (Interval.TotalMilliseconds > 0)
+				await Task.Delay(Interval, stoppingToken);
 		}
+
+		await _loggingService.LogAsync(new(LogSeverity.Warning, "AbstractBackgroundService", "Service cancelled."));
 	}
 }

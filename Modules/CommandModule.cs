@@ -1,15 +1,14 @@
 ﻿using Discord.Commands;
 using System.Threading.Tasks;
 
-namespace Swarmer.Modules
+namespace Swarmer.Modules;
+
+public class CommandModule : ModuleBase<SocketCommandContext>
 {
-	public class CommandModule : ModuleBase<SocketCommandContext>
+	[Command("stopbot")]
+	[RequireOwner]
+	public async Task StopBot()
 	{
-		[Command("stopbot")]
-		[RequireOwner]
-		public async Task StopBot()
-		{
-			Program.Source.Cancel();
-		}
+		Program.Source.Cancel();
 	}
 }
