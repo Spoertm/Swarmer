@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Swarmer.Services;
 using System;
 using System.Globalization;
@@ -16,7 +17,6 @@ namespace Swarmer;
 
 public static class Program
 {
-	private static IHost _host = null!;
 	private static readonly CancellationTokenSource _source = new();
 
 	private static async Task Main()
@@ -25,17 +25,17 @@ public static class Program
 
 		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
 		CommandService commands = new(new() { LogLevel = LogSeverity.Warning });
-		ConfigureServices(client, commands);
-		IConfiguration config = _host.Services.GetService<IConfiguration>() ?? throw new ArgumentNullException($"{_host.Services.GetService<IConfiguration>()}");
+		IHost host = ConfigureServices(client, commands).Build();
+		IConfiguration config = host.Services.GetService<IConfiguration>() ?? throw new ArgumentNullException($"{host.Services.GetService<IConfiguration>()}");
 
 		await client.LoginAsync(TokenType.Bot, config["BotToken"]);
 		await client.StartAsync();
 		await client.SetGameAsync("Devil Daggers");
-		await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
+		await commands.AddModulesAsync(Assembly.GetEntryAssembly(), host.Services);
 
 		try
 		{
-			await _host.RunAsync(_source.Token);
+			await host.RunAsync(_source.Token);
 		}
 		catch (TaskCanceledException)
 		{
@@ -48,9 +48,8 @@ public static class Program
 		}
 	}
 
-	private static void ConfigureServices(DiscordSocketClient client, CommandService commands)
-	{
-		_host = Host.CreateDefaultBuilder()
+	private static IHostBuilder ConfigureServices(DiscordSocketClient client, CommandService commands)
+		=> Host.CreateDefaultBuilder()
 			.ConfigureServices(services =>
 				services.AddSingleton(client)
 					.AddSingleton(commands)
@@ -59,11 +58,7 @@ public static class Program
 					.AddSingleton<LoggingService>()
 					.AddHostedService<DdStreamsPostingService>()
 					.AddDbContext<DatabaseService>())
-			.Build();
-
-		_host.Services.GetService(typeof(MessageHandlerService));
-		_host.Services.GetService(typeof(LoggingService));
-	}
+			.ConfigureLogging(logging => logging.ClearProviders());
 
 	public static void Exit()
 		=> _source.Cancel();

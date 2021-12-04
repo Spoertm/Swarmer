@@ -7,7 +7,7 @@ namespace Swarmer.Services;
 public class DatabaseService : DbContext
 {
 	private readonly IConfiguration _config;
-	public DbSet<ActiveStream> ActiveStreams { get; set; } = null!;
+	public DbSet<ActiveStream> ActiveDdStreams { get; set; } = null!;
 
 	public DatabaseService(IConfiguration config) => _config = config;
 

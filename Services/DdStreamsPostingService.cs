@@ -37,7 +37,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		_api.Settings.ClientId = config["ClientId"];
 		_api.Settings.AccessToken = config["AccessToken"];
 
-		_activeStreams = _dbContext.ActiveStreams.ToList();
+		_activeStreams = _dbContext.ActiveDdStreams.ToList();
 		_ddPalsNotifChannel = client.GetChannel(config.GetValue<ulong>("DdPalsNotifChannel")) as SocketTextChannel ?? throw new ArgumentException("DdPalsNotifChannel");
 		_ddInfoNotifChannel = client.GetChannel(config.GetValue<ulong>("DdInfoNotifChannel")) as SocketTextChannel ?? throw new ArgumentException("DdInfoNotifChannel");
 	}
@@ -101,7 +101,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 			ActiveStream newStream = new(stream.Id, stream.UserId, ddpalsMessage.Id, ddinfoMessage.Id, twitchUser.OfflineImageUrl);
 			_activeStreams.Add(newStream);
-			await _dbContext.ActiveStreams.AddAsync(newStream);
+			await _dbContext.ActiveDdStreams.AddAsync(newStream);
 		}
 
 		for (int i = _activeStreams.Count - 1; i >= 0; i--)
@@ -118,7 +118,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			await MakeStreamEmbedOfflineIfPossible(ddinfoStreamMsg, activeStream.OfflineThumbnailUrl);
 
 			_activeStreams.Remove(activeStream);
-			_dbContext.ActiveStreams.Remove(activeStream);
+			_dbContext.ActiveDdStreams.Remove(activeStream);
 			changed = true;
 		}
 
