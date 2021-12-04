@@ -19,54 +19,45 @@ namespace Swarmer;
 
 public static class Program
 {
-	private static DiscordSocketClient _client = null!;
-	private static CommandService _commands = null!;
-	private static Config _config = null!;
+
 	private static IHost _host = null!;
-	public static CancellationTokenSource Source { get; } = new();
+	private static readonly CancellationTokenSource _source = new();
 
-	private static void Main(string[] args)
-	{
-		RunBotAsync().GetAwaiter().GetResult();
-	}
-
-	private static async Task RunBotAsync()
+	private static async Task Main()
 	{
 		CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
-		_config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync(Config.ConfigPath)) ?? throw new InvalidOperationException("Error reading config file.");
-		_client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
-		_commands = new(new() { LogLevel = LogSeverity.Warning });
+		Config config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync(Config.ConfigPath)) ?? throw new InvalidOperationException("Error reading config file.");
+		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
+		CommandService commands = new(new() { LogLevel = LogSeverity.Warning });
+		await client.LoginAsync(TokenType.Bot, config.BotToken);
+		await client.StartAsync();
+		await client.SetGameAsync("Devil Daggers");
 
-		await _client.LoginAsync(TokenType.Bot, _config.BotToken);
-		await _client.StartAsync();
-		await _client.SetGameAsync("Devil Daggers");
-
-		_client.Ready += OnReadyAsync;
+		ConfigureServices(client, config, commands);
+		await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
 		try
 		{
-			await Task.Delay(-1, Source.Token);
+			await _host.RunAsync(_source.Token);
 		}
 		catch (TaskCanceledException)
 		{
-			await _client.LogoutAsync();
-			await _client.StopAsync();
+			await client.LogoutAsync();
+			await client.StopAsync();
 		}
 		finally
 		{
-			Source.Dispose();
+			_source.Dispose();
 		}
 	}
 
-	private static async Task OnReadyAsync()
+	private static void ConfigureServices(DiscordSocketClient client, Config config, CommandService commands)
 	{
-		_client.Ready -= OnReadyAsync;
-
 		_host = Host.CreateDefaultBuilder()
 			.ConfigureServices(services =>
-				services.AddSingleton(_client)
-					.AddSingleton(_config)
-					.AddSingleton(_commands)
+				services.AddSingleton(client)
+					.AddSingleton(config)
+					.AddSingleton(commands)
 					.AddSingleton<DiscordHelper>()
 					.AddSingleton<TwitchAPI>()
 					.AddSingleton<MessageHandlerService>()
@@ -76,8 +67,8 @@ public static class Program
 
 		_host.Services.GetService(typeof(MessageHandlerService));
 		_host.Services.GetService(typeof(LoggingService));
-
-		await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
-		Task.Run(async () => await _host.RunAsync(Source.Token), Source.Token);
 	}
+
+	public static void Exit()
+		=> _source.Cancel();
 }
