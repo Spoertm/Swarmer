@@ -66,12 +66,4 @@ public static class EmbedHelper
 			exception = exception.InnerException;
 		}
 	}
-
-	public static Embed ActiveStreamsEmbed(string description)
-	{
-		return new EmbedBuilder()
-			.WithTitle("Active DD streams")
-			.WithDescription(description)
-			.Build();
-	}
 }
