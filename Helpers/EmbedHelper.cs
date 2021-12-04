@@ -27,7 +27,7 @@ public static class EmbedHelper
 	{
 		return new EmbedBuilder()
 			.WithDescription("⚫ Offline| " + (oldEmbed.Description.Length >= 9 ? oldEmbed.Description[9..] : string.Empty))
-			.WithThumbnailUrl(newThumbnailUrl ?? oldEmbed.Thumbnail!.Value.Url)
+			.WithThumbnailUrl(newThumbnailUrl ?? oldEmbed.Thumbnail?.Url ?? string.Empty)
 			.WithAuthor(oldEmbed.Author!.Value.Name, oldEmbed.Author.Value.IconUrl, oldEmbed.Author.Value.Url)
 			.WithColor(1)
 			.Build();
