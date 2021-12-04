@@ -5,8 +5,8 @@ Angrevol#3416 and this project is a rewrite in C#.
 
 ## Framework
 
-- .NET 5.0
+- .NET 6.0
 
 ## Language
 
-- C# 9.0
+- C# 10.0
