@@ -1,15 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
-using Swarmer.Helpers;
-using Swarmer.Models;
 using Swarmer.Services;
 using System;
 using System.Globalization;
-using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,15 +23,16 @@ public static class Program
 	{
 		CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
-		Config config = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync(Config.ConfigPath)) ?? throw new InvalidOperationException("Error reading config file.");
 		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
 		CommandService commands = new(new() { LogLevel = LogSeverity.Warning });
-		await client.LoginAsync(TokenType.Bot, config.BotToken);
+		ConfigureServices(client, commands);
+		IConfiguration config = _host.Services.GetService<IConfiguration>() ?? throw new ArgumentNullException($"{_host.Services.GetService<IConfiguration>()}");
+
+		await client.LoginAsync(TokenType.Bot, config["BotToken"]);
 		await client.StartAsync();
 		await client.SetGameAsync("Devil Daggers");
-
-		ConfigureServices(client, config, commands);
 		await commands.AddModulesAsync(Assembly.GetEntryAssembly(), _host.Services);
+
 		try
 		{
 			await _host.RunAsync(_source.Token);
@@ -50,18 +48,17 @@ public static class Program
 		}
 	}
 
-	private static void ConfigureServices(DiscordSocketClient client, Config config, CommandService commands)
+	private static void ConfigureServices(DiscordSocketClient client, CommandService commands)
 	{
 		_host = Host.CreateDefaultBuilder()
 			.ConfigureServices(services =>
 				services.AddSingleton(client)
-					.AddSingleton(config)
 					.AddSingleton(commands)
-					.AddSingleton<DiscordHelper>()
 					.AddSingleton<TwitchAPI>()
 					.AddSingleton<MessageHandlerService>()
 					.AddSingleton<LoggingService>()
-					.AddHostedService<DdStreamsPostingService>())
+					.AddHostedService<DdStreamsPostingService>()
+					.AddDbContext<DatabaseService>())
 			.Build();
 
 		_host.Services.GetService(typeof(MessageHandlerService));

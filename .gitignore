@@ -387,6 +387,5 @@ FodyWeavers.xsd
 .idea/
 *.sln.iml
 
-# Swarmer files
-Models/Config.json
-Models/ActiveStreams.json
+# Config file
+appsettings.json

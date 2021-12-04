@@ -1,8 +1,8 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
 using Swarmer.Helpers;
-using Swarmer.Models;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -13,14 +13,14 @@ public class LoggingService
 {
 	private readonly SocketTextChannel _swarmerInfoChannel;
 
-	public LoggingService(DiscordSocketClient client, CommandService commands, Config config)
+	public LoggingService(DiscordSocketClient client, CommandService commands, IConfiguration config)
 	{
 		LogDirectory = Path.Combine(AppContext.BaseDirectory, "Logs");
 
 		client.Log += LogAsync;
 		commands.Log += LogAsync;
 
-		_swarmerInfoChannel = (client.GetChannel(config.SwarmerInfoChannelId) as SocketTextChannel)!;
+		_swarmerInfoChannel = (client.GetChannel(config.GetValue<ulong>("SwarmerInfoChannelId")) as SocketTextChannel)!;
 	}
 
 	private string LogDirectory { get; }
