@@ -19,7 +19,6 @@ namespace Swarmer;
 
 public static class Program
 {
-
 	private static IHost _host = null!;
 	private static readonly CancellationTokenSource _source = new();
 

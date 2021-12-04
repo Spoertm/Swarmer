@@ -77,7 +77,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			JObject dynamicResponse = JsonConvert.DeserializeObject<JObject>(responseString)!;
 			string newToken = dynamicResponse.Property("access_token")!.Value.ToString();
 			_config.AccessToken = newToken;
-			var refreshResponse = await _api.Auth.RefreshAuthTokenAsync(newToken, _config.ClientSecret, _config.ClientId);
+			RefreshResponse refreshResponse = await _api.Auth.RefreshAuthTokenAsync(newToken, _config.ClientSecret, _config.ClientId);
 			await File.WriteAllTextAsync(Config.ConfigPath, JsonConvert.SerializeObject(_config, Formatting.Indented), stoppingToken);
 		}
 	}
