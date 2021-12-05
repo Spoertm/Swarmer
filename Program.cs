@@ -28,7 +28,7 @@ public static class Program
 		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
 		CommandService commands = new(new() { LogLevel = LogSeverity.Warning });
 		IHost host = ConfigureServices(client, commands).Build();
-		IConfiguration config = host.Services.GetService<IConfiguration>() ?? throw new ArgumentNullException($"{host.Services.GetService<IConfiguration>()}");
+		IConfiguration config = host.Services.GetRequiredService<IConfiguration>();
 
 		await client.LoginAsync(TokenType.Bot, config["BotToken"]);
 		await client.StartAsync();
