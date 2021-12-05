@@ -9,6 +9,7 @@ public class CommandModule : ModuleBase<SocketCommandContext>
 	[RequireOwner]
 	public async Task StopBot()
 	{
+		await ReplyAsync("Exiting...");
 		Program.Exit();
 	}
 }
