@@ -23,6 +23,7 @@ public static class Program
 	private static async Task Main()
 	{
 		CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+		AppDomain.CurrentDomain.ProcessExit += (_, _) => Exit();
 
 		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
 		CommandService commands = new(new() { LogLevel = LogSeverity.Warning });
