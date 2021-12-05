@@ -35,6 +35,9 @@ public static class Program
 		await client.SetGameAsync("Devil Daggers");
 		await commands.AddModulesAsync(Assembly.GetEntryAssembly(), host.Services);
 
+		host.Services.GetService<MessageHandlerService>();
+		host.Services.GetService<LoggingService>();
+
 		try
 		{
 			await host.RunAsync(_source.Token);
