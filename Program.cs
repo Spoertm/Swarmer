@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Swarmer.Services;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,6 +51,11 @@ public static class Program
 
 	private static IHostBuilder ConfigureServices(DiscordSocketClient client, CommandService commands)
 		=> Host.CreateDefaultBuilder()
+			.ConfigureAppConfiguration((_, config) =>
+			{
+				config.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: false);
+				config.AddEnvironmentVariables();
+			})
 			.ConfigureServices(services =>
 				services.AddSingleton(client)
 					.AddSingleton(commands)
