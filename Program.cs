@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
@@ -55,11 +55,7 @@ public static class Program
 
 	private static IHostBuilder ConfigureServices(DiscordSocketClient client, CommandService commands)
 		=> Host.CreateDefaultBuilder()
-			.ConfigureAppConfiguration((_, config) =>
-			{
-				config.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: false);
-				config.AddEnvironmentVariables();
-			})
+			.ConfigureAppConfiguration((_, config) => config.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json")))
 			.ConfigureServices(services =>
 				services.AddSingleton(client)
 					.AddSingleton(commands)
