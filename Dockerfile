@@ -17,4 +17,5 @@ RUN dotnet publish "Swarmer.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Swarmer.dll"]
+# ENTRYPOINT ["dotnet", "Swarmer.dll"]
+CMD ASPNETCORE_URLS=http://*:$PORT dotnet Swarmer.dll
