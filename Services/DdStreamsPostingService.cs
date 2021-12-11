@@ -17,7 +17,7 @@ namespace Swarmer.Services;
 
 public class DdStreamsPostingService : AbstractBackgroundService
 {
-	private const string _devilDaggersId = "490905";
+	private readonly string _devilDaggersId;
 	private readonly SocketTextChannel _ddPalsNotifChannel;
 	private readonly SocketTextChannel _ddInfoNotifChannel;
 	private readonly DatabaseService _dbContext;
@@ -34,8 +34,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	{
 		_dbContext = dbContext;
 		_api = api;
-		_api.Settings.ClientId = config["ClientId"];
-		_api.Settings.AccessToken = config["AccessToken"];
+		_devilDaggersId = config["DdTwitchGameId"];
 
 		_activeStreams = _dbContext.ActiveDdStreams.ToList();
 		_ddPalsNotifChannel = client.GetChannel(config.GetValue<ulong>("DdPalsNotifChannel")) as SocketTextChannel ?? throw new ArgumentException("DdPalsNotifChannel");

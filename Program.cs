@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +19,7 @@ namespace Swarmer;
 
 public static class Program
 {
-	private static readonly CancellationTokenSource _source = new();
+	private static readonly CancellationTokenSource? _source = new();
 
 	private static async Task Main()
 	{
@@ -27,20 +28,33 @@ public static class Program
 
 		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
 		CommandService commands = new(new() { LogLevel = LogSeverity.Warning });
-		IHost host = ConfigureServices(client, commands).Build();
-		IConfiguration config = host.Services.GetRequiredService<IConfiguration>();
+		TwitchAPI twitchApi = new();
 
+		WebApplication app = ConfigureServices(client, commands, twitchApi).Build();
+
+		app.UseSwagger();
+		app.UseSwaggerUI();
+
+		RegisterEndpoints(app);
+
+		IConfiguration config = app.Services.GetRequiredService<IConfiguration>();
+		twitchApi.Settings.AccessToken = config["AccessToken"];
+		twitchApi.Settings.ClientId = config["ClientId"];
 		await client.LoginAsync(TokenType.Bot, config["BotToken"]);
 		await client.StartAsync();
 		await client.SetGameAsync("Devil Daggers");
-		await commands.AddModulesAsync(Assembly.GetEntryAssembly(), host.Services);
+		await commands.AddModulesAsync(Assembly.GetEntryAssembly(), app.Services);
 
-		host.Services.GetService<MessageHandlerService>();
-		host.Services.GetService<LoggingService>();
+		app.Services.GetService<MessageHandlerService>();
+		app.Services.GetService<LoggingService>();
+
+		app.UseHttpsRedirection();
+		app.UseAuthorization();
+		app.MapControllers();
 
 		try
 		{
-			await host.RunAsync(_source.Token);
+			await app.RunAsync(_source!.Token);
 		}
 		catch (TaskCanceledException)
 		{
@@ -49,23 +63,38 @@ public static class Program
 		}
 		finally
 		{
-			_source.Dispose();
+			_source?.Dispose();
 		}
 	}
 
-	private static IHostBuilder ConfigureServices(DiscordSocketClient client, CommandService commands)
-		=> Host.CreateDefaultBuilder()
-			.ConfigureAppConfiguration((_, config) => config.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json")))
-			.ConfigureServices(services =>
-				services.AddSingleton(client)
-					.AddSingleton(commands)
-					.AddSingleton<TwitchAPI>()
-					.AddSingleton<MessageHandlerService>()
-					.AddSingleton<LoggingService>()
-					.AddHostedService<DdStreamsPostingService>()
-					.AddDbContext<DatabaseService>())
-			.ConfigureLogging(logging => logging.ClearProviders());
+	private static void RegisterEndpoints(WebApplication app)
+	{
+		app.MapGet("/streams", async (TwitchAPI api, IConfiguration config)
+			=> (await api.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new() { config["DdTwitchGameId"] })).Streams);
+	}
+
+	private static WebApplicationBuilder ConfigureServices(DiscordSocketClient client, CommandService commands, TwitchAPI twitchApi)
+	{
+		WebApplicationBuilder builder = WebApplication.CreateBuilder();
+		builder.Logging.ClearProviders();
+		builder.Configuration.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"));
+		builder.Services.AddControllers();
+		builder.Services.AddEndpointsApiExplorer();
+		builder.Services.AddSwaggerGen();
+		builder.Services
+			.AddSingleton(client)
+			.AddSingleton(commands)
+			.AddSingleton(twitchApi)
+			.AddSingleton<MessageHandlerService>()
+			.AddSingleton<LoggingService>()
+			.AddHostedService<DdStreamsPostingService>()
+			.AddDbContext<DatabaseService>();
+
+		return builder;
+	}
 
 	public static void Exit()
-		=> _source.Cancel();
+	{
+		_source?.Cancel();
+	}
 }
