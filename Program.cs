@@ -19,7 +19,7 @@ namespace Swarmer;
 
 public static class Program
 {
-	private static readonly CancellationTokenSource _source = new();
+	private static readonly CancellationTokenSource? _source = new();
 
 	private static async Task Main()
 	{
@@ -54,7 +54,7 @@ public static class Program
 
 		try
 		{
-			await app.RunAsync(_source.Token);
+			await app.RunAsync(_source!.Token);
 		}
 		catch (TaskCanceledException)
 		{
@@ -63,7 +63,7 @@ public static class Program
 		}
 		finally
 		{
-			_source.Dispose();
+			_source?.Dispose();
 		}
 	}
 
@@ -95,6 +95,6 @@ public static class Program
 
 	public static void Exit()
 	{
-		_source.Cancel();
+		_source?.Cancel();
 	}
 }
