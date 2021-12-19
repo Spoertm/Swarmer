@@ -2,6 +2,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -72,6 +73,9 @@ public static class Program
 	{
 		app.MapGet("/streams", async (TwitchAPI api, IConfiguration config)
 			=> (await api.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new() { config["DdTwitchGameId"] })).Streams);
+
+		app.MapGet("/", async context
+			=> await context.Response.WriteAsync(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Pages", "Index.html"))));
 	}
 
 	private static WebApplicationBuilder ConfigureServices(DiscordSocketClient client, CommandService commands, TwitchAPI twitchApi)
