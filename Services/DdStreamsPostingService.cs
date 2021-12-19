@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
 using Swarmer.Helpers;
 using Swarmer.Models;
 using System;
@@ -25,7 +24,6 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	private readonly List<ActiveStream> _activeStreams;
 
 	public DdStreamsPostingService(
-		IConfiguration config,
 		DatabaseService dbContext,
 		DiscordSocketClient client,
 		TwitchAPI api,
@@ -34,11 +32,11 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	{
 		_dbContext = dbContext;
 		_api = api;
-		_devilDaggersId = config["DdTwitchGameId"];
+		_devilDaggersId = Environment.GetEnvironmentVariable("DdTwitchGameId")!;
 
 		_activeStreams = _dbContext.ActiveDdStreams.ToList();
-		_ddPalsNotifChannel = client.GetChannel(config.GetValue<ulong>("DdPalsNotifChannel")) as SocketTextChannel ?? throw new ArgumentException("DdPalsNotifChannel");
-		_ddInfoNotifChannel = client.GetChannel(config.GetValue<ulong>("DdInfoNotifChannel")) as SocketTextChannel ?? throw new ArgumentException("DdInfoNotifChannel");
+		_ddPalsNotifChannel = client.GetChannel(ulong.Parse(Environment.GetEnvironmentVariable("DdPalsNotifChannel")!)) as SocketTextChannel ?? throw new ArgumentException("DdPalsNotifChannel");
+		_ddInfoNotifChannel = client.GetChannel(ulong.Parse(Environment.GetEnvironmentVariable("DdInfoNotifChannel")!)) as SocketTextChannel ?? throw new ArgumentException("DdInfoNotifChannel");
 	}
 
 	protected override TimeSpan Interval => TimeSpan.FromMinutes(2);
