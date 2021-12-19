@@ -19,12 +19,12 @@ namespace Swarmer;
 
 public static class Program
 {
-	private static readonly CancellationTokenSource? _source = new();
+	private static readonly CancellationTokenSource _source = new();
 
 	private static async Task Main()
 	{
 		CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-		AppDomain.CurrentDomain.ProcessExit += (_, _) => Exit();
+		AppDomain.CurrentDomain.ProcessExit += Exit;
 
 		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error, ExclusiveBulkDelete = true });
 		CommandService commands = new(new() { LogLevel = LogSeverity.Warning });
@@ -54,16 +54,17 @@ public static class Program
 
 		try
 		{
-			await app.RunAsync(_source!.Token);
+			await app.RunAsync(_source.Token);
 		}
 		catch (TaskCanceledException)
 		{
 			await client.LogoutAsync();
-			await client.StopAsync();
+			client.Dispose();
 		}
 		finally
 		{
-			_source?.Dispose();
+			_source.Dispose();
+			AppDomain.CurrentDomain.ProcessExit -= Exit;
 		}
 	}
 
@@ -93,8 +94,7 @@ public static class Program
 		return builder;
 	}
 
-	public static void Exit()
-	{
-		_source?.Cancel();
-	}
+	private static void Exit(object? sender, EventArgs e) => Exit();
+
+	public static void Exit() => _source.Cancel();
 }
