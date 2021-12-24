@@ -3,14 +3,9 @@ using Discord.Rest;
 using Discord.WebSocket;
 using Swarmer.Helpers;
 using Swarmer.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using TwitchLib.Api;
-using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
+using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 
 namespace Swarmer.Services;
 

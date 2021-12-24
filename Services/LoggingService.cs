@@ -2,9 +2,6 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Swarmer.Helpers;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Swarmer.Services;
 
