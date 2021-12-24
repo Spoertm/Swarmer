@@ -56,13 +56,10 @@ public static class Program
 		{
 			await app.RunAsync(_source.Token);
 		}
-		catch (TaskCanceledException)
+		finally
 		{
 			await client.LogoutAsync();
 			client.Dispose();
-		}
-		finally
-		{
 			_source.Dispose();
 			AppDomain.CurrentDomain.ProcessExit -= Exit;
 		}
