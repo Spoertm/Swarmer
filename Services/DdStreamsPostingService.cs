@@ -41,32 +41,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		await CheckTwitchStreams();
 	}
 
-	// TODO: Implement ValidateBotToken(stoppingToken)
-	/*
 	private async Task ValidateBotToken(CancellationToken stoppingToken)
 	{
-		const string _tokenReqUrl = "https://id.twitch.tv/oauth2/token";
-		ValidateAccessTokenResponse? tokenResponse = await _api.Auth.ValidateAccessTokenAsync();
-		if (tokenResponse is null || tokenResponse.ExpiresIn < TimeSpan.FromMinutes(15).TotalSeconds)
-		{
-#pragma warning disable 8714
-			Dictionary<string?, string?> postValues = new()
-#pragma warning restore 8714
-			{
-				{ "client_id", _config["ClientId"] }, { "client_secret", _config["ClientSecret"] }, { "grant_type", "client_credentials" },
-			};
-
-			FormUrlEncodedContent content = new(postValues);
-			HttpResponseMessage response = await _httpClient.PostAsync(_tokenReqUrl, content, stoppingToken);
-			string responseString = await response.Content.ReadAsStringAsync(stoppingToken);
-			JObject dynamicResponse = JsonConvert.DeserializeObject<JObject>(responseString)!;
-			string newToken = dynamicResponse.Property("access_token")!.Value.ToString();
-			_config["AccessToken"] = newToken;
-			//RefreshResponse refreshResponse = await _api.Auth.RefreshAuthTokenAsync(newToken, _config["ClientSecret"], _config["ClientId"]);
-			//await File.WriteAllTextAsync(_config.ConfigPath, JsonConvert.SerializeObject(_config, Formatting.Indented), stoppingToken);
-		}
 	}
-	*/
 
 	private async Task CheckTwitchStreams()
 	{
