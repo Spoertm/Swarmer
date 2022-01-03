@@ -40,11 +40,6 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	{
 		await CheckTwitchStreams();
 	}
-
-	private async Task ValidateBotToken(CancellationToken stoppingToken)
-	{
-	}
-
 	private async Task CheckTwitchStreams()
 	{
 		bool changed = false;
