@@ -5,7 +5,7 @@ namespace Swarmer.Services;
 
 public class DatabaseService : DbContext
 {
-	public DbSet<ActiveStream> ActiveDdStreams { get; set; } = null!;
+	public DbSet<ActiveStream> ActiveDdStreams => Set<ActiveStream>();
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		=> optionsBuilder
