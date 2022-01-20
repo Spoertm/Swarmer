@@ -1,51 +1,51 @@
-﻿using Discord;
+﻿global using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
+using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 using Swarmer.Helpers;
 using Swarmer.Models;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
-using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 
 namespace Swarmer.Services;
 
 public class DdStreamsPostingService : AbstractBackgroundService
 {
-	private readonly string _devilDaggersId;
 	private readonly SocketTextChannel _ddPalsNotifChannel;
 	private readonly SocketTextChannel _ddInfoNotifChannel;
 	private readonly DatabaseService _dbContext;
 	private readonly TwitchAPI _api;
 	private readonly List<ActiveStream> _activeStreams;
+	private readonly StreamCache _streamCache;
 
 	public DdStreamsPostingService(
 		DatabaseService dbContext,
 		DiscordSocketClient client,
 		TwitchAPI api,
-		LoggingService loggingService)
+		LoggingService loggingService,
+		StreamCache streamCache)
 		: base(loggingService)
 	{
 		_dbContext = dbContext;
 		_api = api;
-		_devilDaggersId = Environment.GetEnvironmentVariable("DdTwitchGameId")!;
+		_streamCache = streamCache;
 
 		_activeStreams = _dbContext.ActiveDdStreams.ToList();
 		_ddPalsNotifChannel = client.GetChannel(ulong.Parse(Environment.GetEnvironmentVariable("DdPalsNotifChannel")!)) as SocketTextChannel ?? throw new ArgumentException("DdPalsNotifChannel");
 		_ddInfoNotifChannel = client.GetChannel(ulong.Parse(Environment.GetEnvironmentVariable("DdInfoNotifChannel")!)) as SocketTextChannel ?? throw new ArgumentException("DdInfoNotifChannel");
 	}
 
-	protected override TimeSpan Interval => TimeSpan.FromMinutes(2);
+	protected override TimeSpan Interval => TimeSpan.FromSeconds(30);
 
 	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
 		await CheckTwitchStreams();
 	}
+
 	private async Task CheckTwitchStreams()
 	{
 		bool changed = false;
-		Stream[] twitchStreams = (await _api.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new() { _devilDaggersId }))
-			.Streams;
-
+		Stream[] twitchStreams = _streamCache.Cache;
 		foreach (Stream stream in twitchStreams)
 		{
 			if (_activeStreams.Exists(s => s.StreamId == stream.Id))

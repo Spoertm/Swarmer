@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Swarmer.Models;
 using Swarmer.Services;
 using System.Globalization;
 using System.Reflection;
@@ -11,7 +12,6 @@ namespace Swarmer;
 public static class Program
 {
 	private static readonly CancellationTokenSource _source = new();
-	private static readonly string _ddTwitchGameId = Environment.GetEnvironmentVariable("DdTwitchGameId")!;
 
 	private static async Task Main()
 	{
@@ -58,8 +58,8 @@ public static class Program
 
 	private static void RegisterEndpoints(WebApplication app)
 	{
-		app.MapGet("/streams", async (TwitchAPI api)
-			=> (await api.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new() { _ddTwitchGameId })).Streams);
+		app.MapGet("/streams", (StreamCache streamCache)
+			=> streamCache.Cache);
 
 		app.MapGet("/", async context
 			=> await context.Response.WriteAsync(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Pages", "Index.html"))));
@@ -78,7 +78,9 @@ public static class Program
 			.AddSingleton(twitchApi)
 			.AddSingleton<MessageHandlerService>()
 			.AddSingleton<LoggingService>()
+			.AddSingleton<StreamCache>()
 			.AddHostedService<DdStreamsPostingService>()
+			.AddHostedService<UpdateStreamsCacheService>()
 			.AddDbContext<DatabaseService>();
 
 		return builder;
