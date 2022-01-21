@@ -43,7 +43,6 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
-		Console.WriteLine($"Stream buffer @{DateTime.Now.ToLongTimeString()}:\n{string.Join('\n', _streamBuffer)}");
 		CleanUpStreamBuffer();
 		await CheckTwitchStreams();
 	}
