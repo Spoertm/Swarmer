@@ -50,6 +50,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task CheckTwitchStreams()
 	{
+		if (_streamCache.Cache is null)
+			return;
+
 		bool changed = false;
 		Stream[] twitchStreams = _streamCache.Cache;
 		foreach (Stream stream in twitchStreams)

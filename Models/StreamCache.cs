@@ -2,5 +2,5 @@
 
 public class StreamCache
 {
-	public Stream[] Cache { get; set; } = { };
+	public Stream[]? Cache { get; set; }
 }
