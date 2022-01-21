@@ -37,7 +37,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		_ddInfoNotifChannel = client.GetChannel(ulong.Parse(Environment.GetEnvironmentVariable("DdInfoNotifChannel")!)) as SocketTextChannel ?? throw new ArgumentException("DdInfoNotifChannel");
 	}
 
-	protected override TimeSpan Interval => TimeSpan.FromSeconds(30);
+	protected override TimeSpan Interval => TimeSpan.FromSeconds(20);
 
 	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
