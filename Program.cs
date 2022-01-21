@@ -18,7 +18,7 @@ public static class Program
 		CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 		AppDomain.CurrentDomain.ProcessExit += Exit;
 
-		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error, GatewayIntents = GatewayIntents.None });
+		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error });
 		CommandService commands = new(new() { LogLevel = LogSeverity.Warning });
 		TwitchAPI twitchApi = new();
 
