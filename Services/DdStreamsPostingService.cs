@@ -23,9 +23,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		DatabaseService dbContext,
 		DiscordSocketClient client,
 		TwitchAPI api,
-		LoggingService loggingService,
 		StreamCache streamCache)
-		: base(loggingService)
 	{
 		_dbContext = dbContext;
 		_api = api;

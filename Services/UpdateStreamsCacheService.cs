@@ -12,9 +12,7 @@ public class UpdateStreamsCacheService : AbstractBackgroundService
 
 	public UpdateStreamsCacheService(
 		TwitchAPI twitchApi,
-		StreamCache streamCache,
-		LoggingService loggingService)
-		: base(loggingService)
+		StreamCache streamCache)
 	{
 		_devilDaggersId = Environment.GetEnvironmentVariable("DdTwitchGameId")!;
 		_twitchApi = twitchApi;
