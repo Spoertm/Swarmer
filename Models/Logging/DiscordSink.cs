@@ -51,6 +51,7 @@ public class DiscordSink : ILogEventSink
 		{
 			LogEventLevel.Error or LogEventLevel.Fatal => (Color.Red, string.Empty),
 			LogEventLevel.Warning                      => (Color.Gold, message),
+			LogEventLevel.Debug                        => (Color.Purple, message),
 			_                                          => (Color.Blue, message),
 		};
 	}
