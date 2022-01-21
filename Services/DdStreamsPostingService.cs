@@ -10,7 +10,7 @@ namespace Swarmer.Services;
 
 public class DdStreamsPostingService : AbstractBackgroundService
 {
-	private readonly TimeSpan _maxBufferTime = TimeSpan.FromMinutes(10);
+	private readonly TimeSpan _maxBufferTime = TimeSpan.FromMinutes(15);
 	private readonly SocketTextChannel _ddPalsNotifChannel;
 	private readonly SocketTextChannel _ddInfoNotifChannel;
 	private readonly DatabaseService _dbContext;
