@@ -91,7 +91,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	private void RefreshBufferedStreamOrCreateNew(string streamId, ulong? ddpalsMessageId, ulong? ddinfoMessageId)
 	{
-		if (_streamBuffer.Find(bs => bs.StreamId == streamId) is { StreamId: { } } bufferedStream)
+		if (_streamBuffer.Find(bs => bs.StreamId == streamId) is { StreamId: not null } bufferedStream)
 			bufferedStream.DateAddedUtc = DateTime.UtcNow;
 		else
 			_streamBuffer.Add(new(streamId, ddpalsMessageId, ddinfoMessageId, DateTime.UtcNow));
