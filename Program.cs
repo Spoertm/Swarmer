@@ -48,6 +48,7 @@ public static class Program
 		app.Services.GetRequiredService<MessageHandlerService>();
 
 		app.UseHttpsRedirection();
+		app.UseCors(policyBuilder => policyBuilder.AllowAnyOrigin());
 		app.UseAuthorization();
 		app.MapControllers();
 
