@@ -25,7 +25,7 @@ public static class Program
 		ConfigureLogging();
 		Log.Information("Starting");
 
-		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Warning });
+		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error });
 		CommandService commands = new(new() { LogLevel = LogSeverity.Warning });
 		client.Log += OnLog;
 		commands.Log += OnLog;
