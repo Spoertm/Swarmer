@@ -8,15 +8,15 @@ public class UpdateStreamsCacheService : AbstractBackgroundService
 {
 	private readonly string _devilDaggersId;
 	private readonly TwitchAPI _twitchApi;
-	private readonly StreamCache _streamCache;
+	private readonly DdStreamProvider _ddStreamProvider;
 
 	public UpdateStreamsCacheService(
 		TwitchAPI twitchApi,
-		StreamCache streamCache)
+		DdStreamProvider ddStreamProvider)
 	{
 		_devilDaggersId = Environment.GetEnvironmentVariable("DdTwitchGameId")!;
 		_twitchApi = twitchApi;
-		_streamCache = streamCache;
+		_ddStreamProvider = ddStreamProvider;
 	}
 
 	protected override TimeSpan Interval => TimeSpan.FromMinutes(1);
@@ -25,6 +25,6 @@ public class UpdateStreamsCacheService : AbstractBackgroundService
 	{
 		GetStreamsResponse streamResponse = await _twitchApi.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new() { _devilDaggersId });
 		Stream[] twitchStreams = streamResponse.Streams;
-		_streamCache.Cache = twitchStreams;
+		_ddStreamProvider.Streams = twitchStreams;
 	}
 }

@@ -18,17 +18,17 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	private readonly TwitchAPI _api;
 	private readonly List<ActiveStream> _activeStreams;
 	private readonly List<BufferedStream> _streamBuffer = new();
-	private readonly StreamCache _streamCache;
+	private readonly DdStreamProvider _ddStreamProvider;
 
 	public DdStreamsPostingService(
 		DatabaseService dbContext,
 		DiscordSocketClient client,
 		TwitchAPI api,
-		StreamCache streamCache)
+		DdStreamProvider ddStreamProvider)
 	{
 		_dbContext = dbContext;
 		_api = api;
-		_streamCache = streamCache;
+		_ddStreamProvider = ddStreamProvider;
 
 		_activeStreams = _dbContext.ActiveDdStreams.ToList();
 		foreach (ActiveStream stream in _activeStreams)
@@ -48,11 +48,11 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task CheckTwitchStreams()
 	{
-		if (_streamCache.Cache is null)
+		if (_ddStreamProvider.Streams is null)
 			return;
 
 		bool changed = false;
-		Stream[] twitchStreams = _streamCache.Cache;
+		Stream[] twitchStreams = _ddStreamProvider.Streams;
 		foreach (Stream stream in twitchStreams)
 		{
 			if (StreamStillActive(stream))

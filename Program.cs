@@ -94,8 +94,8 @@ public static class Program
 
 	private static void RegisterEndpoints(WebApplication app)
 	{
-		app.MapGet("/streams", (StreamCache streamCache)
-			=> streamCache.Cache);
+		app.MapGet("/streams", (DdStreamProvider ddStreamProvider)
+			=> ddStreamProvider.Streams);
 
 		app.MapGet("/", async context
 			=> await context.Response.WriteAsync(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Pages", "Index.html"))));
@@ -120,7 +120,7 @@ public static class Program
 			.AddSingleton(commands)
 			.AddSingleton(twitchApi)
 			.AddSingleton<MessageHandlerService>()
-			.AddSingleton<StreamCache>()
+			.AddSingleton<DdStreamProvider>()
 			.AddHostedService<DdStreamsPostingService>()
 			.AddHostedService<UpdateStreamsCacheService>()
 			.AddDbContext<DatabaseService>();
