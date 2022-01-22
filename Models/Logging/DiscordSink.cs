@@ -30,7 +30,6 @@ public class DiscordSink : ILogEventSink
 
 			if (logEvent.Exception is not null)
 			{
-				embedBuilder.Color = Color.Red;
 				embedBuilder.WithTitle(logEvent.Exception.Message.Truncate(256));
 				embedBuilder.AddField("Type:", nameof(logEvent.Exception), true);
 				embedBuilder.AddField("Exception message:", logEvent.Exception.Message.Truncate(1024), true);
