@@ -3,6 +3,7 @@ using Discord;
 using Discord.WebSocket;
 using Swarmer.Helpers;
 using Swarmer.Models;
+using Swarmer.Models.Extensions;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
@@ -102,8 +103,8 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		Embed streamEmbed = EmbedHelper.GetOnlineStreamEmbed(
 			stream.Title,
 			stream.UserName,
-			GetProperUrl(stream.ThumbnailUrl),
-			GetProperUrl(twitchUser.ProfileImageUrl),
+			stream.ThumbnailUrl.FormatDimensions(),
+			twitchUser.ProfileImageUrl.FormatDimensions(),
 			"https://twitch.tv/" + stream.UserName);
 
 		IUserMessage? ddpalsMsg = null;
@@ -149,8 +150,6 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			await streamMessage.ModifyAsync(m => m.Embed = newEmbed);
 		}
 	}
-
-	private static string GetProperUrl(string url) => url.Replace("{height}", "1080").Replace("{width}", "1920");
 
 	private record struct BufferedStream(string StreamId, ulong? DdpalsMessageId, ulong? DdinfoMessageId, DateTime DateAddedUtc);
 }
