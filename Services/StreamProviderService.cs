@@ -1,22 +1,18 @@
-﻿using Swarmer.Models;
-using TwitchLib.Api;
+﻿using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 
 namespace Swarmer.Services;
 
-public class UpdateStreamsCacheService : AbstractBackgroundService
+public class StreamProviderService : AbstractBackgroundService
 {
 	private readonly string _devilDaggersId;
 	private readonly TwitchAPI _twitchApi;
-	private readonly DdStreamProvider _ddStreamProvider;
+	public Stream[]? Streams { get; private set; }
 
-	public UpdateStreamsCacheService(
-		TwitchAPI twitchApi,
-		DdStreamProvider ddStreamProvider)
+	public StreamProviderService(TwitchAPI twitchApi)
 	{
 		_devilDaggersId = Environment.GetEnvironmentVariable("DdTwitchGameId")!;
 		_twitchApi = twitchApi;
-		_ddStreamProvider = ddStreamProvider;
 	}
 
 	protected override TimeSpan Interval => TimeSpan.FromMinutes(1);
@@ -25,6 +21,6 @@ public class UpdateStreamsCacheService : AbstractBackgroundService
 	{
 		GetStreamsResponse streamResponse = await _twitchApi.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new() { _devilDaggersId });
 		Stream[] twitchStreams = streamResponse.Streams;
-		_ddStreamProvider.Streams = twitchStreams;
+		Streams = twitchStreams;
 	}
 }
