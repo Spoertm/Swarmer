@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Swarmer.Models;
+namespace Swarmer.Models.Database;
 
 public class DdStream
 {

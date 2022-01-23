@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Swarmer.Models;
+namespace Swarmer.Models.Database;
 
 public class DdStreamChannel
 {
