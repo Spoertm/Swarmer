@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using Swarmer.Models.Logging;
@@ -131,7 +132,7 @@ public static class Program
 	private static void SetConfigFromDb(WebApplicationBuilder builder)
 	{
 		using DatabaseService dbService = new();
-		string jsonConfig = dbService.SwarmerConfig.First().JsonConfig;
+		string jsonConfig = dbService.SwarmerConfig.AsNoTracking().First().JsonConfig;
 		string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DbConfig.json");
 		File.WriteAllText(configPath, jsonConfig);
 		builder.Configuration.AddJsonFile(configPath);
