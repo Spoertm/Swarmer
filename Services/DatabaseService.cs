@@ -5,13 +5,10 @@ namespace Swarmer.Services;
 
 public class DatabaseService : DbContext
 {
-	public DbSet<ActiveStream> ActiveDdStreams => Set<ActiveStream>();
+	public DbSet<DdStreamChannel> DdStreamChannels => Set<DdStreamChannel>();
+	public DbSet<DdStream> DdStreams => Set<DdStream>();
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		=> optionsBuilder
-			.UseNpgsql(Environment.GetEnvironmentVariable("PostgresConnectionString")!)
-			.UseSnakeCaseNamingConvention();
-
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
-		=> modelBuilder.Entity<ActiveStream>().HasKey(stream => stream.StreamId);
+			.UseNpgsql(Environment.GetEnvironmentVariable("PostgresConnectionString") ?? throw new ArgumentException("Envvar PostgresConnectionString not found."));
 }
