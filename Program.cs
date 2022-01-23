@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Serilog;
 using Serilog.Events;
-using Swarmer.Models;
 using Swarmer.Models.Logging;
 using Swarmer.Services;
 using System.Globalization;
@@ -94,8 +93,8 @@ public static class Program
 
 	private static void RegisterEndpoints(WebApplication app)
 	{
-		app.MapGet("/streams", (DdStreamProvider ddStreamProvider)
-			=> ddStreamProvider.Streams);
+		app.MapGet("/streams", (StreamProviderService streamProvider)
+			=> streamProvider.Streams);
 
 		app.MapGet("/", async context
 			=> await context.Response.WriteAsync(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Pages", "Index.html"))));
@@ -120,9 +119,8 @@ public static class Program
 			.AddSingleton(commands)
 			.AddSingleton(twitchApi)
 			.AddSingleton<MessageHandlerService>()
-			.AddSingleton<DdStreamProvider>()
 			.AddHostedService<DdStreamsPostingService>()
-			.AddHostedService<UpdateStreamsCacheService>()
+			.AddHostedService<StreamProviderService>()
 			.AddDbContext<DatabaseService>();
 
 		return builder;
