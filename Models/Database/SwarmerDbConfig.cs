@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Swarmer.Models;
+namespace Swarmer.Models.Database;
 
 [Keyless]
 public class SwarmerDbConfig
