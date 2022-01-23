@@ -9,9 +9,9 @@ public class StreamProviderService : AbstractBackgroundService
 	private readonly TwitchAPI _twitchApi;
 	public Stream[]? Streams { get; private set; }
 
-	public StreamProviderService(TwitchAPI twitchApi)
+	public StreamProviderService(IConfiguration config, TwitchAPI twitchApi)
 	{
-		_devilDaggersId = Environment.GetEnvironmentVariable("DdTwitchGameId")!;
+		_devilDaggersId = config["DdTwitchGameId"];
 		_twitchApi = twitchApi;
 	}
 
