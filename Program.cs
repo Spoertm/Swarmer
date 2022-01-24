@@ -101,7 +101,7 @@ public static class Program
 			=> streamProvider.Streams);
 
 		app.MapGet("/", async context
-			=> await context.Response.WriteAsync(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Pages", "Index.html"))));
+			=> await context.Response.WriteAsync(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Models", "Pages", "Index.html"))));
 	}
 
 	private static void ConfigureLogging(IConfiguration config) =>
