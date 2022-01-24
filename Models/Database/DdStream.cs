@@ -13,7 +13,9 @@ public class DdStream
 
 	public ulong MessageId { get; set; }
 
-	public int StreamId { get; set; }
+	public string StreamId { get; set; } = null!;
 
 	public string? OfflineThumbnailUrl { get; set; }
+
+	public DateTime? StartedLingering { get; set; }
 }
