@@ -3,10 +3,10 @@ using Swarmer.Models.Database;
 
 namespace Swarmer.Services;
 
-public class DatabaseService : DbContext
+public class DbService : DbContext
 {
 	public DbSet<DdStreamChannel> DdStreamChannels => Set<DdStreamChannel>();
-	public DbSet<DdStream> DdStreams => Set<DdStream>();
+	public DbSet<StreamMessage> DdStreams => Set<StreamMessage>();
 	public DbSet<SwarmerDbConfig> SwarmerConfig => Set<SwarmerDbConfig>();
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>

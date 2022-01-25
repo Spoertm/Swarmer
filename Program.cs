@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
+using Swarmer.Models;
 using Swarmer.Models.Logging;
 using Swarmer.Services;
 using System.Globalization;
@@ -97,8 +98,8 @@ public static class Program
 
 	private static void RegisterEndpoints(WebApplication app)
 	{
-		app.MapGet("/streams", (StreamProviderService streamProvider)
-			=> streamProvider.Streams);
+		app.MapGet("/streams", (StreamProvider twitchStreams)
+			=> twitchStreams.Streams);
 
 		app.MapGet("/", async context
 			=> await context.Response.WriteAsync(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Models", "Pages", "Index.html"))));
@@ -106,7 +107,7 @@ public static class Program
 
 	private static void ConfigureLogging(IConfiguration config) =>
 		Log.Logger = new LoggerConfiguration()
-			.MinimumLevel.Debug()
+			.MinimumLevel.Fatal()
 			.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u4}] {Message:lj}{NewLine}{Exception}")
 			.WriteTo.Discord(config.GetValue<ulong>("SwarmerLoggerId"), config["SwarmerLoggerToken"])
 			.CreateLogger();
@@ -122,16 +123,17 @@ public static class Program
 			.AddSingleton(commands)
 			.AddSingleton(twitchApi)
 			.AddSingleton<MessageHandlerService>()
+			.AddSingleton<StreamProvider>()
+			.AddHostedService<StreamRefresherService>()
 			.AddHostedService<DdStreamsPostingService>()
-			.AddHostedService<StreamProviderService>()
-			.AddDbContext<DatabaseService>();
+			.AddDbContext<DbService>();
 
 		return builder;
 	}
 
 	private static void SetConfigFromDb(WebApplicationBuilder builder)
 	{
-		using DatabaseService dbService = new();
+		using DbService dbService = new();
 		string jsonConfig = dbService.SwarmerConfig.AsNoTracking().First().JsonConfig;
 		string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DbConfig.json");
 		File.WriteAllText(configPath, jsonConfig);

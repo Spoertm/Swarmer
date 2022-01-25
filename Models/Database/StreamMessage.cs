@@ -3,12 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Swarmer.Models.Database;
 
-public class DdStream
+[Table("DdStreams")]
+public class StreamMessage
 {
 	[Key]
 	public int Id { get; init; }
 
-	[ForeignKey(nameof(ChannelId))]
+	public bool IsLive { get; set; }
+
 	public ulong ChannelId { get; set; }
 
 	public ulong MessageId { get; set; }
@@ -17,5 +19,11 @@ public class DdStream
 
 	public string? OfflineThumbnailUrl { get; set; }
 
-	public DateTime? StartedLingering { get; set; }
+	public string? AvatarUrl { get; set; }
+
+	public DateTime? LingeringSinceUtc { get; set; }
+
+	public void Linger() => LingeringSinceUtc = DateTime.UtcNow;
+
+	public void StopLingering() => LingeringSinceUtc = null;
 }
