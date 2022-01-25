@@ -107,7 +107,7 @@ public static class Program
 
 	private static void ConfigureLogging(IConfiguration config) =>
 		Log.Logger = new LoggerConfiguration()
-			.MinimumLevel.Fatal()
+			.MinimumLevel.Verbose()
 			.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u4}] {Message:lj}{NewLine}{Exception}")
 			.WriteTo.Discord(config.GetValue<ulong>("SwarmerLoggerId"), config["SwarmerLoggerToken"])
 			.CreateLogger();
