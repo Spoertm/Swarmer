@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using Swarmer.Models;
@@ -22,7 +23,11 @@ public static class Program
 		AppDomain.CurrentDomain.ProcessExit += Exit;
 		AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
-		ConfigureLogging();
+		WebApplicationBuilder builder = WebApplication.CreateBuilder();
+		if (builder.Environment.IsProduction())
+			SetConfigFromDb(builder);
+
+		ConfigureLogging(builder.Configuration);
 		Log.Information("Starting");
 
 		DiscordSocketClient client = new(new() { LogLevel = LogSeverity.Error });
@@ -31,19 +36,11 @@ public static class Program
 		commands.Log += OnLog;
 		TwitchAPI twitchApi = new();
 
-		WebApplication app = ConfigureServices(client, commands, twitchApi).Build();
-
+		WebApplication app = ConfigureServices(builder, client, commands, twitchApi).Build();
 		app.UseSwagger();
 		app.UseSwaggerUI();
 
 		RegisterEndpoints(app);
-
-		twitchApi.Settings.AccessToken = Environment.GetEnvironmentVariable("AccessToken");
-		twitchApi.Settings.ClientId = Environment.GetEnvironmentVariable("ClientId");
-		await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("BotToken"));
-		await client.StartAsync();
-		await client.SetGameAsync("Devil Daggers");
-		await commands.AddModulesAsync(Assembly.GetEntryAssembly(), app.Services);
 
 		app.Services.GetRequiredService<MessageHandlerService>();
 
@@ -51,6 +48,13 @@ public static class Program
 		app.UseCors(policyBuilder => policyBuilder.AllowAnyOrigin());
 		app.UseAuthorization();
 		app.MapControllers();
+
+		twitchApi.Settings.AccessToken = app.Configuration["AccessToken"];
+		twitchApi.Settings.ClientId = app.Configuration["ClientId"];
+		await client.LoginAsync(TokenType.Bot, app.Configuration["BotToken"]);
+		await client.StartAsync();
+		await client.SetGameAsync("Devil Daggers");
+		await commands.AddModulesAsync(Assembly.GetEntryAssembly(), app.Services);
 
 		try
 		{
@@ -94,23 +98,22 @@ public static class Program
 
 	private static void RegisterEndpoints(WebApplication app)
 	{
-		app.MapGet("/streams", (StreamCache streamCache)
-			=> streamCache.Cache);
+		app.MapGet("/streams", (StreamProvider twitchStreams)
+			=> twitchStreams.Streams);
 
 		app.MapGet("/", async context
-			=> await context.Response.WriteAsync(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Pages", "Index.html"))));
+			=> await context.Response.WriteAsync(await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Models", "Pages", "Index.html"))));
 	}
 
-	private static void ConfigureLogging() =>
+	private static void ConfigureLogging(IConfiguration config) =>
 		Log.Logger = new LoggerConfiguration()
-			.MinimumLevel.Debug()
+			.MinimumLevel.Verbose()
 			.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u4}] {Message:lj}{NewLine}{Exception}")
-			.WriteTo.Discord(ulong.Parse(Environment.GetEnvironmentVariable("SwarmerLoggerId")!), Environment.GetEnvironmentVariable("SwarmerLoggerToken")!)
+			.WriteTo.Discord(config.GetValue<ulong>("SwarmerLoggerId"), config["SwarmerLoggerToken"])
 			.CreateLogger();
 
-	private static WebApplicationBuilder ConfigureServices(DiscordSocketClient client, CommandService commands, TwitchAPI twitchApi)
+	private static WebApplicationBuilder ConfigureServices(WebApplicationBuilder builder, DiscordSocketClient client, CommandService commands, TwitchAPI twitchApi)
 	{
-		WebApplicationBuilder builder = WebApplication.CreateBuilder();
 		builder.Logging.ClearProviders();
 		builder.Services.AddControllers();
 		builder.Services.AddEndpointsApiExplorer();
@@ -120,12 +123,21 @@ public static class Program
 			.AddSingleton(commands)
 			.AddSingleton(twitchApi)
 			.AddSingleton<MessageHandlerService>()
-			.AddSingleton<StreamCache>()
+			.AddSingleton<StreamProvider>()
+			.AddHostedService<StreamRefresherService>()
 			.AddHostedService<DdStreamsPostingService>()
-			.AddHostedService<UpdateStreamsCacheService>()
-			.AddDbContext<DatabaseService>();
+			.AddDbContext<DbService>();
 
 		return builder;
+	}
+
+	private static void SetConfigFromDb(WebApplicationBuilder builder)
+	{
+		using DbService dbService = new();
+		string jsonConfig = dbService.SwarmerConfig.AsNoTracking().First().JsonConfig;
+		string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DbConfig.json");
+		File.WriteAllText(configPath, jsonConfig);
+		builder.Configuration.AddJsonFile(configPath);
 	}
 
 	private static void Exit(object? sender, EventArgs e) => Exit();
