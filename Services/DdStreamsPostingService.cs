@@ -65,8 +65,8 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	{
 		foreach (Stream ongoingStream in _streamProvider.Streams!)
 		{
-			bool streamIsntPosted = db.DdStreams.AsNoTracking().All(s => s.StreamId != ongoingStream.Id);
-			if (!streamIsntPosted)
+			bool streamIsPosted = db.DdStreams.AsNoTracking().Any(s => s.StreamId == ongoingStream.Id);
+			if (streamIsPosted)
 				continue;
 
 			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: new() { ongoingStream.UserId })).Users[0];
