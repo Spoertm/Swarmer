@@ -113,15 +113,14 @@ public class DdStreamsPostingService : AbstractBackgroundService
 					continue;
 
 				bool messageIsLingering = streamMessage.LingeringSinceUtc.HasValue;
-				if (messageIsLingering) // The Discord message is offline, and it's lingering (came online again within time limit)
-				{
-					streamMessage.IsLive = true;
-					await GoOnlineAgainAsync(streamMessage, ongoingStream!);
-				}
-				else
+				if (!messageIsLingering)
 				{
 					db.Remove(streamMessage);
+					continue;
 				}
+
+				streamMessage.IsLive = true;
+				await GoOnlineAgainAsync(streamMessage, ongoingStream!);
 			}
 			else // Stream is offline on Twitch
 			{
