@@ -4,6 +4,9 @@ namespace Swarmer.Utils;
 
 public static class StreamEmbed
 {
+	public static Embed Online(Stream stream, string thumbnailUrl)
+		=> Online(stream.Title, stream.UserName, stream.ThumbnailUrl, thumbnailUrl, $"https://twitch.tv/{stream.UserName}");
+
 	public static Embed Online(
 		string title,
 		string username,
