@@ -120,6 +120,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 				}
 
 				streamMessage.IsLive = true;
+				streamMessage.Linger();
 				await GoOnlineAgainAsync(streamMessage, ongoingStream!);
 			}
 			else // Stream is offline on Twitch
