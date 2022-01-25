@@ -107,7 +107,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		foreach (StreamMessage streamMessage in db.DdStreams)
 		{
 			Stream? ongoingStream = _streamProvider.Streams!.FirstOrDefault(s => s.Id == streamMessage.StreamId);
-			if (ongoingStream is not null) // Stream is live on Twith
+			if (ongoingStream is not null) // Stream is live on Twitch
 			{
 				if (streamMessage.IsLive)
 					continue;
