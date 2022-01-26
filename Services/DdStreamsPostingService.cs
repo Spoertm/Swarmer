@@ -149,8 +149,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			await channel.GetMessageAsync(streamMessage.MessageId) is not IUserMessage message)
 			return;
 
-		bool streamMessageIsOffline = message.Embeds.First().Description.StartsWith("⚫ Offline");
-		if (!streamMessageIsOffline)
+		if (streamMessage.IsLive)
 		{
 			Embed newEmbed = StreamEmbed.Offline(message.Embeds.First(), streamMessage.OfflineThumbnailUrl);
 			await message.ModifyAsync(m => m.Embeds = new(new[] { newEmbed }));
@@ -163,8 +162,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			await channel.GetMessageAsync(streamMessage.MessageId) is not IUserMessage message)
 			return;
 
-		bool streamMessageIsOnline = message.Embeds.First().Description.StartsWith("🔴 Live");
-		if (!streamMessageIsOnline)
+		if (!streamMessage.IsLive)
 		{
 			Embed streamEmbed = StreamEmbed.Online(ongoingStream, streamMessage.AvatarUrl);
 			await message.ModifyAsync(m => m.Embeds = new(new[] { streamEmbed }));
