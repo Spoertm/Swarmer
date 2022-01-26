@@ -143,27 +143,23 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task GoOfflineAsync(StreamMessage streamMessage)
 	{
-		if (await _discordClient.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
+		if (!streamMessage.IsLive ||
+			await _discordClient.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
 			await channel.GetMessageAsync(streamMessage.MessageId) is not IUserMessage message)
 			return;
 
-		if (streamMessage.IsLive)
-		{
-			Embed newEmbed = StreamEmbed.Offline(message.Embeds.First(), streamMessage.OfflineThumbnailUrl);
-			await message.ModifyAsync(m => m.Embeds = new(new[] { newEmbed }));
-		}
+		Embed newEmbed = StreamEmbed.Offline(message.Embeds.First(), streamMessage.OfflineThumbnailUrl);
+		await message.ModifyAsync(m => m.Embeds = new(new[] { newEmbed }));
 	}
 
 	private async Task GoOnlineAgainAsync(StreamMessage streamMessage, Stream ongoingStream)
 	{
-		if (await _discordClient.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
+		if (streamMessage.IsLive ||
+			await _discordClient.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
 			await channel.GetMessageAsync(streamMessage.MessageId) is not IUserMessage message)
 			return;
 
-		if (!streamMessage.IsLive)
-		{
-			Embed streamEmbed = StreamEmbed.Online(ongoingStream, streamMessage.AvatarUrl);
-			await message.ModifyAsync(m => m.Embeds = new(new[] { streamEmbed }));
-		}
+		Embed streamEmbed = StreamEmbed.Online(ongoingStream, streamMessage.AvatarUrl);
+		await message.ModifyAsync(m => m.Embeds = new(new[] { streamEmbed }));
 	}
 }
