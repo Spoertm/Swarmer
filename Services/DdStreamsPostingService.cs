@@ -118,17 +118,17 @@ public class DdStreamsPostingService : AbstractBackgroundService
 					continue;
 				}
 
+				await GoOnlineAgainAsync(streamMessage, ongoingStream);
 				streamMessage.IsLive = true;
 				streamMessage.Linger();
-				await GoOnlineAgainAsync(streamMessage, ongoingStream);
 			}
 			else // Stream is offline on Twitch
 			{
 				if (streamMessage.IsLive) // The Discord message is live (stream just went offline)
 				{
+					await GoOfflineAsync(streamMessage);
 					streamMessage.IsLive = false;
 					streamMessage.Linger();
-					await GoOfflineAsync(streamMessage);
 				}
 
 				if (streamMessage.IsLingering) // The Discord message is offline, and it's lingering
@@ -154,8 +154,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task GoOnlineAgainAsync(StreamMessage streamMessage, Stream ongoingStream)
 	{
-		if (streamMessage.IsLive ||
-			await _discordClient.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
+		if (await _discordClient.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
 			await channel.GetMessageAsync(streamMessage.MessageId) is not IUserMessage message)
 			return;
 
