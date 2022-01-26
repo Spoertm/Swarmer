@@ -112,8 +112,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 				if (streamMessage.IsLive)
 					continue;
 
-				bool messageIsLingering = streamMessage.LingeringSinceUtc.HasValue;
-				if (!messageIsLingering)
+				if (!streamMessage.IsLingering)
 				{
 					db.Remove(streamMessage);
 					continue;
@@ -132,8 +131,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 					await GoOfflineAsync(streamMessage);
 				}
 
-				bool messageIsLingering = streamMessage.LingeringSinceUtc.HasValue;
-				if (messageIsLingering) // The Discord message is offline, and it's lingering
+				if (streamMessage.IsLingering) // The Discord message is offline, and it's lingering
 					continue;
 
 				db.Remove(streamMessage);

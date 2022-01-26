@@ -26,4 +26,6 @@ public class StreamMessage
 	public void Linger() => LingeringSinceUtc = DateTime.UtcNow;
 
 	public void StopLingering() => LingeringSinceUtc = null;
+
+	public bool IsLingering => LingeringSinceUtc.HasValue;
 }
