@@ -63,9 +63,10 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task PostCompletelyNewStreamsAndAddToDb(DbService db)
 	{
+
 		foreach (Stream ongoingStream in _streamProvider.Streams!)
 		{
-			bool streamIsPosted = db.DdStreams.AsNoTracking().Any(s => s.StreamId == ongoingStream.Id);
+			bool streamIsPosted = db.DdStreams.Any(s => s.StreamId == ongoingStream.Id);
 			if (streamIsPosted)
 				continue;
 
