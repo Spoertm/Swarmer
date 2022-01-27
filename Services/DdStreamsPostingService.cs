@@ -63,7 +63,10 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task PostCompletelyNewStreamsAndAddToDb(DbService db)
 	{
+		if (_streamProvider.Streams!.Length == 0)
+			return;
 
+		List<DdStreamChannel> streamChannels = db.DdStreamChannels.AsNoTracking().ToList();
 		foreach (Stream ongoingStream in _streamProvider.Streams!)
 		{
 			bool streamIsPosted = db.DdStreams.Any(s => s.StreamId == ongoingStream.Id);
@@ -72,7 +75,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: new() { ongoingStream.UserId })).Users[0];
 			Embed newStreamEmbed = StreamEmbed.Online(ongoingStream, twitchUser.ProfileImageUrl);
-			foreach (DdStreamChannel streamChannel in db.DdStreamChannels.AsNoTracking().ToList())
+			foreach (DdStreamChannel streamChannel in streamChannels)
 			{
 				if (await _discordClient.GetChannelAsync(streamChannel.Id) is not ITextChannel channel)
 				{
