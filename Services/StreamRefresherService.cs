@@ -10,7 +10,7 @@ public class StreamRefresherService : AbstractBackgroundService
 	private readonly TwitchAPI _twitchApi;
 	private readonly StreamProvider _streamProvider;
 
-	public StreamRefresherService(IConfiguration config, TwitchAPI twitchApi, StreamProvider streamProvider)
+	public StreamRefresherService(TwitchAPI twitchApi, StreamProvider streamProvider)
 	{
 		_twitchApi = twitchApi;
 		_streamProvider = streamProvider;
