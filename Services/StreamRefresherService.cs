@@ -6,13 +6,12 @@ namespace Swarmer.Services;
 
 public class StreamRefresherService : AbstractBackgroundService
 {
-	private readonly string _devilDaggersId;
+	private const string _devilDaggersId = "490905";
 	private readonly TwitchAPI _twitchApi;
 	private readonly StreamProvider _streamProvider;
 
 	public StreamRefresherService(IConfiguration config, TwitchAPI twitchApi, StreamProvider streamProvider)
 	{
-		_devilDaggersId = config["DdTwitchGameId"];
 		_twitchApi = twitchApi;
 		_streamProvider = streamProvider;
 	}
