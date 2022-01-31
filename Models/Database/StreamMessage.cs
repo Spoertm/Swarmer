@@ -21,9 +21,9 @@ public class StreamMessage
 
 	public string? AvatarUrl { get; set; }
 
-	public DateTime? LingeringSinceUtc { get; set; }
+	public DateTimeOffset? LingeringSinceUtc { get; set; }
 
-	public void Linger() => LingeringSinceUtc = DateTime.UtcNow;
+	public void Linger() => LingeringSinceUtc = DateTimeOffset.UtcNow;
 
 	public void StopLingering() => LingeringSinceUtc = null;
 
