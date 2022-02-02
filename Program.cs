@@ -46,8 +46,6 @@ public static class Program
 
 		app.UseHttpsRedirection();
 		app.UseCors(policyBuilder => policyBuilder.AllowAnyOrigin());
-		app.UseAuthorization();
-		app.MapControllers();
 
 		twitchApi.Settings.AccessToken = app.Configuration["AccessToken"];
 		twitchApi.Settings.ClientId = app.Configuration["ClientId"];
@@ -115,10 +113,10 @@ public static class Program
 	private static WebApplicationBuilder ConfigureServices(WebApplicationBuilder builder, DiscordSocketClient client, CommandService commands, TwitchAPI twitchApi)
 	{
 		builder.Logging.ClearProviders();
-		builder.Services.AddControllers();
-		builder.Services.AddEndpointsApiExplorer();
-		builder.Services.AddSwaggerGen();
 		builder.Services
+			.AddEndpointsApiExplorer()
+			.AddSwaggerGen()
+			.AddCors()
 			.AddSingleton(client)
 			.AddSingleton(commands)
 			.AddSingleton(twitchApi)
