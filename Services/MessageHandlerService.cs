@@ -18,10 +18,10 @@ public class MessageHandlerService
 		_services = services;
 		_config = config;
 
-		client.MessageReceived += OnMessageRecievedAsync;
+		client.MessageReceived += OnMessageReceivedAsync;
 	}
 
-	private async Task OnMessageRecievedAsync(SocketMessage msg)
+	private async Task OnMessageReceivedAsync(SocketMessage msg)
 	{
 		if (msg is not SocketUserMessage { Source: MessageSource.User } message)
 			return;
