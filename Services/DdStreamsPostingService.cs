@@ -158,8 +158,10 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			}
 		}
 
-		await db.SaveChangesAsync();
-		Log.Debug("After saving changes (handleSM):\n{AllMsgs}", string.Join("\n\n", db.DdStreams.ToList()));
+		int writtenEntries = await db.SaveChangesAsync();
+
+		if (writtenEntries > 0)
+			Log.Debug("After saving changes (handleSM):\n{AllMsgs}", string.Join("\n\n", db.DdStreams.ToList()));
 	}
 
 	private async Task GoOfflineAsync(StreamMessage streamMessage)
