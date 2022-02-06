@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿global using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
+using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -7,7 +8,6 @@ using Swarmer.Models.Database;
 using Swarmer.Utils;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
-global using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 
 namespace Swarmer.Services;
 
