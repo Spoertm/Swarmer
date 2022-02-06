@@ -28,4 +28,7 @@ public class StreamMessage
 	public void StopLingering() => LingeringSinceUtc = null;
 
 	public bool IsLingering => LingeringSinceUtc.HasValue;
+
+	public override string ToString()
+		=> $"{{ {nameof(Id)}: {Id}, {nameof(IsLive)}: {IsLive}, {nameof(ChannelId)}: {ChannelId}, {nameof(MessageId)}: {MessageId}, {nameof(StreamId)}: {StreamId}, {nameof(LingeringSinceUtc)}: {LingeringSinceUtc} }}";
 }

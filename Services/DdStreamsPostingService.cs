@@ -51,14 +51,21 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	private async Task UpdateLingerStatus(DbService db)
 	{
 		DateTime utcNow = DateTime.UtcNow;
-		foreach (StreamMessage ddStream in db.DdStreams)
-		{
-			bool hasLingeredForLongEnough = ddStream.LingeringSinceUtc.HasValue && utcNow - ddStream.LingeringSinceUtc >= _maxLingeringTime;
-			if (hasLingeredForLongEnough)
-				ddStream.StopLingering();
-		}
+		List<StreamMessage> toStopLingering = db.DdStreams
+			.Where(ds => ds.IsLingering && utcNow - ds.LingeringSinceUtc >= _maxLingeringTime)
+			.ToList();
+
+		Log.Debug("At UTC: {UtcNow} => attempting to stop these streams from lingering:\n{StopLingering}", utcNow, string.Join("\n\n", toStopLingering));
+		foreach (StreamMessage streamMessage in toStopLingering)
+			streamMessage.StopLingering();
 
 		await db.SaveChangesAsync();
+
+		List<StreamMessage> afterSaving = db.DdStreams
+			.Intersect(toStopLingering)
+			.ToList();
+
+		Log.Debug("After saving changes (lingering):\n{StopLingeringAfterChanges}", string.Join("\n\n", afterSaving));
 	}
 
 	private async Task PostCompletelyNewStreamsAndAddToDb(DbService db)
@@ -99,6 +106,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 					LingeringSinceUtc = DateTime.UtcNow,
 				};
 
+				Log.Debug("Adding new stream: {NewStream}", newDbStreamMessage);
 				await db.DdStreams.AddAsync(newDbStreamMessage);
 			}
 		}
@@ -118,6 +126,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 				if (!streamMessage.IsLingering)
 				{
+					Log.Debug("Removing StreamMessage (offline && not lingering):\n{MsgToRemove}", streamMessage);
 					db.Remove(streamMessage);
 					continue;
 				}
@@ -125,6 +134,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 				await GoOnlineAgainAsync(streamMessage, ongoingStream);
 				streamMessage.IsLive = true;
 				streamMessage.Linger();
+				Log.Debug("StreamMessage going online again:\n{OnlineAgain}", streamMessage);
 			}
 			else // Stream is offline on Twitch
 			{
@@ -133,16 +143,19 @@ public class DdStreamsPostingService : AbstractBackgroundService
 					await GoOfflineAsync(streamMessage);
 					streamMessage.IsLive = false;
 					streamMessage.Linger();
+					Log.Debug("StreamMessage going offline (offline on twitch)\n{GoingOffline}", streamMessage);
 				}
 
 				if (streamMessage.IsLingering) // The Discord message is offline, and it's lingering
 					continue;
 
+				Log.Debug("Removing StreamMessage (offline && not lingering):\n{MsgToRemove}", streamMessage);
 				db.Remove(streamMessage);
 			}
 		}
 
 		await db.SaveChangesAsync();
+		Log.Debug("After saving changes (handleSM):\n{AllMsgs}", string.Join("\n\n", db.DdStreams.ToList()));
 	}
 
 	private async Task GoOfflineAsync(StreamMessage streamMessage)
