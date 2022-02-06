@@ -2,6 +2,7 @@
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Serilog;
 using Swarmer.Models;
 using Swarmer.Models.Database;
@@ -110,8 +111,8 @@ public class DdStreamsPostingService : AbstractBackgroundService
 					LingeringSinceUtc = DateTime.UtcNow,
 				};
 
-				Log.Debug("Adding new stream: {NewStream}", newDbStreamMessage);
-				await db.DdStreams.AddAsync(newDbStreamMessage);
+				EntityEntry<StreamMessage> entry = await db.DdStreams.AddAsync(newDbStreamMessage);
+				Log.Debug("Added new stream: {NewStream}", entry.Entity);
 			}
 		}
 
