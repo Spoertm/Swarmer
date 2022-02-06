@@ -1,5 +1,4 @@
-﻿global using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -8,6 +7,7 @@ using Swarmer.Models.Database;
 using Swarmer.Utils;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
+global using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 
 namespace Swarmer.Services;
 
@@ -56,17 +56,20 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			.Where(ds => ds.IsLingering && utcNow - ds.LingeringSinceUtc >= _maxLingeringTime)
 			.ToList();
 
-		Log.Debug("At UTC: {UtcNow} => attempting to stop these streams from lingering:\n{StopLingering}", utcNow, string.Join("\n\n", toStopLingering));
+		if (toStopLingering.Count > 0)
+			Log.Debug("At UTC: {UtcNow} => attempting to stop these streams from lingering:\n{StopLingering}", utcNow, string.Join("\n\n", toStopLingering));
+
 		foreach (StreamMessage streamMessage in toStopLingering)
 			streamMessage.StopLingering();
 
 		await db.SaveChangesAsync();
 
-		List<StreamMessage> afterSaving = db.DdStreams
-			.Intersect(toStopLingering)
-			.ToList();
+		IEnumerable<StreamMessage> afterSaving = db.DdStreams
+			.ToList()
+			.Intersect(toStopLingering);
 
-		Log.Debug("After saving changes (lingering):\n{StopLingeringAfterChanges}", string.Join("\n\n", afterSaving));
+		if (toStopLingering.Count > 0)
+			Log.Debug("After saving changes (lingering):\n{StopLingeringAfterChanges}", string.Join("\n\n", afterSaving));
 	}
 
 	private async Task PostCompletelyNewStreamsAndAddToDb(DbService db)
