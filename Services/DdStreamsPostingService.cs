@@ -52,6 +52,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	{
 		DateTime utcNow = DateTime.UtcNow;
 		List<StreamMessage> toStopLingering = db.DdStreams
+			.ToList()
 			.Where(ds => ds.IsLingering && utcNow - ds.LingeringSinceUtc >= _maxLingeringTime)
 			.ToList();
 
