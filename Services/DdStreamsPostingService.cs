@@ -42,13 +42,10 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		using IServiceScope scope = _serviceScopeFactory.CreateScope();
 		await using DbService db = scope.ServiceProvider.GetRequiredService<DbService>();
 
-		Log.Debug("Attempting to run UpdateLingerStatus()");
 		await UpdateLingerStatus(db);
 
-		Log.Debug("About to run PostCompletelyNewStreamsAndAddToDb()");
 		await PostCompletelyNewStreamsAndAddToDb(db);
 
-		Log.Debug("About to run HandleStreamMessages()");
 		await HandleStreamMessages(db);
 	}
 
