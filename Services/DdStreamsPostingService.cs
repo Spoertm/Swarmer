@@ -69,7 +69,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		List<DdStreamChannel> streamChannels = db.DdStreamChannels.AsNoTracking().ToList();
 		foreach (Stream ongoingStream in _streamProvider.Streams!)
 		{
-			bool streamIsPosted = db.DdStreams.Any(s => s.StreamId == ongoingStream.Id);
+			bool streamIsPosted = db.DdStreams.Any(s => s.StreamId == ongoingStream.UserId);
 			if (streamIsPosted)
 				continue;
 
@@ -90,7 +90,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 				IUserMessage message = await channel.SendMessageAsync(embed: newStreamEmbed);
 				StreamMessage newDbStreamMessage = new()
 				{
-					StreamId = ongoingStream.Id,
+					StreamId = ongoingStream.UserId,
 					IsLive = true,
 					ChannelId = channel.Id,
 					MessageId = message.Id,
@@ -110,7 +110,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	{
 		foreach (StreamMessage streamMessage in db.DdStreams)
 		{
-			Stream? ongoingStream = Array.Find(_streamProvider.Streams!, s => s.Id == streamMessage.StreamId);
+			Stream? ongoingStream = Array.Find(_streamProvider.Streams!, s => s.UserId == streamMessage.StreamId);
 			if (ongoingStream is not null) // Stream is live on Twitch
 			{
 				if (streamMessage.IsLive)
