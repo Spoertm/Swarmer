@@ -152,8 +152,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		}
 
 		int writtenEntries = await db.SaveChangesAsync();
+		List<StreamMessage> logDb = await db.DdStreams.ToListAsync();
 		if (writtenEntries > 0)
-			Log.Debug("Database after saving changes in HandleStreamMessages:\n{@AllMsgs}", db.DdStreams.ToList());
+			Log.Debug("Database after saving changes in HandleStreamMessages:\n{@AllMsgs}", logDb);
 	}
 
 	private async Task GoOfflineAsync(StreamMessage streamMessage)
