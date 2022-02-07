@@ -42,10 +42,13 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		using IServiceScope scope = _serviceScopeFactory.CreateScope();
 		await using DbService db = scope.ServiceProvider.GetRequiredService<DbService>();
 
+		Log.Debug("Attempting to run UpdateLingerStatus()");
 		await UpdateLingerStatus(db);
 
+		Log.Debug("About to run PostCompletelyNewStreamsAndAddToDb()");
 		await PostCompletelyNewStreamsAndAddToDb(db);
 
+		Log.Debug("About to run HandleStreamMessages()");
 		await HandleStreamMessages(db);
 	}
 
@@ -57,20 +60,12 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			.Where(ds => ds.IsLingering && utcNow - ds.LingeringSinceUtc >= _maxLingeringTime)
 			.ToList();
 
-		if (toStopLingering.Count > 0)
-			Log.Debug("At UTC: {UtcNow} => attempting to stop these streams from lingering:\n{StopLingering}", utcNow, string.Join("\n\n", toStopLingering));
-
 		foreach (StreamMessage streamMessage in toStopLingering)
 			streamMessage.StopLingering();
 
-		await db.SaveChangesAsync();
-
-		IEnumerable<StreamMessage> afterSaving = db.DdStreams
-			.ToList()
-			.Intersect(toStopLingering);
-
-		if (toStopLingering.Count > 0)
-			Log.Debug("After saving changes (lingering):\n{StopLingeringAfterChanges}", string.Join("\n\n", afterSaving));
+		int numberOfChanges = await db.SaveChangesAsync();
+		if (numberOfChanges > 0)
+			Log.Debug("Stopped streams from lingering:\n{@StopLingeringAfterChanges}", toStopLingering);
 	}
 
 	private async Task PostCompletelyNewStreamsAndAddToDb(DbService db)
@@ -91,7 +86,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			{
 				if (await _discordClient.GetChannelAsync(streamChannel.Id) is not ITextChannel channel)
 				{
-					Log.Warning("Registered channel {} doesn't exist", streamChannel);
+					Log.Warning("Registered channel {@StreamChannel} doesn't exist", streamChannel);
 					continue;
 				}
 
@@ -112,7 +107,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 				};
 
 				EntityEntry<StreamMessage> entry = await db.DdStreams.AddAsync(newDbStreamMessage);
-				Log.Debug("Added new stream: {NewStream}", entry.Entity);
+				Log.Debug("Added new StreamMessage: {@StreamMessage}", entry.Entity);
 			}
 		}
 
@@ -131,7 +126,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 				if (!streamMessage.IsLingering)
 				{
-					Log.Debug("Removing StreamMessage (offline && not lingering):\n{MsgToRemove}", streamMessage);
+					Log.Debug("Removing StreamMessage (offline && not lingering):\n{@MsgToRemove}", streamMessage);
 					db.Remove(streamMessage);
 					continue;
 				}
@@ -139,7 +134,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 				await GoOnlineAgainAsync(streamMessage, ongoingStream);
 				streamMessage.IsLive = true;
 				streamMessage.Linger();
-				Log.Debug("StreamMessage going online again:\n{OnlineAgain}", streamMessage);
+				Log.Debug("StreamMessage going online again:\n{@OnlineAgain}", streamMessage);
 			}
 			else // Stream is offline on Twitch
 			{
@@ -148,21 +143,20 @@ public class DdStreamsPostingService : AbstractBackgroundService
 					await GoOfflineAsync(streamMessage);
 					streamMessage.IsLive = false;
 					streamMessage.Linger();
-					Log.Debug("StreamMessage going offline (offline on twitch)\n{GoingOffline}", streamMessage);
+					Log.Debug("StreamMessage going offline (offline on twitch)\n{@GoingOffline}", streamMessage);
 				}
 
 				if (streamMessage.IsLingering) // The Discord message is offline, and it's lingering
 					continue;
 
-				Log.Debug("Removing StreamMessage (offline && not lingering):\n{MsgToRemove}", streamMessage);
-				db.Remove(streamMessage);
+				EntityEntry<StreamMessage> removedEntiity = db.Remove(streamMessage);
+				Log.Debug("Removed offline StreamMessage (not lingering):\n{@RemovedEntity}", removedEntiity);
 			}
 		}
 
 		int writtenEntries = await db.SaveChangesAsync();
-
 		if (writtenEntries > 0)
-			Log.Debug("After saving changes (handleSM):\n{AllMsgs}", string.Join("\n\n", db.DdStreams.ToList()));
+			Log.Debug("Database after saving changes in HandleStreamMessages:\n{@AllMsgs}", db.DdStreams.ToList());
 	}
 
 	private async Task GoOfflineAsync(StreamMessage streamMessage)
