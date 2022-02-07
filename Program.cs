@@ -108,6 +108,9 @@ public static class Program
 			.MinimumLevel.Verbose()
 			.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u4}] {Message:lj}{NewLine}{Exception}")
 			.WriteTo.Discord(config.GetValue<ulong>("SwarmerLoggerId"), config["SwarmerLoggerToken"])
+			.WriteTo.File(Path.Combine("Logs", "Log-.txt"),
+				outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u4}] {Message:lj}{NewLine}{Exception}",
+				rollingInterval: RollingInterval.Month)
 			.CreateLogger();
 
 	private static WebApplicationBuilder ConfigureServices(WebApplicationBuilder builder, DiscordSocketClient client, CommandService commands, TwitchAPI twitchApi)
