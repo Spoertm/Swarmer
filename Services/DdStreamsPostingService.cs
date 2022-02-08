@@ -125,6 +125,7 @@ public class DdStreamsPostingService : AbstractBackgroundService
 				await GoOnlineAgainAsync(streamMessage, ongoingStream);
 				streamMessage.IsLive = true;
 				streamMessage.Linger();
+				Log.Debug("StreamMessage went online again:\n{@StreamMessage}", streamMessage);
 			}
 			else // Stream is offline on Twitch
 			{
