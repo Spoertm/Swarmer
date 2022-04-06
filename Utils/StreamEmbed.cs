@@ -8,7 +8,7 @@ public static class StreamEmbed
 	public static Embed Online(Stream stream, string? avatarUrl) => new EmbedBuilder()
 		.WithDescription("🔴 Live| " + stream.Title)
 		.WithThumbnailUrl(stream.ThumbnailUrl.FormatDimensions())
-		.WithAuthor(stream.UserName, avatarUrl, $"https://twitch.tv/{stream.UserName}")
+		.WithAuthor(stream.UserName, avatarUrl, $"https://twitch.tv/{stream.UserLogin}")
 		.WithColor(6570404)
 		.Build();
 
