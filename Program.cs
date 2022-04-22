@@ -1,7 +1,6 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using Swarmer.Models;
@@ -24,9 +23,6 @@ public static class Program
 		AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
 		WebApplicationBuilder builder = WebApplication.CreateBuilder();
-		if (builder.Environment.IsProduction())
-			SetConfigFromDb(builder);
-
 		ConfigureLogging(builder.Configuration);
 		Log.Information("Starting");
 
@@ -127,15 +123,6 @@ public static class Program
 			.AddDbContext<DbService>();
 
 		return builder;
-	}
-
-	private static void SetConfigFromDb(WebApplicationBuilder builder)
-	{
-		using DbService dbService = new();
-		string jsonConfig = dbService.SwarmerConfig.AsNoTracking().First().JsonConfig;
-		string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DbConfig.json");
-		File.WriteAllText(configPath, jsonConfig);
-		builder.Configuration.AddJsonFile(configPath);
 	}
 
 	private static void Exit(object? sender, EventArgs e) => Exit();
