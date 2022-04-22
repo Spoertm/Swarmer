@@ -62,7 +62,7 @@ public static class Program
 		{
 			Log.Information("Exiting");
 			await client.LogoutAsync();
-			client.Dispose();
+			await client.DisposeAsync();
 			_source.Dispose();
 			AppDomain.CurrentDomain.ProcessExit -= Exit;
 		}
