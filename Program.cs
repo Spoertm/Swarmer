@@ -125,7 +125,8 @@ public static class Program
 			.AddHostedService<StreamRefresherService>()
 			.AddHostedService<DdStreamsPostingService>()
 			.AddHostedService<KeepDynoAliveService>()
-			.AddDbContext<DbService>();
+			.AddDbContext<DbService>()
+			.AddHttpClient();
 
 		return builder;
 	}
