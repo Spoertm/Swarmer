@@ -124,6 +124,7 @@ public static class Program
 			.AddSingleton<StreamProvider>()
 			.AddHostedService<StreamRefresherService>()
 			.AddHostedService<DdStreamsPostingService>()
+			.AddHostedService<KeepDynoAliveService>()
 			.AddDbContext<DbService>();
 
 		return builder;
