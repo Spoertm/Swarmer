@@ -19,6 +19,8 @@ public class AccessTokenNotifierService : AbstractBackgroundService
 
 	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
+		Log.Debug("Checking access token validity");
+
 		ValidateAccessTokenResponse? response = await _twitchApi.Auth.ValidateAccessTokenAsync(_config["AccessToken"]);
 		if (response is null)
 		{
@@ -28,6 +30,7 @@ public class AccessTokenNotifierService : AbstractBackgroundService
 
 		const int timeLimitDays = 5;
 		TimeSpan timeLeft = TimeSpan.FromSeconds(Convert.ToDouble(response.ExpiresIn));
+		Log.Debug("Time left for invaldity: {TimeSpanLeft}", timeLeft.ToString("dd\\d\\ hh\\h\\ mm\\m"));
 		if (timeLeft.Days < timeLimitDays)
 			Log.Fatal("It's {DaysLeft} days left before the access token expires", timeLeft.Days);
 	}
