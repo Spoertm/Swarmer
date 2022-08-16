@@ -125,6 +125,7 @@ public static class Program
 			.AddHostedService<StreamRefresherService>()
 			.AddHostedService<DdStreamsPostingService>()
 			.AddHostedService<KeepDynoAliveService>()
+			.AddHostedService<AccessTokenNotifierService>()
 			.AddDbContext<DbService>()
 			.AddHttpClient();
 
