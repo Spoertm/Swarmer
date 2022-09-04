@@ -5,6 +5,7 @@ module.exports = {
 	content: ['./**/*.{razor,html}'],
 	theme: {
 		fontSize: {
+			'2xl': '1.4rem',
 			'3xl': '1.875rem',
 			'4xl': '2.25rem',
 			'5xl': '3rem'

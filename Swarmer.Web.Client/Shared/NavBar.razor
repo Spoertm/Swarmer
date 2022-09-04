@@ -3,45 +3,46 @@
 @* ReSharper disable once InconsistentNaming *@
 @inject DarkModeManager DMM
 
-<nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-black border-b-2 border-sky-500 dark:border-sky-700">
+<nav class="px-2 sm:px-4 py-2.5 dark:bg-black border-b-2 border-sky-500 dark:border-sky-700">
 	<div class="container flex flex-wrap justify-between items-center content-center mx-auto lg:pl-15 md:pl-0">
 		<a href="" class="flex items-center">
 			<img src="Assets/Swarmer.svg" class="dark:invert mr-4 h-9 sm:h-9" alt="Flowbite Logo"/>
-			<span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Swarmer</span>
+			<span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Swarmer</span>
 		</a>
-		<button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+		<button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 active:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:active:bg-gray-800">
 			<span class="sr-only">Open main menu</span>
-			<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+			<svg class="w-6 h-6" fill="currentcolor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
 				<path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
 			</svg>
 		</button>
 
 		<div class="hidden w-full md:block md:w-auto content-center" id="navbar-default">
 			<ul class="flex flex-col p-4 mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 md:bg-white dark:bg-black md:dark:bg-black dark:border-gray-700">
-				<li>
+				<li class="flex items-center">
 					<NavLink Match="NavLinkMatch.All" href="" class="nav-item">Home</NavLink>
 				</li>
-				<li>
+				<li class="flex items-center">
 					<NavLink href="counter" class="nav-item">Counter</NavLink>
 				</li>
-				<li>
+				<li class="flex items-center">
 					<NavLink href="swagger" class="nav-item">API</NavLink>
 				</li>
-				<li>
+				<li class="flex items-center">
 					<NavLink href="faq" class="nav-item">FAQ</NavLink>
 				</li>
-				<li>
-					<NavLink href="donate" class="nav-item">Donate <span class="text-red-600">❤</span></NavLink>
+				<li class="flex items-center">
+					<NavLink class="flex flex-row nav-item" href="https://donorbox.org/dd-bots" target="_blank">
+						<img alt="donorbox logo" class="backdrop-invert-0 dark:backdrop-invert-0" src="https://donorbox.org/images/red_logo.png">
+						<span class="ml-2">Donate</span>
+					</NavLink>
 				</li>
 
-				<li>
-					<div class="block w-px h-full bg-gray-400 dark:bg-gray-500"></div>
+				<li class="hidden md:block flex items-center">
+					<div class="w-px h-full bg-gray-400 dark:bg-gray-500"></div>
 				</li>
 
-				<li>
-					<button @onclick="Toggle" id="theme-toggle" type="button" class="h-full rounded p-2 block
-                                                                                       text-black bg-gray-100
-                                                                                       dark:text-white dark:bg-gray-800">
+				<li class="flex items-center">
+					<button @onclick="Toggle" id="theme-toggle" type="button" class="rounded p-2 block text-white bg-gray-800">
 						@if (DMM.DarkMode)
 						{
 							<!--Sun-->
@@ -65,9 +66,6 @@
 
 @code
 {
-	string _dingItem = "block rounded md:p-2 text-black bg-gray-200 hover:bg-gray-100 active:bg-gray-200 dark:text-white dark:bg-gray-700 dark:hover:bg-gray-700 dark:active:bg-gray-800";
-	string _zingItem = "block rounded md:p-2 text-black hover:bg-gray-100 active:bg-gray-200 dark:text-white dark:hover:bg-gray-700 dark:active:bg-gray-800";
-
 	[Parameter]
 	public EventCallback OnDarkModeToggled { get; set; }
 
