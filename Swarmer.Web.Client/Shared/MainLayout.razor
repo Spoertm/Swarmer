@@ -1,17 +1,20 @@
-﻿@using Swarmer.Web.Client.Services
+﻿@implements IDisposable
+@using Swarmer.Web.Client.Services
 @inherits LayoutComponentBase
 @* ReSharper disable once InconsistentNaming *@
 @inject DarkModeManager DMM
 
 <div class="@(_darkMode ? "dark" : "")">
 	<div>
-		<NavBar OnDarkModeToggled="@HandleDarkModeToggled"/>
+		<NavBar/>
 	</div>
 
-	<div class="dark text-center text-black dark:text-white h-screen md:text-left md:px-30 pt-10 dark:bg-black">
+	<div class="dark:bg-black">
 		<ErrorBoundary>
 			<ChildContent>
-				@Body
+				<div class="mx-auto container content-center text-center text-black dark:text-white h-screen md:px-30 pt-10 ">
+					@Body
+				</div>
 			</ChildContent>
 			<ErrorContent>
 				<h3>An error occured. Try <a href="." class="text-sky-500 hover:underline hover:underline-offset-2">reloading</a> the page.</h3>
@@ -27,8 +30,15 @@
 	protected override Task OnInitializedAsync()
 	{
 		_darkMode = DMM.DarkMode;
+		DMM.DarkModeToggle += OnDmmOnDarkModeToggle;
 		return base.OnInitializedAsync();
 	}
 
-	private void HandleDarkModeToggled() => _darkMode = DMM.DarkMode;
+	private void OnDmmOnDarkModeToggle()
+	{
+		_darkMode = DMM.DarkMode;
+		StateHasChanged();
+	}
+
+	public void Dispose() => DMM.DarkModeToggle -= OnDmmOnDarkModeToggle;
 }
