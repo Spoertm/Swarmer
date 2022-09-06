@@ -1,23 +1,23 @@
 ﻿@implements IDisposable
 @using Swarmer.Web.Client.Services
 @inherits LayoutComponentBase
-@* ReSharper disable once InconsistentNaming *@
+@* ReSharper disable InconsistentNaming *@
 @inject DarkModeManager DMM
+@inject IJSRuntime JS
+@* ReSharper restore InconsistentNaming *@
 
-<div class="@(_darkMode ? "dark" : "")">
+<div>
+	<NavBar/>
+
 	<div>
-		<NavBar/>
-	</div>
-
-	<div class="dark:bg-black">
 		<ErrorBoundary>
 			<ChildContent>
-				<div class="mx-auto container dark:text-white h-screen pt-5 lg:pt-14">
+				<div class="mx-auto container dark:text-white pt-5 lg:pt-14">
 					@Body
 				</div>
 			</ChildContent>
 			<ErrorContent>
-				<h3>An error occured. Try <a href="." class="text-sky-500 hover:underline hover:underline-offset-2">reloading</a> the page.</h3>
+				<div class="text-center mx-auto container h-screen pt-5 lg:pt-14 dark:text-white">An error occured. Try <ReloadLink Text="reloading"></ReloadLink> the page.</div>
 			</ErrorContent>
 		</ErrorBoundary>
 	</div>
@@ -25,20 +25,14 @@
 
 @code
 {
-	private bool _darkMode;
-
-	protected override Task OnInitializedAsync()
+	protected override async Task OnInitializedAsync()
 	{
-		_darkMode = DMM.DarkMode;
+		await JS.InvokeVoidAsync("setDarkMode", DMM.DarkMode);
 		DMM.DarkModeToggle += OnDmmOnDarkModeToggle;
-		return base.OnInitializedAsync();
+		await base.OnInitializedAsync();
 	}
 
-	private void OnDmmOnDarkModeToggle()
-	{
-		_darkMode = DMM.DarkMode;
-		StateHasChanged();
-	}
+	private async void OnDmmOnDarkModeToggle() => await JS.InvokeVoidAsync("toggleDarkMode");
 
 	public void Dispose() => DMM.DarkModeToggle -= OnDmmOnDarkModeToggle;
 }

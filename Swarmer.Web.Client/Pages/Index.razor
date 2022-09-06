@@ -1,22 +1,60 @@
 ﻿@using Swarmer.Web.Client.Services
 @implements IDisposable
 @page "/"
+@* ReSharper disable once InconsistentNaming *@
 @inject DarkModeManager DMM
 
 <PageTitle>Swarmer - Home</PageTitle>
 
-<div class="text-center px-7 md:px-30 lg:text-left">
-	<div class="lg:flex lg:justify-between lg:items-center lg:flex-row">
+<div class="text-center px-7 lg:px-20 lg:text-left">
+	<div class="2xl:px-15 lg:flex lg:justify-between lg:items-center lg:flex-row">
 		<div class="lg:max-w-sm">
-			<h1 class="text-4xl">Swarmer</h1>
+			<h1 class="text-4xl font-semibold">Swarmer</h1>
 			<h2 class="mt-1 text-gray-600 dark:text-gray-400">
-				A bot for the DD Pals Discord server that notifies when a
+				A bot for the
+				<a class="custom-link font-semibold" target="_blank" href="https://discord.gg/jMRumVerj2">DD Pals Discord</a>
+				server that notifies when a
 				<a class="custom-link font-semibold" target="_blank" href="https://store.steampowered.com/app/422970/Devil_Daggers/">Devil Daggers</a>
 				stream comes on.
 			</h2>
 		</div>
 		<div class="flex justify-center">
 			<img class="rounded-lg shadow-lg mt-6 lg:mt-0 dark:shadow-gray-600/60" src="@(_darkMode ? "Assets/SwarmerInAction.png" : "Assets/SwarmerInActionLight.png")" alt="Swarmer Discord posts">
+		</div>
+	</div>
+
+	<div class="mt-30 mb-2 lg:mt-20 text-center px-7 md:px-30 text-3xl font-semibold">
+		Features
+	</div>
+
+	<hr>
+
+	<div class="text-center mt-5 lg:grid lg:grid-cols-3 lg:gap-12 lg:mt-8">
+		<div>
+			<h1 class="text-2xl">
+				<span class="text-white rounded px-2 bg-red-600">Live</span>
+				and
+				<span class="text-white rounded px-2 bg-slate-800">Offline</span>
+			</h1>
+			<h2 class="mt-1 text-gray-600 dark:text-gray-400">Recognizable color-coded modes for when a stream is live or offline.</h2>
+		</div>
+
+		<div class="mt-10 lg:mt-0">
+			<h1 class="text-2xl font-semibold">No duplicate posts</h1>
+			<h2 class="mt-1 text-gray-600 dark:text-gray-400">
+				No stream can be posted twice within a specific timeframe. Useful for bursty on/off streams.
+			</h2>
+		</div>
+
+		<div class="mt-10 lg:mt-0">
+			<div class="flex flex-row place-items-center justify-center">
+				<h1 class="text-2xl font-semibold mr-2">Stream preview</h1>
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 dark:invert-0">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+					<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+				</svg>
+			</div>
+			<h2 class="mt-1 text-gray-600 dark:text-gray-400">A small stream preview that changes over time.</h2>
 		</div>
 	</div>
 </div>

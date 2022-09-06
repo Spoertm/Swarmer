@@ -22,12 +22,11 @@ public class DarkModeManager
 		DarkModeToggle?.Invoke();
 	}
 
-	public void ToggleDarkMode()
+	public async Task ToggleDarkMode()
 	{
 		DarkMode = !DarkMode;
 		DarkModeToggle?.Invoke();
-		Console.WriteLine("Invoked!");
 		using IServiceScope scope = _scopeFactory.CreateScope();
-		scope.ServiceProvider.GetRequiredService<ILocalStorageService>().SetItemAsync("darkmode", DarkMode);
+		await scope.ServiceProvider.GetRequiredService<ILocalStorageService>().SetItemAsync("darkmode", DarkMode);
 	}
 }

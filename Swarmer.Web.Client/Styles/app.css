@@ -11,5 +11,5 @@ html, body {
 }
 
 .custom-link {
-	@apply text-blue-600 dark:text-sky-600 hover:underline underline-offset-2
+	@apply text-blue-600 dark:text-sky-500 hover:underline underline-offset-2
 }

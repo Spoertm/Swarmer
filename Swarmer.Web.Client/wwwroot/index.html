@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 
 <head>
 	<meta charset="utf-8"/>
@@ -9,16 +9,28 @@
 	<link href="app.css" rel="stylesheet"/>
 	<link href="../Styles/app.css">
 	<link href="WhiteSwarmer.ico" rel="tab icon" type="image/x-icon"/>
+	<script>
+		function toggleDarkMode() {
+			document.documentElement.classList.toggle("dark");
+		}
+		
+		function setDarkMode(isDarkMode) {
+			if(isDarkMode)
+				document.documentElement.classList.add("dark");
+			else
+				document.documentElement.classList.remove("dark");
+		}
+	</script>
 </head>
 
-<body>
+<body class="dark:bg-black">
 <div id="app">
 	<div class="text-3xl grid h-screen place-items-center text-white bg-black">Loading...</div>
 </div>
 
 <div class="blazor-error-ui">
-	
 </div>
+
 <script src="_framework/blazor.webassembly.js"></script>
 </body>
 

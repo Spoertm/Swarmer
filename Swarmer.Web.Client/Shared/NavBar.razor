@@ -4,7 +4,7 @@
 @inject DarkModeManager DMM
 
 <nav class="px-2 sm:px-4 py-2.5 lg:py-1 dark:bg-black border-b-2 border-sky-500 dark:border-sky-700">
-	<div class="container flex flex-wrap justify-between items-center content-center mx-auto lg:pl-15 md:pl-0">
+	<div class="container flex flex-wrap justify-between items-center content-center mx-auto md:pl-0">
 		<a href="" class="flex items-center">
 			<img src="Assets/Swarmer.svg" class="dark:invert mr-4 h-9 sm:h-9" alt="Swarmer Logo"/>
 			<span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Swarmer</span>
@@ -19,15 +19,15 @@
 		<div class="hidden w-full lg:block lg:w-auto content-center" id="navbar-default">
 			<ul class="flex flex-col p-4 mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 md:bg-white dark:bg-black md:dark:bg-black dark:border-gray-700">
 				<li class="flex items-center">
-					<NavLink Match="NavLinkMatch.All" href="" class="nav-item">Home</NavLink>
-				</li>
-				<li class="flex items-center">
-					<NavLink href="swagger" class="nav-item">API</NavLink>
-				</li>
-				<li class="flex items-center">
 					<NavLink class="flex flex-row nav-item" href="https://github.com/Spoertm/Swarmer" target="_blank">
 						<img alt="GitHub logo" class="dark:invert w-6 h-6" src="Assets/github-logo.svg">
 						<span class="ml-2">Source code</span>
+					</NavLink>
+				</li>
+				<li class="flex items-center">
+					<NavLink class="flex flex-row nav-item" href="swagger" target="_blank">
+						<img alt="swagger logo" class="w-6 h-6" src="Assets/swagger-logo.svg">
+						<span class="ml-2">API</span>
 					</NavLink>
 				</li>
 				<li class="flex items-center">
@@ -66,5 +66,5 @@
 
 @code
 {
-	private void Toggle() => DMM.ToggleDarkMode();
+	private async void Toggle() => await DMM.ToggleDarkMode();
 }
