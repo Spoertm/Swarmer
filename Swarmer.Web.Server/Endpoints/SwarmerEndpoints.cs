@@ -1,4 +1,5 @@
-﻿using Swarmer.Domain.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Swarmer.Domain.Models;
 using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 
 namespace Swarmer.Web.Server.Endpoints;
@@ -10,7 +11,7 @@ public static class SwarmerEndpoints
 		app.MapGet("streams", DdTwitchStreams).WithTags("Streams");
 	}
 
-	private static Stream[]? DdTwitchStreams(StreamProvider provider)
+	private static Stream[]? DdTwitchStreams([FromServices] StreamProvider provider)
 	{
 		return provider.Streams;
 	}
