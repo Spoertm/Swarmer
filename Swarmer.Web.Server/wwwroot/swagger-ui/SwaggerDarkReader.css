@@ -367,69 +367,69 @@ select:-webkit-autofill {
     border-color: inherit;
 }
 .swagger-ui .shadow-1 {
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 4px 2px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0 4px 2px;
 }
 .swagger-ui .shadow-2 {
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 8px 2px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0 8px 2px;
 }
 .swagger-ui .shadow-3 {
     box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 4px 2px;
 }
 .swagger-ui .shadow-4 {
-    box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px 0px;
+    box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px 0;
 }
 .swagger-ui .shadow-5 {
-    box-shadow: rgba(0, 0, 0, 0.2) 4px 4px 8px 0px;
+    box-shadow: rgba(0, 0, 0, 0.2) 4px 4px 8px 0;
 }
 @media screen and (min-width: 30em) {
     .swagger-ui .shadow-1-ns {
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 4px 2px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 0 4px 2px;
     }
     .swagger-ui .shadow-2-ns {
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 8px 2px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 0 8px 2px;
     }
     .swagger-ui .shadow-3-ns {
         box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 4px 2px;
     }
     .swagger-ui .shadow-4-ns {
-        box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px 0;
     }
     .swagger-ui .shadow-5-ns {
-        box-shadow: rgba(0, 0, 0, 0.2) 4px 4px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.2) 4px 4px 8px 0;
     }
 }
 @media screen and (min-width: 30em) and (max-width: 60em) {
     .swagger-ui .shadow-1-m {
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 4px 2px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 0 4px 2px;
     }
     .swagger-ui .shadow-2-m {
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 8px 2px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 0 8px 2px;
     }
     .swagger-ui .shadow-3-m {
         box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 4px 2px;
     }
     .swagger-ui .shadow-4-m {
-        box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px 0;
     }
     .swagger-ui .shadow-5-m {
-        box-shadow: rgba(0, 0, 0, 0.2) 4px 4px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.2) 4px 4px 8px 0;
     }
 }
 @media screen and (min-width: 60em) {
     .swagger-ui .shadow-1-l {
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 4px 2px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 0 4px 2px;
     }
     .swagger-ui .shadow-2-l {
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 8px 2px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 0 8px 2px;
     }
     .swagger-ui .shadow-3-l {
         box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 4px 2px;
     }
     .swagger-ui .shadow-4-l {
-        box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 8px 0;
     }
     .swagger-ui .shadow-5-l {
-        box-shadow: rgba(0, 0, 0, 0.2) 4px 4px 8px 0px;
+        box-shadow: rgba(0, 0, 0, 0.2) 4px 4px 8px 0;
     }
 }
 .swagger-ui .button-reset::-moz-focus-inner,
@@ -1290,7 +1290,7 @@ select:-webkit-autofill {
     text-decoration-color: currentcolor;
 }
 .swagger-ui .shadow-hover::after {
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 16px 2px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0 16px 2px;
 }
 .swagger-ui .nested-links a {
     color: rgb(70, 151, 224);
@@ -1317,7 +1317,7 @@ select:-webkit-autofill {
 }
 .swagger-ui .opblock {
     border-color: rgb(140, 130, 115);
-    box-shadow: rgba(0, 0, 0, 0.19) 0px 0px 3px;
+    box-shadow: rgba(0, 0, 0, 0.19) 0 0 3px;
 }
 .swagger-ui .opblock .tab-header .tab-item.active h4 span::after {
     background-color: rgb(96, 104, 108);
@@ -1329,7 +1329,7 @@ select:-webkit-autofill {
 .swagger-ui .opblock .opblock-section-header {
     background-color: rgba(24, 26, 27, 0.8);
     background-image: none;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 1px 2px;
 }
 .swagger-ui .opblock .opblock-section-header > label {
     color: rgb(188, 182, 173);
@@ -1341,7 +1341,7 @@ select:-webkit-autofill {
     background-color: rgb(0, 0, 0);
     background-image: none;
     color: rgb(232, 230, 227);
-    text-shadow: rgba(0, 0, 0, 0.1) 0px 1px 0px;
+    text-shadow: rgba(0, 0, 0, 0.1) 0 1px 0;
 }
 .swagger-ui .opblock .opblock-summary-operation-id,
 .swagger-ui .opblock .opblock-summary-path,
@@ -1553,7 +1553,7 @@ select:-webkit-autofill {
 .swagger-ui .scheme-container {
     background-color: rgb(24, 26, 27);
     background-image: none;
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 2px 0px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0 1px 2px 0;
 }
 .swagger-ui .scheme-container .schemes > label {
     color: rgb(188, 182, 173);
@@ -1597,11 +1597,11 @@ select:-webkit-autofill {
     background-color: transparent;
     background-image: none;
     border-color: rgb(84, 91, 94);
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 1px 2px;
     color: rgb(188, 182, 173);
 }
 .swagger-ui .btn:hover {
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
 }
 .swagger-ui .btn.cancel {
     background-color: transparent;
@@ -1696,7 +1696,7 @@ select:-webkit-autofill {
     background-color: rgb(29, 31, 32);
     background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\"><path d=\"M13.418 7.859a.695.695 0 0 1 .978 0 .68.68 0 0 1 0 .969l-3.908 3.83a.697.697 0 0 1-.979 0l-3.908-3.83a.68.68 0 0 1 0-.969.695.695 0 0 1 .978 0L10 11l3.418-3.141z\"/></svg>");
     border-color: rgb(116, 108, 96);
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 2px 0px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0 1px 2px 0;
     color: rgb(188, 182, 173);
 }
 .swagger-ui select[multiple] {
@@ -1760,7 +1760,7 @@ select:-webkit-autofill {
 .swagger-ui .checkbox input[type="checkbox"] + label > .item {
     background-color: rgb(37, 40, 42);
     background-image: none;
-    box-shadow: rgb(37, 40, 42) 0px 0px 0px 2px; 
+    box-shadow: rgb(37, 40, 42) 0 0 0 2px; 
 }
 .swagger-ui .checkbox input[type="checkbox"]:checked + label > .item {
     background-color: rgb(37, 40, 42);
@@ -1774,7 +1774,7 @@ select:-webkit-autofill {
     background-color: rgb(24, 26, 27);
     background-image: none;
     border-color: rgb(54, 58, 60);
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 30px 0px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 10px 30px 0;
 }
 .swagger-ui .dialog-ux .modal-ux-content p {
     color: rgb(188, 182, 173);
