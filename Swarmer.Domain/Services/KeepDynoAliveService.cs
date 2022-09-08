@@ -11,9 +11,10 @@ public class KeepDynoAliveService : AbstractBackgroundService
 
 	protected override TimeSpan Interval => TimeSpan.FromMinutes(5);
 
-	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
+	protected override Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
 		const string url = "https://swarmer.herokuapp.com/";
-		await _httpClientFactory.CreateClient().GetStringAsync(url, stoppingToken);
+		_ = _httpClientFactory.CreateClient().GetStringAsync(url, stoppingToken);
+		return Task.CompletedTask;
 	}
 }

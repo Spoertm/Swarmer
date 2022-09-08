@@ -36,7 +36,8 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
-		if (_streamProvider.Streams is null) // Provider hasn't initialised Streams yet
+		// Provider hasn't initialised Streams yet or token is cancelled
+		if (_streamProvider.Streams is null || stoppingToken.IsCancellationRequested)
 			return;
 
 		using IServiceScope scope = _serviceScopeFactory.CreateScope();

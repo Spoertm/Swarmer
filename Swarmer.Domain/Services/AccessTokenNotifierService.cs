@@ -20,6 +20,11 @@ public class AccessTokenNotifierService : AbstractBackgroundService
 
 	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
+		if (stoppingToken.IsCancellationRequested)
+		{
+			return;
+		}
+
 		ValidateAccessTokenResponse? response = await _twitchApi.Auth.ValidateAccessTokenAsync(_config["AccessToken"]);
 		if (response is null)
 		{

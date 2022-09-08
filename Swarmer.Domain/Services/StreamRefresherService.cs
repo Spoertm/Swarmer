@@ -20,8 +20,11 @@ public class StreamRefresherService : AbstractBackgroundService
 
 	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
-		GetStreamsResponse streamResponse = await _twitchApi.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new() { _devilDaggersId });
-		Stream[] twitchStreams = streamResponse.Streams;
-		_streamProvider.Streams = twitchStreams;
+		if (!stoppingToken.IsCancellationRequested)
+		{
+			GetStreamsResponse streamResponse = await _twitchApi.Helix.Streams.GetStreamsAsync(first: 50, gameIds: new() { _devilDaggersId });
+			Stream[] twitchStreams = streamResponse.Streams;
+			_streamProvider.Streams = twitchStreams;
+		}
 	}
 }
