@@ -9,6 +9,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swarmer.Domain", "Swarmer.Domain\Swarmer.Domain.csproj", "{C8E0A5A2-71A6-40C1-8C0B-CB57ED0FBC25}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swarmer.Web.Server", "Swarmer.Web.Server\Swarmer.Web.Server.csproj", "{728D3D4F-2252-4808-8B7C-A0F224346A1F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C8E0A5A2-71A6-40C1-8C0B-CB57ED0FBC25} = {C8E0A5A2-71A6-40C1-8C0B-CB57ED0FBC25}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swarmer.Web.Client", "Swarmer.Web.Client\Swarmer.Web.Client.csproj", "{67F5B874-4EF0-4F87-AF77-363E76FCA748}"
 EndProject
