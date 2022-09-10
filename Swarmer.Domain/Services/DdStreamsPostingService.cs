@@ -56,7 +56,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		{
 			bool hasLingeredForLongEnough = ddStream.LingeringSinceUtc.HasValue && utcNow - ddStream.LingeringSinceUtc >= _maxLingeringTime;
 			if (hasLingeredForLongEnough)
+			{
 				ddStream.StopLingering();
+			}
 		}
 
 		await db.SaveChangesAsync();
@@ -64,15 +66,19 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task PostCompletelyNewStreamsAndAddToDb(DbService db)
 	{
-		if (_streamProvider.Streams!.Length == 0)
+		if (_streamProvider.Streams is { Length: 0 })
+		{
 			return;
+		}
 
 		List<DdStreamChannel> streamChannels = db.DdStreamChannels.AsNoTracking().ToList();
 		foreach (Stream ongoingStream in _streamProvider.Streams!)
 		{
 			bool streamIsPosted = db.DdStreams.Any(s => s.StreamId == ongoingStream.UserId);
 			if (streamIsPosted)
+			{
 				continue;
+			}
 
 			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: new() { ongoingStream.UserId })).Users[0];
 			Embed newStreamEmbed = StreamEmbed.Online(ongoingStream, twitchUser.ProfileImageUrl);
@@ -86,7 +92,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 
 				bool canSendInChannel = (await channel.GetUserAsync(_discordClient.Client.CurrentUser.Id)).GetPermissions(channel).SendMessages;
 				if (!canSendInChannel)
+				{
 					continue;
+				}
 
 				IUserMessage message = await channel.SendMessageAsync(embed: newStreamEmbed);
 				StreamMessage newDbStreamMessage = new()
@@ -115,7 +123,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 			if (ongoingStream is not null) // Stream is live on Twitch
 			{
 				if (streamMessage.IsLive)
+				{
 					continue;
+				}
 
 				if (!streamMessage.IsLingering)
 				{
@@ -137,7 +147,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 				}
 
 				if (streamMessage.IsLingering) // The Discord message is offline, and it's lingering
+				{
 					continue;
+				}
 
 				db.Remove(streamMessage);
 			}
@@ -151,7 +163,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 		if (!streamMessage.IsLive ||
 			await _discordClient.Client.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
 			await channel.GetMessageAsync(streamMessage.MessageId) is not IUserMessage message)
+		{
 			return;
+		}
 
 		Embed newEmbed = StreamEmbed.Offline(message.Embeds.First(), streamMessage.OfflineThumbnailUrl);
 		await message.ModifyAsync(m => m.Embeds = new(new[] { newEmbed }));
@@ -161,7 +175,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	{
 		if (await _discordClient.Client.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
 			await channel.GetMessageAsync(streamMessage.MessageId) is not IUserMessage message)
+		{
 			return;
+		}
 
 		Embed streamEmbed = StreamEmbed.Online(ongoingStream, streamMessage.AvatarUrl);
 		await message.ModifyAsync(m => m.Embeds = new(new[] { streamEmbed }));
