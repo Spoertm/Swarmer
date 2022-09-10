@@ -16,7 +16,7 @@ public class SwarmerDiscordClient
 	{
 		_config = config;
 		const GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites & ~GatewayIntents.GuildScheduledEvents;
-		Client = new(new() { GatewayIntents = gatewayIntents});
+		Client = new(new() { GatewayIntents = gatewayIntents });
 		Client.Log += OnLog;
 		Client.Ready += () =>
 		{
