@@ -6,8 +6,8 @@ using Serilog;
 using Swarmer.Domain.Models;
 using Swarmer.Domain.Models.Database;
 using Swarmer.Domain.Utils;
-using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
+using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Domain.Services;
 
@@ -17,12 +17,12 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	private readonly StreamProvider _streamProvider;
 	private readonly SwarmerDiscordClient _discordClient;
 	private readonly IServiceScopeFactory _serviceScopeFactory;
-	private readonly TwitchAPI _twitchApi;
+	private readonly ITwitchAPI _twitchApi;
 
 	public DdStreamsPostingService(
 		SwarmerDiscordClient discordClient,
 		IServiceScopeFactory serviceScopeFactory,
-		TwitchAPI twitchApi,
+		ITwitchAPI twitchApi,
 		StreamProvider streamProvider)
 	{
 		_discordClient = discordClient;
