@@ -67,8 +67,7 @@ internal static class Program
 
 		app.Lifetime.ApplicationStopping.Register(() =>
 		{
-			Log.Information("Program shut-down requested");
-			_ = app.Services.GetRequiredService<SwarmerDiscordClient>().Client.LogoutAsync();
+			app.Services.GetRequiredService<SwarmerDiscordClient>().Client.StopAsync().ConfigureAwait(false);
 		});
 
 		if (app.Environment.IsDevelopment())
