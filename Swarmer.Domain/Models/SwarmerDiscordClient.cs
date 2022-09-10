@@ -32,13 +32,8 @@ public class SwarmerDiscordClient
 			return;
 		}
 
-		int argumentPos = 0;
-		if (!message.HasMentionPrefix(Client.CurrentUser, ref argumentPos))
-		{
-			return;
-		}
-
-		if (Emote.TryParse("<a:swarmer:855162753093337109>", out Emote swarmerEmote))
+		bool messageMentionsBot = message.Content.StartsWith($"<@{Client.CurrentUser.Id}>") || message.Content.StartsWith($"<!{Client.CurrentUser.Id}>");
+		if (messageMentionsBot && Emote.TryParse("<a:swarmer:855162753093337109>", out Emote swarmerEmote))
 		{
 			await msg.AddReactionAsync(swarmerEmote);
 		}
