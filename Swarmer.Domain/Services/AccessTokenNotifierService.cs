@@ -28,13 +28,15 @@ public class AccessTokenNotifierService : AbstractBackgroundService
 		ValidateAccessTokenResponse? response = await _twitchApi.Auth.ValidateAccessTokenAsync(_config["AccessToken"]);
 		if (response is null)
 		{
-			Log.Fatal("The access token is no longer valid and has to be renewed");
+			Log.Error("The access token is no longer valid and has to be renewed");
 			return;
 		}
 
 		const int timeLimitDays = 10;
 		TimeSpan timeLeft = TimeSpan.FromSeconds(response.ExpiresIn);
 		if (timeLeft.Days < timeLimitDays)
-			Log.Fatal("It's {DaysLeft} days left before the access token expires", timeLeft.Days);
+		{
+			Log.Warning("It's {DaysLeft} days left before the access token expires", timeLeft.Days);
+		}
 	}
 }
