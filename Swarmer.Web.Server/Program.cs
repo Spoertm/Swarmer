@@ -76,8 +76,6 @@ internal static class Program
 			app.UseWebAssemblyDebugging();
 		}
 
-		app.UseSerilogRequestLogging();
-
 		app.UseStaticFiles();
 
 		app.UseSwagger();
