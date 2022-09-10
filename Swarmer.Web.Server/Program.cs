@@ -57,10 +57,10 @@ internal static class Program
 		builder.Services.AddHostedService<StreamRefresherService>();
 		builder.Services.AddHostedService<DdStreamsPostingService>();
 		builder.Services.AddHostedService<AccessTokenNotifierService>();
+		builder.Services.AddHostedService<KeepDynoAliveService>();
 		builder.Services.AddDbContext<DbService>();
 
 		builder.Services.AddSingleton<SwarmerDiscordClient>();
-		builder.Services.AddHostedService<KeepDynoAliveService>();
 		builder.Services.AddHttpClient();
 
 		WebApplication app = builder.Build();
