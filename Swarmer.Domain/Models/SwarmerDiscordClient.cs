@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -14,8 +15,33 @@ public class SwarmerDiscordClient
 	public SwarmerDiscordClient(IConfiguration config)
 	{
 		_config = config;
-		Client = new(new() { LogLevel = LogSeverity.Error });
+		const GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites & ~GatewayIntents.GuildScheduledEvents;
+		Client = new(new() { GatewayIntents = gatewayIntents});
 		Client.Log += OnLog;
+		Client.Ready += () =>
+		{
+			Client.MessageReceived += message => Task.Run(() => ClientOnMessageReceived(message));
+			return Task.CompletedTask;
+		};
+	}
+
+	private async Task ClientOnMessageReceived(SocketMessage msg)
+	{
+		if (msg is not SocketUserMessage { Source: MessageSource.User } message)
+		{
+			return;
+		}
+
+		int argumentPos = 0;
+		if (!message.HasMentionPrefix(Client.CurrentUser, ref argumentPos))
+		{
+			return;
+		}
+
+		if (Emote.TryParse("<a:swarmer:855162753093337109>", out Emote swarmerEmote))
+		{
+			await msg.AddReactionAsync(swarmerEmote);
+		}
 	}
 
 	public async Task InitAsync()
