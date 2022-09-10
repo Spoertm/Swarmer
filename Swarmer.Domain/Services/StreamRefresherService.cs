@@ -1,16 +1,16 @@
 ﻿using Swarmer.Domain.Models;
-using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
+using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Domain.Services;
 
 public class StreamRefresherService : AbstractBackgroundService
 {
 	private const string _devilDaggersId = "490905";
-	private readonly TwitchAPI _twitchApi;
+	private readonly ITwitchAPI _twitchApi;
 	private readonly StreamProvider _streamProvider;
 
-	public StreamRefresherService(TwitchAPI twitchApi, StreamProvider streamProvider)
+	public StreamRefresherService(ITwitchAPI twitchApi, StreamProvider streamProvider)
 	{
 		_twitchApi = twitchApi;
 		_streamProvider = streamProvider;
