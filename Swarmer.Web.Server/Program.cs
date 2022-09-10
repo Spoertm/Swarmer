@@ -6,7 +6,6 @@ using Swarmer.Domain.Services;
 using Swarmer.Web.Server.Endpoints;
 using System.Globalization;
 using TwitchLib.Api;
-using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Web.Server;
 
@@ -53,7 +52,7 @@ internal static class Program
 
 		TwitchAPI twitchApi = new() { Settings = { AccessToken = builder.Configuration["AccessToken"], ClientId = builder.Configuration["ClientId"] } };
 
-		builder.Services.AddSingleton(typeof(ITwitchAPI), twitchApi);
+		builder.Services.AddSingleton(twitchApi);
 		builder.Services.AddSingleton<StreamProvider>();
 		builder.Services.AddHostedService<StreamRefresherService>();
 		builder.Services.AddHostedService<DdStreamsPostingService>();
