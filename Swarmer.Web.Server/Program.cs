@@ -53,15 +53,12 @@ internal static class Program
 
 		TwitchAPI twitchApi = new() { Settings = { AccessToken = builder.Configuration["AccessToken"], ClientId = builder.Configuration["ClientId"] } };
 
-		if (builder.Environment.IsProduction())
-		{
-			builder.Services.AddSingleton(typeof(ITwitchAPI), twitchApi);
-			builder.Services.AddSingleton<StreamProvider>();
-			builder.Services.AddHostedService<StreamRefresherService>();
-			builder.Services.AddHostedService<DdStreamsPostingService>();
-			builder.Services.AddHostedService<AccessTokenNotifierService>();
-			builder.Services.AddDbContext<DbService>();
-		}
+		builder.Services.AddSingleton(typeof(ITwitchAPI), twitchApi);
+		builder.Services.AddSingleton<StreamProvider>();
+		builder.Services.AddHostedService<StreamRefresherService>();
+		builder.Services.AddHostedService<DdStreamsPostingService>();
+		builder.Services.AddHostedService<AccessTokenNotifierService>();
+		builder.Services.AddDbContext<DbService>();
 
 		builder.Services.AddSingleton<SwarmerDiscordClient>();
 		builder.Services.AddHostedService<KeepDynoAliveService>();
