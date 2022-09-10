@@ -37,7 +37,9 @@ public class DdStreamsPostingService : AbstractBackgroundService
 	{
 		// Provider hasn't initialised Streams yet or token is cancelled
 		if (_streamProvider.Streams is null || stoppingToken.IsCancellationRequested)
+		{
 			return;
+		}
 
 		using IServiceScope scope = _serviceScopeFactory.CreateScope();
 		await using DbService db = scope.ServiceProvider.GetRequiredService<DbService>();
