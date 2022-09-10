@@ -23,7 +23,7 @@ public class SwarmerDiscordClient
 		Log.Debug("Initiating {Client}", nameof(SwarmerDiscordClient));
 		await Client.LoginAsync(TokenType.Bot, _config["BotToken"]);
 		await Client.StartAsync();
-		await Client.SetGameAsync("Devil Daggers");
+		await Client.SetActivityAsync(new Game("DD Twitch streams", ActivityType.Watching));
 	}
 
 	private Task OnLog(LogMessage logMessage)
