@@ -12,7 +12,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.6" />
     <PackageReference Include="Serilog" Version="2.11.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.43.0.51858">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.44.0.52574">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -31,6 +31,28 @@
     <None Update="Models\Pages\Index.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Swarmer.Application\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Application\obj\project.packagespec.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Application\obj\Swarmer.Application.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Infrastructure\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Infrastructure\obj\project.packagespec.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Infrastructure\obj\Swarmer.Infrastructure.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\Pages\Error.cshtml" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\Pages\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\Pages\Privacy.cshtml" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\Pages\Shared\_Layout.cshtml" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\Pages\Shared\_ValidationScriptsPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\Pages\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\Pages\_ViewStart.cshtml" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\appsettings.Development.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\appsettings.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\obj\project.packagespec.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\obj\Swarmer.Web.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="Swarmer.Web\Properties\launchSettings.json" />
   </ItemGroup>
 
 </Project>
