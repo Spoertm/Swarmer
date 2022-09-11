@@ -1,6 +1,6 @@
 # Swarmer
 
-A Discord bot for the [DD Pals](https://discord.gg/jMRumVerj2) server that notifies when a [Devil Daggers](https://store.steampowered.com/app/422970/Devil_Daggers/) stream comes on[^1].
+A Discord bot for the [DD Pals](https://discord.gg/jMRumVerj2) server that notifies when [Devil Daggers](https://store.steampowered.com/app/422970/Devil_Daggers/) streams go live[^1].
 
 ### Framework
 - .NET 6.0
