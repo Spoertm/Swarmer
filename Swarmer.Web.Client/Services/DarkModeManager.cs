@@ -2,7 +2,7 @@
 
 namespace Swarmer.Web.Client.Services;
 
-public class DarkModeManager
+public sealed class DarkModeManager
 {
 	private readonly IServiceScopeFactory _scopeFactory;
 	public event DarkModeToggleHandler? DarkModeToggle;

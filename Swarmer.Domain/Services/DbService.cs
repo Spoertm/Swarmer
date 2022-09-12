@@ -3,7 +3,7 @@ using Swarmer.Domain.Models.Database;
 
 namespace Swarmer.Domain.Services;
 
-public class DbService : DbContext
+public sealed class DbService : DbContext
 {
 	public DbSet<DdStreamChannel> DdStreamChannels => Set<DdStreamChannel>();
 	public DbSet<StreamMessage> DdStreams => Set<StreamMessage>();

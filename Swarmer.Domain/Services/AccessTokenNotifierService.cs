@@ -5,7 +5,7 @@ using TwitchLib.Api.Auth;
 
 namespace Swarmer.Domain.Services;
 
-public class AccessTokenNotifierService : AbstractBackgroundService
+public sealed class AccessTokenNotifierService : AbstractBackgroundService
 {
 	private readonly IConfiguration _config;
 	private readonly TwitchAPI _twitchApi;

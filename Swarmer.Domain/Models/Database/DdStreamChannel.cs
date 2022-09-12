@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Swarmer.Domain.Models.Database;
 
 [Table("DdStreamChannels")]
-public class DdStreamChannel
+public sealed class DdStreamChannel
 {
 	[Key]
 	public ulong Id { get; set; }

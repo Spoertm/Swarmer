@@ -11,7 +11,7 @@ using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
 namespace Swarmer.Domain.Services;
 
-public class DdStreamsPostingService : AbstractBackgroundService
+public sealed class DdStreamsPostingService : AbstractBackgroundService
 {
 	private readonly TimeSpan _maxLingeringTime = TimeSpan.FromMinutes(15);
 	private readonly StreamProvider _streamProvider;

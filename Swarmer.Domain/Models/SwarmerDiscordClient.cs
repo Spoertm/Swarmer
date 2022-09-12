@@ -6,7 +6,7 @@ using Serilog.Events;
 
 namespace Swarmer.Domain.Models;
 
-public class SwarmerDiscordClient
+public sealed class SwarmerDiscordClient
 {
 	private readonly IConfiguration _config;
 	public DiscordSocketClient Client { get; }

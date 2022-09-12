@@ -4,7 +4,7 @@ using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 
 namespace Swarmer.Domain.Services;
 
-public class StreamRefresherService : AbstractBackgroundService
+public sealed class StreamRefresherService : AbstractBackgroundService
 {
 	private readonly List<string> _twitchGameIds = new()
 	{

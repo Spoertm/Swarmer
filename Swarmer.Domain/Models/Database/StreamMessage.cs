@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Swarmer.Domain.Models.Database;
 
 [Table("DdStreams")]
-public class StreamMessage
+public sealed class StreamMessage
 {
 	[Key]
 	public int Id { get; init; }

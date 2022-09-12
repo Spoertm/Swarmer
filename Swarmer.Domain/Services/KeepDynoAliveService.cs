@@ -1,6 +1,6 @@
 namespace Swarmer.Domain.Services;
 
-public class KeepDynoAliveService : AbstractBackgroundService
+public sealed class KeepDynoAliveService : AbstractBackgroundService
 {
 	private readonly IHttpClientFactory _httpClientFactory;
 

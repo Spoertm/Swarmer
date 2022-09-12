@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Swarmer.Domain.Models.Database;
 
 [Keyless]
-public class SwarmerDbConfig
+public sealed class SwarmerDbConfig
 {
 	[Column(TypeName = "jsonb")]
 	public string JsonConfig { get; set; } = null!;
