@@ -1,6 +1,6 @@
 # Swarmer[^1]
 
-A Discord bot for the [DD Pals](https://discord.gg/jMRumVerj2) server that notifies when [Devil Daggers](https://store.steampowered.com/app/422970/Devil_Daggers/) streams go live.
+A Discord bot that notifies when [Devil Daggers](https://store.steampowered.com/app/422970/Devil_Daggers/) streams go live.
 
 ### Framework
 - .NET 6.0
@@ -19,5 +19,4 @@ There was an attempt at following [Clean Architecture](https://blog.cleancoder.c
 
 * [Swarmer.Web.Server](Swarmer.Web.Server) is where the API is defined and can be regarded as the entry point of the application.
 
-[^1]: This bot was originally made by
-Angrevol#3416 and this project is a complete rewrite in C#.
+[^1]: This bot was originally made by Angrevol#3416 and this project is a complete rewrite in C#.
