@@ -75,14 +75,14 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 		}
 
 		List<GameChannel> gameChannels = db.GameChannels.AsNoTracking().ToList();
-		List<string> ongoingStreamIds = db.StreamMessages.AsNoTracking().Select(os => os.StreamId).ToList();
+		List<StreamMessage> ongoingStreams = db.StreamMessages.AsNoTracking().ToList();
 
 		IEnumerable<StreamToPost> streamsToPost = _streamProvider.Streams
-			.Where(os => ongoingStreamIds.All(streamId => streamId != os.UserId))
-			.Join(inner: gameChannels,
+			.Join<Stream, GameChannel, string, StreamToPost>(inner: gameChannels,
 				outerKeySelector: stream => stream.GameId,
 				innerKeySelector: gameChannel => gameChannel.TwitchGameId.ToString(),
-				resultSelector: (stream, channel) => new StreamToPost(stream, channel));
+				resultSelector: (stream, channel) => new(stream, channel))
+			.Where(stp => !ongoingStreams.Exists(os => (os.StreamId, os.ChannelId) == (stp.Stream.UserId, stp.Channel.StreamChannelId)));
 
 		foreach (StreamToPost stp in streamsToPost)
 		{
