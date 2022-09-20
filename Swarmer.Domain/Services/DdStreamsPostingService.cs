@@ -88,7 +88,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			{
 				if (await _discordClient.Client.GetChannelAsync(streamChannel.Id) is not ITextChannel channel)
 				{
-					Log.Warning("Registered channel {@StreamChannel} doesn't exist", streamChannel);
+					Log.Error("Registered channel {@StreamChannel} doesn't exist", streamChannel);
 					continue;
 				}
 
