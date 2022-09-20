@@ -1,4 +1,5 @@
 ﻿using Swarmer.Domain.Models;
+using Swarmer.Domain.Utils;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 
@@ -6,10 +7,6 @@ namespace Swarmer.Domain.Services;
 
 public sealed class StreamRefresherService : AbstractBackgroundService
 {
-	private readonly List<string> _twitchGameIds = new()
-	{
-		"490905", // Devil Daggers
-	};
 	private readonly TwitchAPI _twitchApi;
 	private readonly StreamProvider _streamProvider;
 
@@ -25,7 +22,7 @@ public sealed class StreamRefresherService : AbstractBackgroundService
 	{
 		if (!stoppingToken.IsCancellationRequested)
 		{
-			GetStreamsResponse streamResponse = await _twitchApi.Helix.Streams.GetStreamsAsync(first: 50, gameIds: _twitchGameIds);
+			GetStreamsResponse streamResponse = await _twitchApi.Helix.Streams.GetStreamsAsync(first: 100, gameIds: Constants.TwitchGameIds);
 			Stream[] twitchStreams = streamResponse.Streams;
 			_streamProvider.Streams = twitchStreams;
 		}

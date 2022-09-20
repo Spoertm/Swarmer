@@ -54,7 +54,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 	private async Task UpdateLingerStatus(DbService db)
 	{
 		DateTime utcNow = DateTime.UtcNow;
-		foreach (StreamMessage ddStream in db.DdStreams)
+		foreach (StreamMessage ddStream in db.StreamMessages)
 		{
 			bool hasLingeredForLongEnough = ddStream.LingeringSinceUtc.HasValue && utcNow - ddStream.LingeringSinceUtc >= _maxLingeringTime;
 			if (hasLingeredForLongEnough)
@@ -68,50 +68,52 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task PostCompletelyNewStreamsAndAddToDb(DbService db)
 	{
-		if (_streamProvider.Streams is { Length: 0 })
+		// Provider hasn't initialised Streams yet
+		if (_streamProvider.Streams is not { Length: > 0 })
 		{
 			return;
 		}
 
-		List<DdStreamChannel> streamChannels = db.DdStreamChannels.AsNoTracking().ToList();
-		foreach (Stream ongoingStream in _streamProvider.Streams!)
+		List<GameChannel> gameChannels = db.GameChannels.AsNoTracking().ToList();
+		List<StreamMessage> ongoingStreams = db.StreamMessages.AsNoTracking().ToList();
+
+		IEnumerable<StreamToPost> streamsToPost = _streamProvider.Streams
+			.Join<Stream, GameChannel, string, StreamToPost>(inner: gameChannels,
+				outerKeySelector: stream => stream.GameId,
+				innerKeySelector: gameChannel => gameChannel.TwitchGameId.ToString(),
+				resultSelector: (stream, channel) => new(stream, channel))
+			.Where(stp => !ongoingStreams.Exists(os => (os.StreamId, os.ChannelId) == (stp.Stream.UserId, stp.Channel.StreamChannelId)));
+
+		foreach (StreamToPost stp in streamsToPost)
 		{
-			bool streamIsPosted = db.DdStreams.Any(s => s.StreamId == ongoingStream.UserId);
-			if (streamIsPosted)
+			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: new() { stp.Stream.UserId })).Users[0];
+			Embed newStreamEmbed = StreamEmbed.Online(stp.Stream, twitchUser.ProfileImageUrl);
+
+			if (await _discordClient.Client.GetChannelAsync(stp.Channel.StreamChannelId) is not ITextChannel channel)
+			{
+				Log.Error("Registered channel {@StreamChannel} doesn't exist", stp.Channel);
+				continue;
+			}
+
+			bool canSendInChannel = (await channel.GetUserAsync(_discordClient.Client.CurrentUser.Id)).GetPermissions(channel).SendMessages;
+			if (!canSendInChannel)
 			{
 				continue;
 			}
 
-			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: new() { ongoingStream.UserId })).Users[0];
-			Embed newStreamEmbed = StreamEmbed.Online(ongoingStream, twitchUser.ProfileImageUrl);
-			foreach (DdStreamChannel streamChannel in streamChannels)
+			IUserMessage message = await channel.SendMessageAsync(embed: newStreamEmbed);
+			StreamMessage newDbStreamMessage = new()
 			{
-				if (await _discordClient.Client.GetChannelAsync(streamChannel.Id) is not ITextChannel channel)
-				{
-					Log.Warning("Registered channel {@StreamChannel} doesn't exist", streamChannel);
-					continue;
-				}
+				StreamId = stp.Stream.UserId,
+				IsLive = true,
+				ChannelId = channel.Id,
+				MessageId = message.Id,
+				AvatarUrl = twitchUser.ProfileImageUrl,
+				OfflineThumbnailUrl = twitchUser.OfflineImageUrl,
+				LingeringSinceUtc = DateTime.UtcNow,
+			};
 
-				bool canSendInChannel = (await channel.GetUserAsync(_discordClient.Client.CurrentUser.Id)).GetPermissions(channel).SendMessages;
-				if (!canSendInChannel)
-				{
-					continue;
-				}
-
-				IUserMessage message = await channel.SendMessageAsync(embed: newStreamEmbed);
-				StreamMessage newDbStreamMessage = new()
-				{
-					StreamId = ongoingStream.UserId,
-					IsLive = true,
-					ChannelId = channel.Id,
-					MessageId = message.Id,
-					AvatarUrl = twitchUser.ProfileImageUrl,
-					OfflineThumbnailUrl = twitchUser.OfflineImageUrl,
-					LingeringSinceUtc = DateTime.UtcNow,
-				};
-
-				await db.DdStreams.AddAsync(newDbStreamMessage);
-			}
+			await db.StreamMessages.AddAsync(newDbStreamMessage);
 		}
 
 		await db.SaveChangesAsync();
@@ -119,9 +121,15 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task HandleStreamMessages(DbService db)
 	{
-		foreach (StreamMessage streamMessage in db.DdStreams)
+		// Provider hasn't initialised Streams yet
+		if (_streamProvider.Streams is null)
 		{
-			Stream? ongoingStream = Array.Find(_streamProvider.Streams!, s => s.UserId == streamMessage.StreamId);
+			return;
+		}
+
+		foreach (StreamMessage streamMessage in db.StreamMessages)
+		{
+			Stream? ongoingStream = Array.Find(_streamProvider.Streams, s => s.UserId == streamMessage.StreamId);
 			if (ongoingStream is not null) // Stream is live on Twitch
 			{
 				if (streamMessage.IsLive)
@@ -185,3 +193,5 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 		await message.ModifyAsync(m => m.Embeds = new(new[] { streamEmbed }));
 	}
 }
+
+internal record struct StreamToPost(Stream Stream, GameChannel Channel);
