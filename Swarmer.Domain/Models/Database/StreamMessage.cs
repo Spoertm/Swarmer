@@ -3,17 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Swarmer.Domain.Models.Database;
 
-[Table("DdStreams")]
+[Table("StreamMessages")]
 public sealed class StreamMessage
 {
 	[Key]
-	public int Id { get; init; }
+	public int Id { get; set; }
 
-	public bool IsLive { get; set; }
+	public ulong MessageId { get; set; }
 
 	public ulong ChannelId { get; set; }
 
-	public ulong MessageId { get; set; }
+	public bool IsLive { get; set; }
 
 	public string StreamId { get; set; } = null!;
 
