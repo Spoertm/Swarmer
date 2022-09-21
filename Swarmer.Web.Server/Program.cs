@@ -45,12 +45,13 @@ internal static class Program
 
 		builder.Services.AddSwaggerGen(options =>
 		{
+			options.EnableAnnotations();
 			options.SwaggerDoc("Main", new()
 			{
 				Version = "Main",
 				Title = "Swarmer API",
 				Description = @"This API serves as a replacement for Twitch's, in case one is unable/unwilling to deal with the latter.
-However only Devil Daggers Twitch streams can be requested.",
+However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 			});
 		});
 

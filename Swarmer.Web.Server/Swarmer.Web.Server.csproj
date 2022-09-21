@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Swarmer.Domain\Swarmer.Domain.csproj"/>
-    <ProjectReference Include="..\Swarmer.Web.Client\Swarmer.Web.Client.csproj"/>
+    <ProjectReference Include="..\Swarmer.Domain\Swarmer.Domain.csproj" />
+    <ProjectReference Include="..\Swarmer.Web.Client\Swarmer.Web.Client.csproj" />
   </ItemGroup>
 
 </Project>
