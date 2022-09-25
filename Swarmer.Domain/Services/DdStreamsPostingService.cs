@@ -1,6 +1,7 @@
 ﻿global using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 using Discord;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Swarmer.Domain.Models;
@@ -18,9 +19,10 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 	private readonly SwarmerDiscordClient _discordClient;
 	private readonly IServiceScopeFactory _serviceScopeFactory;
 	private readonly TwitchAPI _twitchApi;
-	private readonly string[] _bannedUserLogins = { "thedevildagger", "lazorical" };
+	private readonly string[] _bannedUserLogins;
 
 	public DdStreamsPostingService(
+		IConfiguration config,
 		SwarmerDiscordClient discordClient,
 		IServiceScopeFactory serviceScopeFactory,
 		TwitchAPI twitchApi,
@@ -30,6 +32,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 		_serviceScopeFactory = serviceScopeFactory;
 		_twitchApi = twitchApi;
 		_streamProvider = streamProvider;
+		_bannedUserLogins = config.GetSection("BannedUserLogins").Get<string[]>() ?? Array.Empty<string>();
 	}
 
 	protected override TimeSpan Interval => TimeSpan.FromSeconds(15);
