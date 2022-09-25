@@ -18,7 +18,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 	private readonly SwarmerDiscordClient _discordClient;
 	private readonly IServiceScopeFactory _serviceScopeFactory;
 	private readonly TwitchAPI _twitchApi;
-	private string[] _bannedUserLogins = { "thedevildagger" };
+	private readonly string[] _bannedUserLogins = { "thedevildagger", "lazorical" };
 
 	public DdStreamsPostingService(
 		SwarmerDiscordClient discordClient,
