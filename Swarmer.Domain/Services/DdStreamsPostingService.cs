@@ -18,6 +18,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 	private readonly SwarmerDiscordClient _discordClient;
 	private readonly IServiceScopeFactory _serviceScopeFactory;
 	private readonly TwitchAPI _twitchApi;
+	private string[] _bannedUserLogins = { "thedevildagger" };
 
 	public DdStreamsPostingService(
 		SwarmerDiscordClient discordClient,
@@ -82,6 +83,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 				outerKeySelector: stream => stream.GameId,
 				innerKeySelector: gameChannel => gameChannel.TwitchGameId.ToString(),
 				resultSelector: (stream, channel) => new(stream, channel))
+			.Where(stp => !_bannedUserLogins.Contains(stp.Stream.UserLogin))
 			.Where(stp => !ongoingStreams.Exists(os => (os.StreamId, os.ChannelId) == (stp.Stream.UserId, stp.Channel.StreamChannelId)));
 
 		foreach (StreamToPost stp in streamsToPost)
