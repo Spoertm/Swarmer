@@ -1,10 +1,10 @@
 namespace Swarmer.Domain.Services;
 
-public sealed class KeepDynoAliveService : AbstractBackgroundService
+public sealed class KeepAppAliveService : AbstractBackgroundService
 {
 	private readonly IHttpClientFactory _httpClientFactory;
 
-	public KeepDynoAliveService(IHttpClientFactory httpClientFactory)
+	public KeepAppAliveService(IHttpClientFactory httpClientFactory)
 	{
 		_httpClientFactory = httpClientFactory;
 	}
@@ -13,7 +13,7 @@ public sealed class KeepDynoAliveService : AbstractBackgroundService
 
 	protected override Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
-		const string url = "https://swarmer.herokuapp.com/";
+		const string url = "https://swarmerbot.azurewebsites.net/";
 		_ = _httpClientFactory.CreateClient().GetStringAsync(url, stoppingToken);
 		return Task.CompletedTask;
 	}
