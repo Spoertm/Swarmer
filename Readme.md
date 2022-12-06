@@ -3,10 +3,10 @@
 A Discord bot that notifies when [Devil Daggers](https://store.steampowered.com/app/422970/Devil_Daggers/) streams go live.
 
 ### Framework
-- .NET 6.0
+- .NET 7.0
 
 ### Language
-- C# 10.0
+- C# 11.0
 
 ### Architecture
 There was an attempt at following [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html), where:
