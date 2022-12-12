@@ -23,7 +23,7 @@ internal static class Program
 		}
 
 		Log.Logger = new LoggerConfiguration()
-			.MinimumLevel.Information()
+			.MinimumLevel.Warning()
 			.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u4}] {Message:lj}{NewLine}{Exception}")
 			.WriteTo.Sentry(o =>
 			{
@@ -35,7 +35,6 @@ internal static class Program
 			.CreateLogger();
 
 		builder.Logging.ClearProviders();
-		builder.Host.UseSerilog();
 
 		Log.Information("Starting application");
 
