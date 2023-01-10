@@ -119,6 +119,8 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			};
 
 			await db.StreamMessages.AddAsync(newDbStreamMessage);
+
+			await Task.Delay(TimeSpan.FromSeconds(1)); // Wait 1s between actions to not get rate-limited by Discord's API
 		}
 
 		await db.SaveChangesAsync();
@@ -168,6 +170,8 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 
 				db.Remove(streamMessage);
 			}
+
+			await Task.Delay(TimeSpan.FromSeconds(1)); // Wait 1s between actions to not get rate-limited by Discord's API
 		}
 
 		await db.SaveChangesAsync();
