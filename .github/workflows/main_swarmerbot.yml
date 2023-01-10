@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'swarmerbot'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A2DC78F786A64B38A531DF15C3CEB15E }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CBCC08A665B244458599A61BB4CA0939 }}
           package: .
