@@ -13,8 +13,8 @@ public static class StreamEmbed
 		.Build();
 
 	public static Embed Offline(IEmbed oldEmbed, string? newThumbnailUrl = null) => new EmbedBuilder()
-		.WithDescription("⚫ Offline| " + (oldEmbed.Description?.Length >= 9 ? oldEmbed.Description[9..] : string.Empty))
-		.WithThumbnailUrl(newThumbnailUrl?.FormatDimensions() ?? oldEmbed.Thumbnail?.Url ?? string.Empty)
+		.WithDescription("⚫ Offline| " + (oldEmbed.Description?.Length >= 9 ? oldEmbed.Description[9..] : default))
+		.WithThumbnailUrl(newThumbnailUrl?.FormatDimensions() ?? oldEmbed.Thumbnail?.Url ?? default)
 		.WithAuthor(oldEmbed.Author?.Name ?? "NaN", oldEmbed.Author?.IconUrl, oldEmbed.Author?.Url)
 		.WithColor(1)
 		.Build();

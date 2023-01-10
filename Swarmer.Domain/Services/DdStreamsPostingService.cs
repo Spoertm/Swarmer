@@ -113,8 +113,8 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 				IsLive = true,
 				ChannelId = channel.Id,
 				MessageId = message.Id,
-				AvatarUrl = twitchUser.ProfileImageUrl,
-				OfflineThumbnailUrl = twitchUser.OfflineImageUrl,
+				AvatarUrl = string.IsNullOrWhiteSpace(twitchUser.ProfileImageUrl) ? null : twitchUser.ProfileImageUrl,
+				OfflineThumbnailUrl = string.IsNullOrWhiteSpace(twitchUser.OfflineImageUrl) ? null : twitchUser.OfflineImageUrl,
 				LingeringSinceUtc = DateTime.UtcNow,
 			};
 
