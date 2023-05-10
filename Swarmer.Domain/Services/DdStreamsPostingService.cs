@@ -94,13 +94,13 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: new() { stp.Stream.UserId })).Users[0];
 			Embed newStreamEmbed = StreamEmbed.Online(stp.Stream, twitchUser.ProfileImageUrl);
 
-			if (await _discordClient.Client.GetChannelAsync(stp.Channel.StreamChannelId) is not ITextChannel channel)
+			if (await _discordClient.GetChannelAsync(stp.Channel.StreamChannelId) is not ITextChannel channel)
 			{
 				Log.Error("Registered channel {@StreamChannel} doesn't exist", stp.Channel);
 				continue;
 			}
 
-			bool canSendInChannel = (await channel.GetUserAsync(_discordClient.Client.CurrentUser.Id)).GetPermissions(channel).SendMessages;
+			bool canSendInChannel = (await channel.GetUserAsync(_discordClient.CurrentUser.Id)).GetPermissions(channel).SendMessages;
 			if (!canSendInChannel)
 			{
 				continue;
@@ -180,7 +180,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 	private async Task GoOfflineAsync(StreamMessage streamMessage)
 	{
 		if (!streamMessage.IsLive ||
-			await _discordClient.Client.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
+			await _discordClient.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
 			await channel.GetMessageAsync(streamMessage.MessageId) is not IUserMessage message)
 		{
 			return;
@@ -192,7 +192,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 
 	private async Task GoOnlineAgainAsync(StreamMessage streamMessage, Stream ongoingStream)
 	{
-		if (await _discordClient.Client.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
+		if (await _discordClient.GetChannelAsync(streamMessage.ChannelId) is not ITextChannel channel ||
 			await channel.GetMessageAsync(streamMessage.MessageId) is not IUserMessage message)
 		{
 			return;
