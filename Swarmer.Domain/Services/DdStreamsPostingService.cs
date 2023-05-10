@@ -78,8 +78,8 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			return;
 		}
 
-		List<GameChannel> gameChannels = db.GameChannels.AsNoTracking().ToList();
-		List<StreamMessage> ongoingStreams = db.StreamMessages.AsNoTracking().ToList();
+		List<GameChannel> gameChannels = await db.GameChannels.AsNoTracking().ToListAsync();
+		List<StreamMessage> ongoingStreams = await db.StreamMessages.AsNoTracking().ToListAsync();
 
 		IEnumerable<StreamToPost> streamsToPost = _streamProvider.Streams
 			.Join<Stream, GameChannel, string, StreamToPost>(inner: gameChannels,
