@@ -13,7 +13,6 @@ public class SwarmerDiscordClient : DiscordSocketClient
 	{
 		_config = config;
 
-		MessageReceived += message => Task.Run(() => ClientOnMessageReceived(message));
 		Log += OnLog;
 		Ready += () =>
 		{
