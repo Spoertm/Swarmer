@@ -45,7 +45,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			return;
 		}
 
-		using IServiceScope scope = _serviceScopeFactory.CreateScope();
+		await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
 		await using DbService db = scope.ServiceProvider.GetRequiredService<DbService>();
 
 		await UpdateLingerStatus(db);
