@@ -73,7 +73,7 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 
 		app.Lifetime.ApplicationStopping.Register(() =>
 		{
-			app.Services.GetRequiredService<SwarmerDiscordClient>().Client.StopAsync().ConfigureAwait(false);
+			app.Services.GetRequiredService<SwarmerDiscordClient>().StopAsync().ConfigureAwait(false);
 		});
 
 		if (app.Environment.IsDevelopment())

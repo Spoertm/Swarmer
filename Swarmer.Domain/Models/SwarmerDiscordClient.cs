@@ -1,25 +1,23 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
-using Serilog;
 using Serilog.Events;
 
 namespace Swarmer.Domain.Models;
 
-public sealed class SwarmerDiscordClient
+public class SwarmerDiscordClient : DiscordSocketClient
 {
 	private readonly IConfiguration _config;
-	public DiscordSocketClient Client { get; }
 
 	public SwarmerDiscordClient(IConfiguration config)
 	{
 		_config = config;
-		const GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites & ~GatewayIntents.GuildScheduledEvents;
-		Client = new(new() { GatewayIntents = gatewayIntents });
-		Client.Log += OnLog;
-		Client.Ready += () =>
+
+		MessageReceived += message => Task.Run(() => ClientOnMessageReceived(message));
+		Log += OnLog;
+		Ready += () =>
 		{
-			Client.MessageReceived += message => Task.Run(() => ClientOnMessageReceived(message));
+			MessageReceived += message => Task.Run(() => ClientOnMessageReceived(message));
 			return Task.CompletedTask;
 		};
 	}
@@ -31,7 +29,7 @@ public sealed class SwarmerDiscordClient
 			return;
 		}
 
-		bool messageMentionsBot = message.Content.StartsWith($"<@{Client.CurrentUser.Id}>") || message.Content.StartsWith($"<!{Client.CurrentUser.Id}>");
+		bool messageMentionsBot = message.Content.StartsWith($"<@{CurrentUser.Id}>") || message.Content.StartsWith($"<!{CurrentUser.Id}>");
 		if (messageMentionsBot && Emote.TryParse("<a:swarmer:855162753093337109>", out Emote swarmerEmote))
 		{
 			await msg.AddReactionAsync(swarmerEmote);
@@ -40,10 +38,10 @@ public sealed class SwarmerDiscordClient
 
 	public async Task InitAsync()
 	{
-		Log.Debug("Initiating {Client}", nameof(SwarmerDiscordClient));
-		await Client.LoginAsync(TokenType.Bot, _config["BotToken"]);
-		await Client.StartAsync();
-		await Client.SetActivityAsync(new Game("DD Twitch streams", ActivityType.Watching));
+		Serilog.Log.Debug("Initiating {Client}", nameof(SwarmerDiscordClient));
+		await LoginAsync(TokenType.Bot, _config["BotToken"]);
+		await StartAsync();
+		await SetActivityAsync(new Game("DD Twitch streams", ActivityType.Watching));
 	}
 
 	private Task OnLog(LogMessage logMessage)
@@ -59,7 +57,7 @@ public sealed class SwarmerDiscordClient
 			_                    => throw new ArgumentOutOfRangeException(nameof(logMessage.Severity), logMessage.Severity, null),
 		};
 
-		Log.Logger.Write(logLevel, logMessage.Exception, "Source: {LogMsgSrc}\n{LogMsg}", logMessage.Source, logMessage.Message);
+		Serilog.Log.Logger.Write(logLevel, logMessage.Exception, "Source: {LogMsgSrc}\n{LogMsg}", logMessage.Source, logMessage.Message);
 		return Task.CompletedTask;
 	}
 }
