@@ -6,8 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Swarmer.Domain.Models;
 using Swarmer.Domain.Models.Database;
-using Swarmer.Domain.Utils;
 using TwitchLib.Api;
+using Swarmer.Domain.Models.Extensions;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
 namespace Swarmer.Domain.Services;
@@ -92,7 +92,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 		foreach (StreamToPost stp in streamsToPost)
 		{
 			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: new() { stp.Stream.UserId })).Users[0];
-			Embed newStreamEmbed = StreamEmbed.Online(stp.Stream, twitchUser.ProfileImageUrl);
+			Embed newStreamEmbed = new EmbedBuilder().Online(stp.Stream, twitchUser.ProfileImageUrl);
 
 			if (await _discordClient.GetChannelAsync(stp.Channel.StreamChannelId) is not ITextChannel channel)
 			{
@@ -186,7 +186,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			return;
 		}
 
-		Embed newEmbed = StreamEmbed.Offline(message.Embeds.First(), streamMessage.OfflineThumbnailUrl);
+		Embed newEmbed = new EmbedBuilder().Offline(message.Embeds.First(), streamMessage.OfflineThumbnailUrl);
 		await message.ModifyAsync(m => m.Embeds = new(new[] { newEmbed }));
 	}
 
@@ -198,7 +198,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			return;
 		}
 
-		Embed streamEmbed = StreamEmbed.Online(ongoingStream, streamMessage.AvatarUrl);
+		Embed streamEmbed = new EmbedBuilder().Online(ongoingStream, streamMessage.AvatarUrl);
 		await message.ModifyAsync(m => m.Embeds = new(new[] { streamEmbed }));
 	}
 }
