@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using Swarmer.Domain.Models;
-using Swarmer.Domain.Models.Database;
-using Swarmer.Domain.Services;
+using Swarmer.Domain.Database;
+using Swarmer.Domain.Discord;
+using Swarmer.Domain.Twitch;
 using System;
 using System.Collections.Generic;
 using System.Linq;

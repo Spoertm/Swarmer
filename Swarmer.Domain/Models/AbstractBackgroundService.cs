@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace Swarmer.Domain.Services;
+namespace Swarmer.Domain.Models;
 
 public abstract class AbstractBackgroundService : BackgroundService
 {

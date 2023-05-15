@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Serilog;
+using Swarmer.Domain.Database;
+using Swarmer.Domain.Extensions;
 using Swarmer.Domain.Models;
-using Swarmer.Domain.Models.Database;
-using Swarmer.Domain.Models.Extensions;
 
-namespace Swarmer.Domain.Services;
+namespace Swarmer.Domain.Discord;
 
 public class DiscordService : IDiscordService
 {

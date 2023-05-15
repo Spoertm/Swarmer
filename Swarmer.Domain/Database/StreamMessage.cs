@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Swarmer.Domain.Models.Database;
+namespace Swarmer.Domain.Database;
 
 [Table("StreamMessages")]
 public sealed class StreamMessage

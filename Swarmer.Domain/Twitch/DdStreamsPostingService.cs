@@ -2,13 +2,14 @@
 using Discord;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swarmer.Domain.Database;
+using Swarmer.Domain.Discord;
+using Swarmer.Domain.Extensions;
 using Swarmer.Domain.Models;
-using Swarmer.Domain.Models.Database;
-using Swarmer.Domain.Models.Extensions;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Api.Interfaces;
 
-namespace Swarmer.Domain.Services;
+namespace Swarmer.Domain.Twitch;
 
 public sealed class DdStreamsPostingService : AbstractBackgroundService
 {

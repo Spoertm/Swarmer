@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Swarmer.Domain.Models.Database;
+namespace Swarmer.Domain.Database;
 
 [Table("GameChannels")]
 public class GameChannel

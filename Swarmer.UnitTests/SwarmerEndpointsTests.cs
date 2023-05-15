@@ -1,4 +1,4 @@
-﻿using Swarmer.Domain.Models;
+﻿using Swarmer.Domain.Twitch;
 using Swarmer.Web.Server.Endpoints;
 using System;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;

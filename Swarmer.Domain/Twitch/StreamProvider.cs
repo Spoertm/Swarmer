@@ -1,4 +1,4 @@
-﻿namespace Swarmer.Domain.Models;
+﻿namespace Swarmer.Domain.Twitch;
 
 public class StreamProvider
 {
