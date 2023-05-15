@@ -27,23 +27,24 @@ public class SwarmerRepositoryTests
 	[Fact]
 	public async Task GetStreamsToPost_ReturnsExpectedStreams()
 	{
-		StreamProvider streamProvider = new();
 		await using AppDbContext appDbContext = new(_dbContextOptions);
 
-		SwarmerRepository repository = new(streamProvider, appDbContext);
+		GameChannel gameChannel1 = new() { TwitchGameId = 1, StreamChannelId = 12345 };
+		GameChannel gameChannel2 = new() { TwitchGameId = 2, StreamChannelId = 54321 };
+		StreamMessage streamMessage = new() { Id = 1, StreamId = "userid1", ChannelId = 12345 };
 
 		MockStream stream1 = new("1", "userid1", gameId: "1");
 		MockStream stream2 = new("2", "userid2", gameId: "1");
-		GameChannel gameChannel1 = new() { TwitchGameId = 1, StreamChannelId = 12345 };
-		GameChannel gameChannel2 = new() { TwitchGameId = 2, StreamChannelId = 54321 };
-		StreamMessage streamMessage1 = new() { Id = 1, StreamId = "userid1", ChannelId = 12345 };
-
-		streamProvider.Streams = new Stream[] { stream1, stream2 };
+		StreamProvider streamProvider = new()
+		{
+			Streams = new Stream[] { stream1, stream2 },
+		};
 
 		appDbContext.GameChannels.AddRange(gameChannel1, gameChannel2);
-		appDbContext.StreamMessages.Add(streamMessage1);
+		appDbContext.StreamMessages.Add(streamMessage);
 		await appDbContext.SaveChangesAsync();
 
+		SwarmerRepository repository = new(streamProvider, appDbContext);
 		List<StreamToPost> result = repository.GetStreamsToPost().ToList();
 
 		Assert.Single(result);
