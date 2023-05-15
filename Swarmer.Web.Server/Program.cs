@@ -23,7 +23,7 @@ internal static class Program
 
 		if (builder.Environment.IsProduction())
 		{
-			SetConfigFromDb(builder);
+			await SetConfigFromDb(builder);
 		}
 
 		Log.Logger = new LoggerConfiguration()
@@ -140,12 +140,16 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		}
 	}
 
-	private static void SetConfigFromDb(WebApplicationBuilder builder)
+	private static async Task SetConfigFromDb(WebApplicationBuilder builder)
 	{
-		using AppDbContext appDbContext = new();
+		DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
+			.UseNpgsql(Environment.GetEnvironmentVariable("PostgresConnectionString") ?? throw new("Envvar PostgresConnectionString not found."))
+			.Options;
+
+		await using AppDbContext appDbContext = new(options);
 		string jsonConfig = appDbContext.SwarmerConfig.AsNoTracking().First().JsonConfig;
 		string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DbConfig.json");
-		File.WriteAllText(configPath, jsonConfig);
+		await File.WriteAllTextAsync(configPath, jsonConfig);
 		builder.Configuration.AddJsonFile(configPath, optional: true, reloadOnChange: true);
 	}
 }
