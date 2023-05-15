@@ -7,12 +7,12 @@ public class SwarmerRepository
 {
 	private readonly StreamProvider _streamProvider;
 	private readonly AppDbContext _appDbContext;
-	private readonly DiscordService _discordService;
+	private readonly IDiscordService _discordService;
 
 	public SwarmerRepository(
 		AppDbContext appDbContext,
 		StreamProvider streamProvider,
-		DiscordService discordService)
+		IDiscordService discordService)
 	{
 		_streamProvider = streamProvider;
 		_appDbContext = appDbContext;
@@ -62,7 +62,7 @@ public class SwarmerRepository
 
 				if (!streamMessage.IsLingering)
 				{
-					RemoveStreamMessage(streamMessage);
+					await RemoveStreamMessageAsync(streamMessage);
 					continue;
 				}
 
@@ -84,7 +84,7 @@ public class SwarmerRepository
 					continue;
 				}
 
-				RemoveStreamMessage(streamMessage);
+				await RemoveStreamMessageAsync(streamMessage);
 			}
 
 			await Task.Delay(TimeSpan.FromSeconds(1)); // Wait 1s between actions to not get rate-limited by Discord's API
@@ -93,12 +93,18 @@ public class SwarmerRepository
 		await SaveChangesAsync();
 	}
 
-	public async Task InsertStreamMessage(StreamMessage streamMessage)
-		=> await _appDbContext.StreamMessages.AddAsync(streamMessage);
+	public async Task InsertStreamMessageAsync(StreamMessage streamMessage)
+	{
+		await _appDbContext.StreamMessages.AddAsync(streamMessage);
+		await SaveChangesAsync();
+	}
+
+	public async Task RemoveStreamMessageAsync(StreamMessage streamMessage)
+	{
+		_appDbContext.StreamMessages.Remove(streamMessage);
+		await SaveChangesAsync();
+	}
 
 	public async Task SaveChangesAsync()
 		=> await _appDbContext.SaveChangesAsync();
-
-	private void RemoveStreamMessage(StreamMessage streamMessage)
-		=> _appDbContext.StreamMessages.Remove(streamMessage);
 }

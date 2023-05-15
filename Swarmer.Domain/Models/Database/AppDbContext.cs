@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Swarmer.Domain.Models.Database;
 
-public sealed class AppDbContext : DbContext
+public class AppDbContext : DbContext
 {
 	public AppDbContext()
 	{

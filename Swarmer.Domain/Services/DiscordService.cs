@@ -6,7 +6,7 @@ using Swarmer.Domain.Models.Extensions;
 
 namespace Swarmer.Domain.Services;
 
-public class DiscordService
+public class DiscordService : IDiscordService
 {
 	private readonly SwarmerDiscordClient _discordClient;
 

@@ -15,7 +15,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 	private readonly IServiceScopeFactory _serviceScopeFactory;
 	private readonly ITwitchAPI _twitchApi;
 	private readonly StreamProvider _streamProvider;
-	private readonly DiscordService _discordService;
+	private readonly IDiscordService _discordService;
 	private readonly string[] _bannedUserLogins;
 	private readonly TimeSpan _maxLingeringTime = TimeSpan.FromMinutes(15);
 
@@ -24,7 +24,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 		IServiceScopeFactory serviceScopeFactory,
 		ITwitchAPI twitchApi,
 		StreamProvider streamProvider,
-		DiscordService discordService)
+		IDiscordService discordService)
 	{
 		_serviceScopeFactory = serviceScopeFactory;
 		_twitchApi = twitchApi;
@@ -87,7 +87,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 				LingeringSinceUtc = DateTime.UtcNow,
 			};
 
-			await repo.InsertStreamMessage(newDbStreamMessage);
+			await repo.InsertStreamMessageAsync(newDbStreamMessage);
 
 			await Task.Delay(TimeSpan.FromSeconds(1)); // Wait 1s between actions to not get rate-limited by Discord's API
 		}
