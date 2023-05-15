@@ -1,6 +1,5 @@
 ﻿global using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 using Discord;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swarmer.Domain.Database;
 using Swarmer.Domain.Discord;
@@ -17,11 +16,9 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 	private readonly ITwitchAPI _twitchApi;
 	private readonly StreamProvider _streamProvider;
 	private readonly IDiscordService _discordService;
-	private readonly string[] _bannedUserLogins;
 	private readonly TimeSpan _maxLingeringTime = TimeSpan.FromMinutes(15);
 
 	public DdStreamsPostingService(
-		IConfiguration config,
 		IServiceScopeFactory serviceScopeFactory,
 		ITwitchAPI twitchApi,
 		StreamProvider streamProvider,
@@ -31,7 +28,6 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 		_twitchApi = twitchApi;
 		_streamProvider = streamProvider;
 		_discordService = discordService;
-		_bannedUserLogins = config.GetSection("BannedUserLogins").Get<string[]>() ?? Array.Empty<string>();
 	}
 
 	protected override TimeSpan Interval => TimeSpan.FromSeconds(15);
@@ -62,10 +58,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			return;
 		}
 
-		IEnumerable<StreamToPost> streamsToPost = repo.GetStreamsToPost()
-			.Where(stp => !_bannedUserLogins.Contains(stp.Stream.UserLogin));
-
-		foreach (StreamToPost stp in streamsToPost)
+		foreach (StreamToPost stp in await repo.GetStreamsToPostAsync())
 		{
 			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: new() { stp.Stream.UserId })).Users[0];
 			Embed newStreamEmbed = new EmbedBuilder().Online(stp.Stream, twitchUser.ProfileImageUrl);

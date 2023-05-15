@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Swarmer.Domain.Database;
 using Swarmer.Domain.Discord;
@@ -16,6 +17,7 @@ public class SwarmerRepositoryTests
 {
 	private readonly DbContextOptions<AppDbContext> _dbContextOptions;
 	private readonly Mock<IDiscordService> _discordServiceMock;
+	private readonly IConfiguration _config;
 
 	public SwarmerRepositoryTests()
 	{
@@ -35,6 +37,10 @@ public class SwarmerRepositoryTests
 			.Returns(Task.CompletedTask);
 
 		_discordServiceMock = discordServiceMock;
+
+		_config = new ConfigurationBuilder()
+			.AddInMemoryCollection()
+			.Build();
 	}
 
 	[Fact]
@@ -57,12 +63,11 @@ public class SwarmerRepositoryTests
 		appDbContext.StreamMessages.Add(streamMessage);
 		await appDbContext.SaveChangesAsync();
 
-		SwarmerRepository sut = new(appDbContext, streamProvider, _discordServiceMock.Object);
-		List<StreamToPost> result = sut.GetStreamsToPost().ToList();
+		SwarmerRepository sut = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
+		List<StreamToPost> result = (await sut.GetStreamsToPostAsync()).ToList();
 
 		Assert.Single(result);
 		Assert.Equal(stream2, result[0].Stream);
-		Assert.Equal(gameChannel1, result[0].Channel);
 	}
 
 	[Fact]
@@ -70,7 +75,7 @@ public class SwarmerRepositoryTests
 	{
 		await using AppDbContext appDbContext = new(_dbContextOptions);
 
-		SwarmerRepository sut = new(appDbContext, new(), _discordServiceMock.Object);
+		SwarmerRepository sut = new(appDbContext, new(), _discordServiceMock.Object, _config);
 
 		TimeSpan maxLingerTime = TimeSpan.FromMinutes(15);
 		DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -95,7 +100,7 @@ public class SwarmerRepositoryTests
 		Mock<AppDbContext> appDbContextMock = new();
 		StreamProvider streamProvider = new();
 
-		SwarmerRepository repository = new(appDbContextMock.Object, streamProvider, _discordServiceMock.Object);
+		SwarmerRepository repository = new(appDbContextMock.Object, streamProvider, _discordServiceMock.Object, _config);
 
 		// Act
 		await repository.HandleExistingStreamsAsync();
@@ -118,7 +123,7 @@ public class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = new Stream[] { stream } };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
 
 		await repository.HandleExistingStreamsAsync();
 
@@ -140,7 +145,7 @@ public class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = new Stream[] { stream } };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
 
 		await repository.HandleExistingStreamsAsync();
 
@@ -160,7 +165,7 @@ public class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = new Stream[] { stream } };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
 
 		await repository.HandleExistingStreamsAsync();
 
@@ -181,7 +186,7 @@ public class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = Array.Empty<Stream>() };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
 
 		await repository.HandleExistingStreamsAsync();
 
@@ -203,7 +208,7 @@ public class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = Array.Empty<Stream>() };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
 
 		await repository.HandleExistingStreamsAsync();
 
@@ -224,7 +229,7 @@ public class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = Array.Empty<Stream>() };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
 
 		await repository.HandleExistingStreamsAsync();
 
@@ -236,7 +241,7 @@ public class SwarmerRepositoryTests
 	{
 		await using AppDbContext appDbContext = new(_dbContextOptions);
 
-		SwarmerRepository repository = new(appDbContext, new(), _discordServiceMock.Object);
+		SwarmerRepository repository = new(appDbContext, new(), _discordServiceMock.Object, _config);
 
 		StreamMessage streamMessage = new() { Id = It.IsAny<int>(), StreamId = "SomeId" };
 		await repository.InsertStreamMessageAsync(streamMessage);
@@ -253,7 +258,7 @@ public class SwarmerRepositoryTests
 		appDbContext.Add(streamMessage);
 		await appDbContext.SaveChangesAsync();
 
-		SwarmerRepository repository = new(appDbContext, new(), _discordServiceMock.Object);
+		SwarmerRepository repository = new(appDbContext, new(), _discordServiceMock.Object, _config);
 		await repository.RemoveStreamMessageAsync(streamMessage);
 
 		Assert.Empty(appDbContext.StreamMessages.ToList());

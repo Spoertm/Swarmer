@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Swarmer.Domain.Discord;
 using Swarmer.Domain.Twitch;
 
@@ -9,22 +10,29 @@ public class SwarmerRepository
 	private readonly StreamProvider _streamProvider;
 	private readonly AppDbContext _appDbContext;
 	private readonly IDiscordService _discordService;
+	private readonly string[] _bannedUserLogins;
 
 	public SwarmerRepository(
 		AppDbContext appDbContext,
 		StreamProvider streamProvider,
-		IDiscordService discordService)
+		IDiscordService discordService,
+		IConfiguration configuration)
 	{
 		_streamProvider = streamProvider;
 		_appDbContext = appDbContext;
 		_discordService = discordService;
+		_bannedUserLogins = configuration.GetSection("BannedUserLogins").Get<string[]>() ?? Array.Empty<string>();
 	}
 
-	public IEnumerable<StreamToPost> GetStreamsToPost()
+	public async Task<IEnumerable<StreamToPost>> GetStreamsToPostAsync()
 	{
-		return from channel in _appDbContext.GameChannels.ToList()
+		List<GameChannel> gameChannels = await _appDbContext.GameChannels.AsNoTracking().ToListAsync();
+		List<StreamMessage> streamMessages = await _appDbContext.StreamMessages.AsNoTracking().ToListAsync();
+
+		return from channel in gameChannels
 				join stream in _streamProvider.Streams on channel.TwitchGameId.ToString() equals stream.GameId
-				where !_appDbContext.StreamMessages.Any(os => os.StreamId == stream.UserId && os.ChannelId == channel.StreamChannelId)
+				where !_bannedUserLogins.Contains(stream.UserLogin)
+				where !streamMessages.Any(os => os.StreamId == stream.UserId && os.ChannelId == channel.StreamChannelId)
 				select new StreamToPost(stream, channel);
 	}
 
@@ -32,9 +40,13 @@ public class SwarmerRepository
 	{
 		DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-		await _appDbContext.StreamMessages.AsQueryable()
-			.Where(sm => utcNow - sm.LingeringSinceUtc >= maxLingerTime)
-			.ForEachAsync(sm => sm.StopLingering());
+		foreach (StreamMessage sm in await _appDbContext.StreamMessages.ToListAsync())
+		{
+			if (utcNow - sm.LingeringSinceUtc >= maxLingerTime)
+			{
+				sm.StopLingering();
+			}
+		}
 
 		await SaveChangesAsync();
 	}
@@ -47,7 +59,7 @@ public class SwarmerRepository
 			return;
 		}
 
-		foreach (StreamMessage streamMessage in _appDbContext.StreamMessages.AsQueryable())
+		foreach (StreamMessage streamMessage in await _appDbContext.StreamMessages.ToListAsync())
 		{
 			Stream? ongoingStream = Array.Find(_streamProvider.Streams, s => s.UserId == streamMessage.StreamId);
 			if (ongoingStream is not null) // Stream is live on Twitch
