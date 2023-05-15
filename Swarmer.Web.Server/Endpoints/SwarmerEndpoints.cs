@@ -15,8 +15,12 @@ public static class SwarmerEndpoints
 		app.MapGet("streams", DdTwitchStreams).WithTags("Streams");
 	}
 
-	[SwaggerOperation(description: @"Returns streams for all games if nothing is specified;
-otherwise the streams for a specific game (can only be ""devil daggers"" or ""hyper demon"").")]
+	[SwaggerOperation(description:
+		$"""
+		Returns streams for all games if nothing is specified;
+		otherwise the streams for a specific game (can only be "{_ddName}" or {_hdName}").
+		"""
+	)]
 	private static Stream[]? DdTwitchStreams([FromServices] StreamProvider provider, string? gameName = null)
 	{
 		if (provider.Streams is null || gameName is null)
