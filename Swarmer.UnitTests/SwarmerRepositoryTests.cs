@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using Swarmer.Domain.Models;
 using Swarmer.Domain.Models.Database;
 using Swarmer.Domain.Services;
@@ -14,6 +16,7 @@ namespace Swarmer.UnitTests;
 public class SwarmerRepositoryTests
 {
 	private readonly DbContextOptions<AppDbContext> _dbContextOptions;
+	private readonly DiscordService _discordService;
 
 	public SwarmerRepositoryTests()
 	{
@@ -22,6 +25,11 @@ public class SwarmerRepositoryTests
 		_dbContextOptions = new DbContextOptionsBuilder<AppDbContext>()
 			.UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
 			.Options;
+
+		IConfiguration configMock = Mock.Of<IConfiguration>();
+		Mock<SwarmerDiscordClient> discordClientMock = new(() => new(configMock, new()));
+		Mock<DiscordService> discordServiceMock = new(() => new(discordClientMock.Object));
+		_discordService = discordServiceMock.Object;
 	}
 
 	[Fact]
@@ -44,8 +52,8 @@ public class SwarmerRepositoryTests
 		appDbContext.StreamMessages.Add(streamMessage);
 		await appDbContext.SaveChangesAsync();
 
-		SwarmerRepository repository = new(streamProvider, appDbContext);
-		List<StreamToPost> result = repository.GetStreamsToPost().ToList();
+		SwarmerRepository sut = new(appDbContext, streamProvider, _discordService);
+		List<StreamToPost> result = sut.GetStreamsToPost().ToList();
 
 		Assert.Single(result);
 		Assert.Equal(stream2, result[0].Stream);
@@ -56,7 +64,8 @@ public class SwarmerRepositoryTests
 	public async Task UpdateLingeringStreamMessages_UpdatesLingeringStreams()
 	{
 		await using AppDbContext appDbContext = new(_dbContextOptions);
-		SwarmerRepository repository = new(new(), appDbContext);
+
+		SwarmerRepository sut = new(appDbContext, new(), _discordService);
 
 		TimeSpan maxLingerTime = TimeSpan.FromMinutes(15);
 		DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -67,7 +76,7 @@ public class SwarmerRepositoryTests
 		appDbContext.StreamMessages.AddRange(lingeringStream1, lingeringStream2, recentStream);
 		await appDbContext.SaveChangesAsync();
 
-		await repository.UpdateLingeringStreamMessages(maxLingerTime);
+		await sut.UpdateLingeringStreamMessages(maxLingerTime);
 
 		Assert.False((await appDbContext.StreamMessages.FindAsync(1))!.IsLingering);
 		Assert.True((await appDbContext.StreamMessages.FindAsync(2))!.IsLingering);

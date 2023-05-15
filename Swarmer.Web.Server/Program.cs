@@ -78,6 +78,7 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		});
 
 		builder.Services.AddScoped<SwarmerRepository>();
+		builder.Services.AddScoped<DiscordService>();
 
 		builder.Services.AddHttpClient();
 
