@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using Swarmer.Domain.Models;
-using Swarmer.Domain.Models.Database;
-using Swarmer.Domain.Services;
+using Swarmer.Domain.Database;
+using Swarmer.Domain.Discord;
+using Swarmer.Domain.Twitch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -217,7 +217,7 @@ public class SwarmerRepositoryTests
 	public async Task HandleExistingStreamsAsync_StreamIsOfflineOnTwitch_DiscordMessageIsNotLiveOrLingering_RemovesStreamMessage()
 	{
 		const string streamId = "SomeId";
-		StreamMessage streamMessageBefore = new() { Id = It.IsAny<int>(), StreamId = streamId, IsLive = false, LingeringSinceUtc = null};
+		StreamMessage streamMessageBefore = new() { Id = It.IsAny<int>(), StreamId = streamId, IsLive = false, LingeringSinceUtc = null };
 
 		await using AppDbContext appDbContext = new(_dbContextOptions);
 		appDbContext.Add(streamMessageBefore);

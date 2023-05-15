@@ -1,4 +1,4 @@
-﻿namespace Swarmer.Domain.Models.Extensions;
+﻿namespace Swarmer.Domain.Extensions;
 
 public static class StringExtensions
 {

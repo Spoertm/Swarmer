@@ -2,7 +2,7 @@
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 using TwitchLib.Api.Interfaces;
 
-namespace Swarmer.Domain.Services;
+namespace Swarmer.Domain.Twitch;
 
 public sealed class StreamRefresherService : AbstractBackgroundService
 {

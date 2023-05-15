@@ -1,8 +1,8 @@
 ﻿using Discord;
+using Swarmer.Domain.Database;
 using Swarmer.Domain.Models;
-using Swarmer.Domain.Models.Database;
 
-namespace Swarmer.Domain.Services;
+namespace Swarmer.Domain.Discord;
 
 public interface IDiscordService
 {

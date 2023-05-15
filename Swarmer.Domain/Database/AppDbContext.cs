@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Swarmer.Domain.Models.Database;
+namespace Swarmer.Domain.Database;
 
 public class AppDbContext : DbContext
 {

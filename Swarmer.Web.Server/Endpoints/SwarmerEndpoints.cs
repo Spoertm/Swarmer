@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Swarmer.Domain.Models;
+using Swarmer.Domain.Twitch;
 using Swashbuckle.AspNetCore.Annotations;
 using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 

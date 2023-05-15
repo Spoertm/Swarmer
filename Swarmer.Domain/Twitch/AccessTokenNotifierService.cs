@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Serilog;
+using Swarmer.Domain.Models;
 using TwitchLib.Api.Auth;
 using TwitchLib.Api.Interfaces;
 
-namespace Swarmer.Domain.Services;
+namespace Swarmer.Domain.Twitch;
 
 public sealed class AccessTokenNotifierService : AbstractBackgroundService
 {

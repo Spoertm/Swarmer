@@ -1,4 +1,6 @@
-namespace Swarmer.Domain.Services;
+using Swarmer.Domain.Models;
+
+namespace Swarmer.Domain;
 
 public sealed class KeepAppAliveService : AbstractBackgroundService
 {
