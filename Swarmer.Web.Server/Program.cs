@@ -1,11 +1,14 @@
+using Discord;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using Swarmer.Domain.Models;
+using Swarmer.Domain.Models.Database;
 using Swarmer.Domain.Services;
 using Swarmer.Web.Server.Endpoints;
 using System.Globalization;
 using TwitchLib.Api;
+using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Web.Server;
 
@@ -56,24 +59,35 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 
 		builder.Services.AddCors();
 
-		TwitchAPI twitchApi = new() { Settings = { AccessToken = builder.Configuration["AccessToken"], ClientId = builder.Configuration["ClientId"] } };
-
-		builder.Services.AddSingleton(twitchApi);
 		builder.Services.AddSingleton<StreamProvider>();
+		builder.Services.AddSingleton<IDiscordService, DiscordService>();
+
 		builder.Services.AddHostedService<StreamRefresherService>();
 		builder.Services.AddHostedService<DdStreamsPostingService>();
 		builder.Services.AddHostedService<AccessTokenNotifierService>();
 		builder.Services.AddHostedService<KeepAppAliveService>();
-		builder.Services.AddDbContext<DbService>();
+		builder.Services.AddDbContext<AppDbContext>(options =>
+		{
+			string connectionString = Environment.GetEnvironmentVariable("PostgresConnectionString") ?? throw new("Envvar PostgresConnectionString not found.");
+			options.UseNpgsql(connectionString);
+		});
 
-		builder.Services.AddSingleton<SwarmerDiscordClient>();
+		builder.Services.AddSingleton<ITwitchAPI, TwitchAPI>(_ => new() { Settings = { AccessToken = builder.Configuration["AccessToken"], ClientId = builder.Configuration["ClientId"] } });
+		builder.Services.AddSingleton<SwarmerDiscordClient>(_ =>
+		{
+			const GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites & ~GatewayIntents.GuildScheduledEvents;
+			return new(builder.Configuration, new() { GatewayIntents = gatewayIntents });
+		});
+
+		builder.Services.AddScoped<SwarmerRepository>();
+
 		builder.Services.AddHttpClient();
 
 		WebApplication app = builder.Build();
 
 		app.Lifetime.ApplicationStopping.Register(() =>
 		{
-			app.Services.GetRequiredService<SwarmerDiscordClient>().Client.StopAsync().ConfigureAwait(false);
+			app.Services.GetRequiredService<SwarmerDiscordClient>().StopAsync().ConfigureAwait(false);
 		});
 
 		if (app.Environment.IsDevelopment())
@@ -127,8 +141,8 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 
 	private static void SetConfigFromDb(WebApplicationBuilder builder)
 	{
-		using DbService dbService = new();
-		string jsonConfig = dbService.SwarmerConfig.AsNoTracking().First().JsonConfig;
+		using AppDbContext appDbContext = new();
+		string jsonConfig = appDbContext.SwarmerConfig.AsNoTracking().First().JsonConfig;
 		string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DbConfig.json");
 		File.WriteAllText(configPath, jsonConfig);
 		builder.Configuration.AddJsonFile(configPath, optional: true, reloadOnChange: true);
