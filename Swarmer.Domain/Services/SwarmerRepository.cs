@@ -1,4 +1,5 @@
-﻿using Swarmer.Domain.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Swarmer.Domain.Models;
 using Swarmer.Domain.Models.Database;
 
 namespace Swarmer.Domain.Services;
@@ -30,14 +31,10 @@ public class SwarmerRepository
 	public async Task UpdateLingeringStreamMessages(TimeSpan maxLingerTime)
 	{
 		DateTime utcNow = DateTime.UtcNow;
-		foreach (StreamMessage ddStream in _appDbContext.StreamMessages)
-		{
-			bool hasLingeredForLongEnough = ddStream.LingeringSinceUtc.HasValue && utcNow - ddStream.LingeringSinceUtc >= maxLingerTime;
-			if (hasLingeredForLongEnough)
-			{
-				ddStream.StopLingering();
-			}
-		}
+
+		await _appDbContext.StreamMessages
+			.Where(sm => utcNow - sm.LingeringSinceUtc >= maxLingerTime)
+			.ForEachAsync(sm => sm.StopLingering());
 
 		await SaveChangesAsync();
 	}
@@ -50,7 +47,7 @@ public class SwarmerRepository
 			return;
 		}
 
-		foreach (StreamMessage streamMessage in _appDbContext.StreamMessages)
+		foreach (StreamMessage streamMessage in _appDbContext.StreamMessages.AsQueryable())
 		{
 			Stream? ongoingStream = Array.Find(_streamProvider.Streams, s => s.UserId == streamMessage.StreamId);
 			if (ongoingStream is not null) // Stream is live on Twitch

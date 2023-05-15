@@ -61,9 +61,8 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			return;
 		}
 
-		IEnumerable<StreamToPost> streamsToPost = repo.GetStreamsToPost();
-
-		streamsToPost = streamsToPost.Where(stp => !_bannedUserLogins.Contains(stp.Stream.UserLogin));
+		IEnumerable<StreamToPost> streamsToPost = repo.GetStreamsToPost()
+			.Where(stp => !_bannedUserLogins.Contains(stp.Stream.UserLogin));
 
 		foreach (StreamToPost stp in streamsToPost)
 		{
