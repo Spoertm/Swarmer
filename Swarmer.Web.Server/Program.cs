@@ -60,6 +60,8 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		builder.Services.AddCors();
 
 		builder.Services.AddSingleton<StreamProvider>();
+		builder.Services.AddSingleton<IDiscordService, DiscordService>();
+
 		builder.Services.AddHostedService<StreamRefresherService>();
 		builder.Services.AddHostedService<DdStreamsPostingService>();
 		builder.Services.AddHostedService<AccessTokenNotifierService>();
@@ -78,7 +80,6 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		});
 
 		builder.Services.AddScoped<SwarmerRepository>();
-		builder.Services.AddScoped<IDiscordService, DiscordService>();
 
 		builder.Services.AddHttpClient();
 
