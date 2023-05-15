@@ -30,7 +30,7 @@ public class SwarmerRepository
 
 	public async Task UpdateLingeringStreamMessages(TimeSpan maxLingerTime)
 	{
-		DateTime utcNow = DateTime.UtcNow;
+		DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
 		await _appDbContext.StreamMessages
 			.Where(sm => utcNow - sm.LingeringSinceUtc >= maxLingerTime)
