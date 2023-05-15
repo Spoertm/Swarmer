@@ -1,17 +1,27 @@
 using Microsoft.EntityFrameworkCore;
-using Swarmer.Domain.Models.Database;
 
-namespace Swarmer.Domain.Services;
+namespace Swarmer.Domain.Models.Database;
 
-public sealed class DbService : DbContext
+public sealed class AppDbContext : DbContext
 {
+	public AppDbContext()
+	{
+	}
+
+	public AppDbContext(DbContextOptions options) : base(options)
+	{
+	}
+
 	public DbSet<GameChannel> GameChannels => Set<GameChannel>();
 	public DbSet<StreamMessage> StreamMessages => Set<StreamMessage>();
 	public DbSet<SwarmerDbConfig> SwarmerConfig => Set<SwarmerDbConfig>();
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
-		optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("PostgresConnectionString") ?? throw new ArgumentException("Envvar PostgresConnectionString not found."));
+		if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Test")
+		{
+			optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("PostgresConnectionString") ?? throw new ArgumentException("Envvar PostgresConnectionString not found."));
+		}
 	}
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)

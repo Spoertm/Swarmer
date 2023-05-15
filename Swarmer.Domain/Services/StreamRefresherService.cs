@@ -1,12 +1,12 @@
 ﻿using Swarmer.Domain.Models;
-using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
+using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Domain.Services;
 
 public sealed class StreamRefresherService : AbstractBackgroundService
 {
-	private readonly TwitchAPI _twitchApi;
+	private readonly ITwitchAPI _twitchApi;
 	private readonly StreamProvider _streamProvider;
 	private static readonly List<string> _twitchGameIds = new()
 	{
@@ -14,7 +14,7 @@ public sealed class StreamRefresherService : AbstractBackgroundService
 		"1350012934", // HYPER DEMON
 	};
 
-	public StreamRefresherService(TwitchAPI twitchApi, StreamProvider streamProvider)
+	public StreamRefresherService(ITwitchAPI twitchApi, StreamProvider streamProvider)
 	{
 		_twitchApi = twitchApi;
 		_streamProvider = streamProvider;

@@ -1,31 +1,29 @@
 ﻿global using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 using Discord;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Swarmer.Domain.Models;
 using Swarmer.Domain.Models.Database;
-using TwitchLib.Api;
 using Swarmer.Domain.Models.Extensions;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
+using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Domain.Services;
 
 public sealed class DdStreamsPostingService : AbstractBackgroundService
 {
-	private readonly TimeSpan _maxLingeringTime = TimeSpan.FromMinutes(15);
 	private readonly StreamProvider _streamProvider;
 	private readonly SwarmerDiscordClient _discordClient;
 	private readonly IServiceScopeFactory _serviceScopeFactory;
-	private readonly TwitchAPI _twitchApi;
+	private readonly ITwitchAPI _twitchApi;
 	private readonly string[] _bannedUserLogins;
 
 	public DdStreamsPostingService(
 		IConfiguration config,
 		SwarmerDiscordClient discordClient,
 		IServiceScopeFactory serviceScopeFactory,
-		TwitchAPI twitchApi,
+		ITwitchAPI twitchApi,
 		StreamProvider streamProvider)
 	{
 		_discordClient = discordClient;
@@ -36,6 +34,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 	}
 
 	protected override TimeSpan Interval => TimeSpan.FromSeconds(15);
+	public TimeSpan MaxLingeringTime { get; } = TimeSpan.FromMinutes(15);
 
 	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
@@ -46,31 +45,16 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 		}
 
 		await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
-		await using DbService db = scope.ServiceProvider.GetRequiredService<DbService>();
+		SwarmerRepository repo = scope.ServiceProvider.GetRequiredService<SwarmerRepository>();
 
-		await UpdateLingerStatus(db);
+		await repo.UpdateLingeringStreamMessages(MaxLingeringTime);
 
-		await PostCompletelyNewStreamsAndAddToDb(db);
+		await PostCompletelyNewStreamsAndAddToDb(repo);
 
-		await HandleStreamMessages(db);
+		await HandleStreamMessages(repo);
 	}
 
-	private async Task UpdateLingerStatus(DbService db)
-	{
-		DateTime utcNow = DateTime.UtcNow;
-		foreach (StreamMessage ddStream in db.StreamMessages)
-		{
-			bool hasLingeredForLongEnough = ddStream.LingeringSinceUtc.HasValue && utcNow - ddStream.LingeringSinceUtc >= _maxLingeringTime;
-			if (hasLingeredForLongEnough)
-			{
-				ddStream.StopLingering();
-			}
-		}
-
-		await db.SaveChangesAsync();
-	}
-
-	private async Task PostCompletelyNewStreamsAndAddToDb(DbService db)
+	public async Task PostCompletelyNewStreamsAndAddToDb(SwarmerRepository repo)
 	{
 		// Provider hasn't initialised Streams yet
 		if (_streamProvider.Streams is not { Length: > 0 })
@@ -78,16 +62,9 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			return;
 		}
 
-		List<GameChannel> gameChannels = await db.GameChannels.AsNoTracking().ToListAsync();
-		List<StreamMessage> ongoingStreams = await db.StreamMessages.AsNoTracking().ToListAsync();
+		IEnumerable<StreamToPost> streamsToPost = repo.GetStreamsToPost();
 
-		IEnumerable<StreamToPost> streamsToPost = _streamProvider.Streams
-			.Join<Stream, GameChannel, string, StreamToPost>(inner: gameChannels,
-				outerKeySelector: stream => stream.GameId,
-				innerKeySelector: gameChannel => gameChannel.TwitchGameId.ToString(),
-				resultSelector: (stream, channel) => new(stream, channel))
-			.Where(stp => !_bannedUserLogins.Contains(stp.Stream.UserLogin))
-			.Where(stp => !ongoingStreams.Exists(os => (os.StreamId, os.ChannelId) == (stp.Stream.UserId, stp.Channel.StreamChannelId)));
+		streamsToPost = streamsToPost.Where(stp => !_bannedUserLogins.Contains(stp.Stream.UserLogin));
 
 		foreach (StreamToPost stp in streamsToPost)
 		{
@@ -118,15 +95,15 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 				LingeringSinceUtc = DateTime.UtcNow,
 			};
 
-			await db.StreamMessages.AddAsync(newDbStreamMessage);
+			await repo.InsertStreamMessage(newDbStreamMessage);
 
 			await Task.Delay(TimeSpan.FromSeconds(1)); // Wait 1s between actions to not get rate-limited by Discord's API
 		}
 
-		await db.SaveChangesAsync();
+		await repo.SaveChangesAsync();
 	}
 
-	private async Task HandleStreamMessages(DbService db)
+	public async Task HandleStreamMessages(SwarmerRepository repo)
 	{
 		// Provider hasn't initialised Streams yet
 		if (_streamProvider.Streams is null)
@@ -134,7 +111,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 			return;
 		}
 
-		foreach (StreamMessage streamMessage in db.StreamMessages)
+		foreach (StreamMessage streamMessage in repo.GetStreamMessages())
 		{
 			Stream? ongoingStream = Array.Find(_streamProvider.Streams, s => s.UserId == streamMessage.StreamId);
 			if (ongoingStream is not null) // Stream is live on Twitch
@@ -146,7 +123,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 
 				if (!streamMessage.IsLingering)
 				{
-					db.Remove(streamMessage);
+					repo.RemoveStreamMessage(streamMessage);
 					continue;
 				}
 
@@ -168,13 +145,13 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 					continue;
 				}
 
-				db.Remove(streamMessage);
+				repo.RemoveStreamMessage(streamMessage);
 			}
 
 			await Task.Delay(TimeSpan.FromSeconds(1)); // Wait 1s between actions to not get rate-limited by Discord's API
 		}
 
-		await db.SaveChangesAsync();
+		await repo.SaveChangesAsync();
 	}
 
 	private async Task GoOfflineAsync(StreamMessage streamMessage)
@@ -202,5 +179,3 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 		await message.ModifyAsync(m => m.Embeds = new(new[] { streamEmbed }));
 	}
 }
-
-internal record struct StreamToPost(Stream Stream, GameChannel Channel);

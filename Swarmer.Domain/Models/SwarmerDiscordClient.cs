@@ -9,7 +9,8 @@ public class SwarmerDiscordClient : DiscordSocketClient
 {
 	private readonly IConfiguration _config;
 
-	public SwarmerDiscordClient(IConfiguration config)
+	public SwarmerDiscordClient(IConfiguration config, DiscordSocketConfig socketConfig)
+		: base(socketConfig)
 	{
 		_config = config;
 

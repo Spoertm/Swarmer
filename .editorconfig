@@ -1,9 +1,16 @@
-﻿root = true
+root = true
 
 # All files
 [*]
 indent_style = tab
 insert_final_newline = true
+
+# Microsoft .NET properties
+csharp_new_line_before_members_in_object_initializers = false
+
+# ReSharper properties
+resharper_max_array_initializer_elements_on_line = 10
+resharper_max_initializer_elements_on_line = 5
 
 # Csproj files
 [*.csproj]
@@ -60,9 +67,9 @@ dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 dotnet_naming_symbols.interface_type_symbol.applicable_kinds = interface
 dotnet_naming_style.interface_type_style.capitalization = pascal_case
 dotnet_naming_style.interface_type_style.required_prefix = I
-dotnet_naming_rule.interface_types_must_be_prefixed_with_I.severity = warning
-dotnet_naming_rule.interface_types_must_be_prefixed_with_I.symbols = interface_type_symbol
-dotnet_naming_rule.interface_types_must_be_prefixed_with_I.style = interface_type_style
+dotnet_naming_rule.interface_types_must_be_prefixed_with_i.severity = warning
+dotnet_naming_rule.interface_types_must_be_prefixed_with_i.symbols = interface_type_symbol
+dotnet_naming_rule.interface_types_must_be_prefixed_with_i.style = interface_type_style
 
 # Use camelCase for parameters
 dotnet_naming_symbols.parameter_symbol.applicable_kinds = parameter
@@ -168,6 +175,7 @@ csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = false
 
 # Wrapping preferences
+csharp_keep_existing_initializer_arrangement = true
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
 
@@ -198,30 +206,30 @@ csharp_preserve_single_line_statements = true
 # SA1633: The file header is missing or not located at the top of the file.
 # SA1642: Constructor summary documentation should begin with standard text.
 
-dotnet_diagnostic.SA1000.severity = none
-dotnet_diagnostic.SA1027.severity = none
-dotnet_diagnostic.SA1101.severity = none
-dotnet_diagnostic.SA1124.severity = none
-dotnet_diagnostic.SA1200.severity = none
-dotnet_diagnostic.SA1202.severity = none
-dotnet_diagnostic.SA1204.severity = none
-dotnet_diagnostic.SA1208.severity = none
-dotnet_diagnostic.SA1214.severity = none
-dotnet_diagnostic.SA1303.severity = none
-dotnet_diagnostic.SA1309.severity = none
-dotnet_diagnostic.SA1311.severity = none
-dotnet_diagnostic.SA1407.severity = none
-dotnet_diagnostic.SA1408.severity = none
-dotnet_diagnostic.SA1503.severity = none
-dotnet_diagnostic.SA1516.severity = none
-dotnet_diagnostic.SA1600.severity = none
-dotnet_diagnostic.SA1601.severity = none
-dotnet_diagnostic.SA1602.severity = none
-dotnet_diagnostic.SA1611.severity = none
-dotnet_diagnostic.SA1615.severity = none
-dotnet_diagnostic.SA1623.severity = none
-dotnet_diagnostic.SA1633.severity = none
-dotnet_diagnostic.SA1642.severity = none
+dotnet_diagnostic.sa1000.severity = none
+dotnet_diagnostic.sa1027.severity = none
+dotnet_diagnostic.sa1101.severity = none
+dotnet_diagnostic.sa1124.severity = none
+dotnet_diagnostic.sa1200.severity = none
+dotnet_diagnostic.sa1202.severity = none
+dotnet_diagnostic.sa1204.severity = none
+dotnet_diagnostic.sa1208.severity = none
+dotnet_diagnostic.sa1214.severity = none
+dotnet_diagnostic.sa1303.severity = none
+dotnet_diagnostic.sa1309.severity = none
+dotnet_diagnostic.sa1311.severity = none
+dotnet_diagnostic.sa1407.severity = none
+dotnet_diagnostic.sa1408.severity = none
+dotnet_diagnostic.sa1503.severity = none
+dotnet_diagnostic.sa1516.severity = none
+dotnet_diagnostic.sa1600.severity = none
+dotnet_diagnostic.sa1601.severity = none
+dotnet_diagnostic.sa1602.severity = none
+dotnet_diagnostic.sa1611.severity = none
+dotnet_diagnostic.sa1615.severity = none
+dotnet_diagnostic.sa1623.severity = none
+dotnet_diagnostic.sa1633.severity = none
+dotnet_diagnostic.sa1642.severity = none
 
 # SonarAnalyzers suppressions
 
@@ -229,14 +237,14 @@ dotnet_diagnostic.SA1642.severity = none
 # S2368: Make this method private or simplify its parameters to not use multidimensional arrays.
 # S3358: Extract this nested ternary operation into an independent statement.
 
-dotnet_diagnostic.S112.severity = none
-dotnet_diagnostic.S2368.severity = none
-dotnet_diagnostic.S3358.severity = none
+dotnet_diagnostic.s112.severity = none
+dotnet_diagnostic.s2368.severity = none
+dotnet_diagnostic.s3358.severity = none
 
 # RoslynatorAnalyzers suppressions
 
 # RCS1090: Call 'ConfigureAwait(false)'.
 # RCS1123: Add parentheses when necessary.
 
-dotnet_diagnostic.RCS1090.severity = none
-dotnet_diagnostic.RCS1123.severity = none
+dotnet_diagnostic.rcs1090.severity = none
+dotnet_diagnostic.rcs1123.severity = none
