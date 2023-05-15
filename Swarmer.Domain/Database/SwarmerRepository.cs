@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Swarmer.Domain.Database;
+using Swarmer.Domain.Discord;
 using Swarmer.Domain.Twitch;
 
-namespace Swarmer.Domain.Discord;
+namespace Swarmer.Domain.Database;
 
 public class SwarmerRepository
 {

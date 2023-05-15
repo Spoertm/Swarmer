@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Serilog.Events;
 
-namespace Swarmer.Domain.Models;
+namespace Swarmer.Domain.Discord;
 
 public class SwarmerDiscordClient : DiscordSocketClient
 {
