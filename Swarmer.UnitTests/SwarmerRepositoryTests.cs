@@ -82,21 +82,4 @@ public class SwarmerRepositoryTests
 		Assert.True((await appDbContext.StreamMessages.FindAsync(2))!.IsLingering);
 		Assert.Null((await appDbContext.StreamMessages.FindAsync(3))!.LingeringSinceUtc);
 	}
-
-	private class MockStream : Stream
-	{
-		public MockStream(
-			string id,
-			string userId = null!,
-			string userLogin = null!,
-			string userName = null!,
-			string gameId = null!)
-		{
-			Id = id;
-			UserId = userId;
-			UserLogin = userLogin;
-			UserName = userName;
-			GameId = gameId;
-		}
-	}
 }

@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Swarmer.Domain\Swarmer.Domain.csproj" />
+    <ProjectReference Include="..\Swarmer.Web.Server\Swarmer.Web.Server.csproj" />
   </ItemGroup>
 
 </Project>
