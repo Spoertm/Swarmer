@@ -32,7 +32,7 @@ public class SwarmerRepository
 	{
 		DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-		await _appDbContext.StreamMessages
+		await _appDbContext.StreamMessages.AsQueryable()
 			.Where(sm => utcNow - sm.LingeringSinceUtc >= maxLingerTime)
 			.ForEachAsync(sm => sm.StopLingering());
 

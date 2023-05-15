@@ -5,7 +5,6 @@ using Serilog.Events;
 using Swarmer.Domain;
 using Swarmer.Domain.Database;
 using Swarmer.Domain.Discord;
-using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
 using Swarmer.Web.Server.Endpoints;
 using System.Globalization;
