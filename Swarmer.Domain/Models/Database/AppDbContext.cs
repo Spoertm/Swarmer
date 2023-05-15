@@ -16,14 +16,6 @@ public sealed class AppDbContext : DbContext
 	public DbSet<StreamMessage> StreamMessages => Set<StreamMessage>();
 	public DbSet<SwarmerDbConfig> SwarmerConfig => Set<SwarmerDbConfig>();
 
-	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-	{
-		if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Test")
-		{
-			optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("PostgresConnectionString") ?? throw new ArgumentException("Envvar PostgresConnectionString not found."));
-		}
-	}
-
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		modelBuilder.Entity<GameChannel>().HasKey(gc => new { gc.StreamChannelId, gc.TwitchGameId });

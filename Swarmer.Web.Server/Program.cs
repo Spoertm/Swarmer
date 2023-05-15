@@ -64,7 +64,11 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		builder.Services.AddHostedService<DdStreamsPostingService>();
 		builder.Services.AddHostedService<AccessTokenNotifierService>();
 		builder.Services.AddHostedService<KeepAppAliveService>();
-		builder.Services.AddDbContext<AppDbContext>(ServiceLifetime.Transient);
+		builder.Services.AddDbContext<AppDbContext>(options =>
+		{
+			string connectionString = Environment.GetEnvironmentVariable("PostgresConnectionString") ?? throw new("Envvar PostgresConnectionString not found.");
+			options.UseNpgsql(connectionString);
+		});
 
 		builder.Services.AddSingleton<ITwitchAPI, TwitchAPI>(_ => new() { Settings = { AccessToken = builder.Configuration["AccessToken"], ClientId = builder.Configuration["ClientId"] } });
 		builder.Services.AddSingleton<SwarmerDiscordClient>(_ =>
