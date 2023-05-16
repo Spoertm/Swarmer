@@ -18,7 +18,7 @@ public static class SwarmerEndpoints
 	[SwaggerOperation(description:
 		$"""
 		Returns streams for all games if nothing is specified;
-		otherwise the streams for a specific game (can only be "{DdEndpointParamName}" or {HdEndpointParamName}").
+		otherwise the streams for a specific game (can only be "{DdEndpointParamName}" or "{HdEndpointParamName}").
 		"""
 	)]
 	public static Stream[]? DdTwitchStreams([FromServices] StreamProvider provider, string? gameName = null)
