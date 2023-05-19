@@ -10,7 +10,7 @@ using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Domain.Twitch;
 
-public sealed class DdStreamsPostingService : AbstractBackgroundService
+public sealed class StreamsPostingService : AbstractBackgroundService
 {
 	private readonly IServiceScopeFactory _serviceScopeFactory;
 	private readonly ITwitchAPI _twitchApi;
@@ -18,7 +18,7 @@ public sealed class DdStreamsPostingService : AbstractBackgroundService
 	private readonly IDiscordService _discordService;
 	private readonly TimeSpan _maxLingeringTime = TimeSpan.FromMinutes(15);
 
-	public DdStreamsPostingService(
+	public StreamsPostingService(
 		IServiceScopeFactory serviceScopeFactory,
 		ITwitchAPI twitchApi,
 		StreamProvider streamProvider,

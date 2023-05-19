@@ -64,7 +64,7 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		builder.Services.AddSingleton<IDiscordService, DiscordService>();
 
 		builder.Services.AddHostedService<StreamRefresherService>();
-		builder.Services.AddHostedService<DdStreamsPostingService>();
+		builder.Services.AddHostedService<StreamsPostingService>();
 		builder.Services.AddHostedService<AccessTokenNotifierService>();
 		builder.Services.AddHostedService<KeepAppAliveService>();
 		builder.Services.AddDbContext<AppDbContext>(options =>
