@@ -39,7 +39,7 @@ public class SwarmerRepositoryTests
 		_discordServiceMock = discordServiceMock;
 
 		_config = new ConfigurationBuilder()
-			.AddInMemoryCollection()
+			.AddInMemoryCollection(new List<KeyValuePair<string, string?>> { new("BannedUserLogins:0", "SomeBannedLogin") })
 			.Build();
 	}
 
@@ -54,9 +54,10 @@ public class SwarmerRepositoryTests
 
 		MockStream stream1 = new("1", "userid1", gameId: "1");
 		MockStream stream2 = new("2", "userid2", gameId: "1");
+		MockStream bannedUserStream = new("3", "userid3", "SomeBannedLogin", gameId: "1");
 		StreamProvider streamProvider = new()
 		{
-			Streams = new Stream[] { stream1, stream2 },
+			Streams = new Stream[] { stream1, stream2, bannedUserStream },
 		};
 
 		appDbContext.GameChannels.AddRange(gameChannel1, gameChannel2);
