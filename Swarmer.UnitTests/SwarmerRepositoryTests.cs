@@ -97,16 +97,13 @@ public class SwarmerRepositoryTests
 	[Fact]
 	public async Task HandleExistingStreamsAsync_StreamsProviderNotInitialized_ReturnsImmediately()
 	{
-		// Arrange
 		Mock<AppDbContext> appDbContextMock = new();
 		StreamProvider streamProvider = new();
 
 		SwarmerRepository repository = new(appDbContextMock.Object, streamProvider, _discordServiceMock.Object, _config);
 
-		// Act
 		await repository.HandleExistingStreamsAsync();
 
-		// Assert
 		// Make sure that the method returns immediately when the stream provider is not initialized
 		appDbContextMock.VerifyNoOtherCalls();
 		_discordServiceMock.VerifyNoOtherCalls();
