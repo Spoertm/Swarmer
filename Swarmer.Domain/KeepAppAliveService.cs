@@ -15,7 +15,7 @@ public sealed class KeepAppAliveService : AbstractBackgroundService
 
 	protected override Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
-		const string url = "https://swarmerbot.azurewebsites.net/";
+		const string url = "https://swarmer.onrender.com";
 		_ = _httpClientFactory.CreateClient().GetStringAsync(url, stoppingToken);
 		return Task.CompletedTask;
 	}
