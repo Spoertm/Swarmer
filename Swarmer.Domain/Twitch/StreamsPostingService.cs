@@ -30,7 +30,7 @@ public sealed class StreamsPostingService : AbstractBackgroundService
 		_discordService = discordService;
 	}
 
-	protected override TimeSpan Interval => TimeSpan.FromSeconds(15);
+	protected override TimeSpan Interval => TimeSpan.FromSeconds(30);
 
 	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
