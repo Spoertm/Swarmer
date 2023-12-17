@@ -1,3 +1,4 @@
+using Serilog;
 using Swarmer.Domain.Models;
 
 namespace Swarmer.Domain;
@@ -13,10 +14,22 @@ public sealed class KeepAppAliveService : AbstractBackgroundService
 
 	protected override TimeSpan Interval => TimeSpan.FromMinutes(5);
 
-	protected override Task ExecuteTaskAsync(CancellationToken stoppingToken)
+	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
 	{
-		const string url = "https://swarmer.onrender.com";
-		_ = _httpClientFactory.CreateClient().GetStringAsync(url, stoppingToken);
-		return Task.CompletedTask;
+		const string envVarName = "AppUrl";
+		if (Environment.GetEnvironmentVariable(envVarName) is not { } appUrl)
+		{
+			Log.Warning("{EnvVarName} environment variable not set", envVarName);
+			return;
+		}
+
+		try
+		{
+			await _httpClientFactory.CreateClient().GetStringAsync(appUrl, stoppingToken).ConfigureAwait(false);
+		}
+		catch (Exception e)
+		{
+			Log.Error(e, "Failed to ping {AppUrl}", appUrl);
+		}
 	}
 }
