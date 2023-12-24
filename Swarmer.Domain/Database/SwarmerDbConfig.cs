@@ -7,5 +7,5 @@ namespace Swarmer.Domain.Database;
 public sealed class SwarmerDbConfig
 {
 	[Column(TypeName = "jsonb")]
-	public string JsonConfig { get; set; } = null!;
+	public required string JsonConfig { get; init; }
 }
