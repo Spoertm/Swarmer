@@ -7,19 +7,22 @@ namespace Swarmer.Domain.Database;
 public sealed class StreamMessage
 {
 	[Key]
-	public int Id { get; set; }
+	public int Id { get; init; }
 
-	public ulong MessageId { get; set; }
+	public ulong MessageId { get; init; }
 
-	public ulong ChannelId { get; set; }
+	public ulong ChannelId { get; init; }
 
 	public bool IsLive { get; set; }
 
-	public string StreamId { get; set; } = null!;
+	[MaxLength(20)]
+	public required string StreamId { get; init; }
 
-	public string? OfflineThumbnailUrl { get; set; }
+	[MaxLength(200)]
+	public string? OfflineThumbnailUrl { get; init; }
 
-	public string? AvatarUrl { get; set; }
+	[MaxLength(200)]
+	public string? AvatarUrl { get; init; }
 
 	public DateTimeOffset? LingeringSinceUtc { get; set; }
 
