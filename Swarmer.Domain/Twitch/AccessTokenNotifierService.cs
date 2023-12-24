@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Options;
 using Serilog;
 using Swarmer.Domain.Models;
 using TwitchLib.Api.Auth;
@@ -8,12 +8,12 @@ namespace Swarmer.Domain.Twitch;
 
 public sealed class AccessTokenNotifierService : AbstractBackgroundService
 {
-	private readonly IConfiguration _config;
+	private readonly SwarmerConfig _config;
 	private readonly ITwitchAPI _twitchApi;
 
-	public AccessTokenNotifierService(IConfiguration config, ITwitchAPI twitchApi)
+	public AccessTokenNotifierService(IOptions<SwarmerConfig> options, ITwitchAPI twitchApi)
 	{
-		_config = config;
+		_config = options.Value;
 		_twitchApi = twitchApi;
 	}
 
@@ -26,7 +26,7 @@ public sealed class AccessTokenNotifierService : AbstractBackgroundService
 			return;
 		}
 
-		ValidateAccessTokenResponse? response = await _twitchApi.Auth.ValidateAccessTokenAsync(_config["AccessToken"]);
+		ValidateAccessTokenResponse? response = await _twitchApi.Auth.ValidateAccessTokenAsync(_config.AccessToken);
 		if (response is null)
 		{
 			Log.Error("The access token is no longer valid and has to be renewed");

@@ -1,10 +1,12 @@
 using Discord;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using Swarmer.Domain;
 using Swarmer.Domain.Database;
 using Swarmer.Domain.Discord;
+using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
 using Swarmer.Web.Server.Endpoints;
 using System.Globalization;
@@ -25,6 +27,11 @@ internal static class Program
 		{
 			await SetConfigFromDb(builder);
 		}
+
+		builder.Services.AddOptions<SwarmerConfig>()
+			.Bind(builder.Configuration.GetSection("SwarmerConfig"))
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel.Warning()
@@ -73,11 +80,30 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 			options.UseNpgsql(connectionString);
 		});
 
-		builder.Services.AddSingleton<ITwitchAPI, TwitchAPI>(_ => new() { Settings = { AccessToken = builder.Configuration["AccessToken"], ClientId = builder.Configuration["ClientId"] } });
-		builder.Services.AddSingleton<SwarmerDiscordClient>(_ =>
+		// TODO: Move the services registrations below to extension methods
+		builder.Services.AddSingleton<ITwitchAPI, TwitchAPI>(services =>
+		{
+			SwarmerConfig config = services.GetRequiredService<IOptions<SwarmerConfig>>().Value;
+			TwitchAPI api = new()
+			{
+				Settings =
+				{
+					AccessToken = config.AccessToken,
+					ClientId = config.ClientId,
+					Secret = config.ClientSecret,
+				},
+			};
+
+			return api;
+		});
+
+		builder.Services.AddSingleton<SwarmerDiscordClient>(services =>
 		{
 			const GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites & ~GatewayIntents.GuildScheduledEvents;
-			return new(builder.Configuration, new() { GatewayIntents = gatewayIntents });
+			IOptions<SwarmerConfig> options = services.GetRequiredService<IOptions<SwarmerConfig>>();
+			SwarmerDiscordClient client = new(options, new() { GatewayIntents = gatewayIntents });
+
+			return client;
 		});
 
 		builder.Services.AddScoped<SwarmerRepository>();

@@ -1,18 +1,19 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Serilog.Events;
+using Swarmer.Domain.Models;
 
 namespace Swarmer.Domain.Discord;
 
 public class SwarmerDiscordClient : DiscordSocketClient
 {
-	private readonly IConfiguration _config;
+	private readonly SwarmerConfig _config;
 
-	public SwarmerDiscordClient(IConfiguration config, DiscordSocketConfig socketConfig)
+	public SwarmerDiscordClient(IOptions<SwarmerConfig> options, DiscordSocketConfig socketConfig)
 		: base(socketConfig)
 	{
-		_config = config;
+		_config = options.Value;
 
 		Log += OnLog;
 		Ready += () =>
@@ -39,7 +40,7 @@ public class SwarmerDiscordClient : DiscordSocketClient
 	public async Task InitAsync()
 	{
 		Serilog.Log.Debug("Initiating {Client}", nameof(SwarmerDiscordClient));
-		await LoginAsync(TokenType.Bot, _config["BotToken"]);
+		await LoginAsync(TokenType.Bot, _config.BotToken);
 		await StartAsync();
 		await SetActivityAsync(new Game("DD Twitch streams", ActivityType.Watching));
 	}
