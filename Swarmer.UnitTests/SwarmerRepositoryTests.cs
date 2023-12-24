@@ -57,7 +57,7 @@ public class SwarmerRepositoryTests
 		MockStream bannedUserStream = new("3", "userid3", "SomeBannedLogin", gameId: "1");
 		StreamProvider streamProvider = new()
 		{
-			Streams = new Stream[] { stream1, stream2, bannedUserStream },
+			Streams = [stream1, stream2, bannedUserStream],
 		};
 
 		appDbContext.GameChannels.AddRange(gameChannel1, gameChannel2);
@@ -120,7 +120,7 @@ public class SwarmerRepositoryTests
 		appDbContext.Add(streamMessageBefore);
 		await appDbContext.SaveChangesAsync();
 
-		StreamProvider streamProvider = new() { Streams = new Stream[] { stream } };
+		StreamProvider streamProvider = new() { Streams = [stream] };
 		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
 
 		await repository.HandleExistingStreamsAsync();
@@ -142,7 +142,7 @@ public class SwarmerRepositoryTests
 		appDbContext.Add(streamMessage);
 		await appDbContext.SaveChangesAsync();
 
-		StreamProvider streamProvider = new() { Streams = new Stream[] { stream } };
+		StreamProvider streamProvider = new() { Streams = [stream] };
 		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
 
 		await repository.HandleExistingStreamsAsync();
@@ -162,7 +162,7 @@ public class SwarmerRepositoryTests
 		appDbContext.Add(streamMessage);
 		await appDbContext.SaveChangesAsync();
 
-		StreamProvider streamProvider = new() { Streams = new Stream[] { stream } };
+		StreamProvider streamProvider = new() { Streams = [stream] };
 		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _config);
 
 		await repository.HandleExistingStreamsAsync();

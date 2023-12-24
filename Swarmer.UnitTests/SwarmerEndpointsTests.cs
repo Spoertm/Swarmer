@@ -16,7 +16,7 @@ public class SwarmerEndpointsTests
 
 		StreamProvider streamProvider = new()
 		{
-			Streams = new Stream[] { stream1, stream2 },
+			Streams = [stream1, stream2],
 		};
 
 		Stream[]? result = SwarmerEndpoints.DdTwitchStreams(streamProvider);
@@ -28,11 +28,11 @@ public class SwarmerEndpointsTests
 	public void DdTwitchStreams_WithGameName_ReturnsFilteredStreams()
 	{
 		Stream[] streams =
-		{
+		[
 			new MockStream("1", gameName: SwarmerEndpoints.DdEndpointParamName),
 			new MockStream("2", gameName: SwarmerEndpoints.DdEndpointParamName),
 			new MockStream("3", gameName: SwarmerEndpoints.HdEndpointParamName),
-		};
+		];
 
 		StreamProvider streamProvider = new()
 		{

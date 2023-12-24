@@ -44,7 +44,7 @@ public class DiscordService : IDiscordService
 		}
 
 		Embed newEmbed = new EmbedBuilder().Offline(message.Embeds.First(), streamMessage.OfflineThumbnailUrl);
-		await message.ModifyAsync(m => m.Embeds = new(new[] { newEmbed }));
+		await message.ModifyAsync(m => m.Embeds = new([newEmbed]));
 	}
 
 	public async Task GoOnlineAgainAsync(StreamMessage streamMessage, Stream ongoingStream)
@@ -56,6 +56,6 @@ public class DiscordService : IDiscordService
 		}
 
 		Embed streamEmbed = new EmbedBuilder().Online(ongoingStream, streamMessage.AvatarUrl);
-		await message.ModifyAsync(m => m.Embeds = new(new[] { streamEmbed }));
+		await message.ModifyAsync(m => m.Embeds = new([streamEmbed]));
 	}
 }

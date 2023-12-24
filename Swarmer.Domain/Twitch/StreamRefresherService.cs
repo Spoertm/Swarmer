@@ -8,11 +8,11 @@ public sealed class StreamRefresherService : AbstractBackgroundService
 {
 	private readonly ITwitchAPI _twitchApi;
 	private readonly StreamProvider _streamProvider;
-	private static readonly List<string> _twitchGameIds = new()
-	{
+	private static readonly List<string> _twitchGameIds =
+	[
 		"490905", // Devil Daggers
 		"1350012934", // HYPER DEMON
-	};
+	];
 
 	public StreamRefresherService(ITwitchAPI twitchApi, StreamProvider streamProvider)
 	{
