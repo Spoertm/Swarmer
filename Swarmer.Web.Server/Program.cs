@@ -153,7 +153,7 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		finally
 		{
 			Log.Information("Shut-down complete");
-			Log.CloseAndFlush(); // TODO: use async overload
+			await Log.CloseAndFlushAsync();
 		}
 	}
 
