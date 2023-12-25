@@ -2,7 +2,7 @@
 
 namespace Swarmer.Domain.Models;
 
-public class SwarmerConfig
+public record SwarmerConfig
 {
 	[Required]
 	public required string BotToken { get; init; }
@@ -11,10 +11,19 @@ public class SwarmerConfig
 	public required string ClientId { get; init; }
 
 	[Required]
-	public required string AccessToken { get; init; }
+	public required string AccessToken { get; set; }
 
 	[Required]
 	public required string ClientSecret { get; init; }
 
 	public required string[] BannedUserLogins { get; init; } = Array.Empty<string>();
+
+	public SwarmerConfig Copy() => new()
+	{
+		BotToken = BotToken,
+		ClientId = ClientId,
+		AccessToken = AccessToken,
+		ClientSecret = ClientId,
+		BannedUserLogins = BannedUserLogins,
+	};
 }

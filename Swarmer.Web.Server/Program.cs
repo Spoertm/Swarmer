@@ -10,6 +10,7 @@ using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
 using Swarmer.Web.Server.Endpoints;
 using System.Globalization;
+using System.Text;
 using TwitchLib.Api;
 using TwitchLib.Api.Interfaces;
 
@@ -72,7 +73,6 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 
 		builder.Services.AddHostedService<StreamRefresherService>();
 		builder.Services.AddHostedService<StreamsPostingService>();
-		builder.Services.AddHostedService<AccessTokenNotifierService>();
 		builder.Services.AddHostedService<KeepAppAliveService>();
 		builder.Services.AddDbContext<AppDbContext>(options =>
 		{
@@ -107,13 +107,14 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		});
 
 		builder.Services.AddScoped<SwarmerRepository>();
+		builder.Services.AddScoped<ConfigRepository>();
 
 		builder.Services.AddHttpClient();
 
 		WebApplication app = builder.Build();
-
 		app.Lifetime.ApplicationStopping.Register(() =>
 		{
+			// TODO: Use Task.Factory.StartNew() to do this async
 			app.Services.GetRequiredService<SwarmerDiscordClient>().StopAsync().ConfigureAwait(false);
 		});
 
@@ -124,9 +125,7 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		}
 
 		app.UseStaticFiles();
-
 		app.UseSwagger();
-
 		app.UseSwaggerUI(options =>
 		{
 			options.InjectStylesheet("/swagger-ui/SwaggerDarkReader.css");
@@ -134,23 +133,16 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		});
 
 		app.UseBlazorFrameworkFiles();
-
 		app.UseRouting();
-
 		app.MapRazorPages();
-
 		app.MapFallbackToFile("index.html");
-
 		app.RegisterSwarmerEndpoints();
-
 		app.UseHttpsRedirection();
-
 		app.UseCors(policyBuilder => policyBuilder.AllowAnyOrigin());
 
 		await app.Services.GetRequiredService<SwarmerDiscordClient>().InitAsync();
 
 		CancellationTokenSource tokenSource = new();
-
 		try
 		{
 			await app.RunAsync(tokenSource.Token);
@@ -162,7 +154,7 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		finally
 		{
 			Log.Information("Shut-down complete");
-			Log.CloseAndFlush();
+			Log.CloseAndFlush(); // TODO: use async overload
 		}
 	}
 
@@ -173,9 +165,10 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 			.Options;
 
 		await using AppDbContext appDbContext = new(options);
+
 		string jsonConfig = appDbContext.SwarmerConfig.AsNoTracking().First().JsonConfig;
-		string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DbConfig.json");
-		await File.WriteAllTextAsync(configPath, jsonConfig);
-		builder.Configuration.AddJsonFile(configPath, optional: true, reloadOnChange: true);
+		using MemoryStream configStream = new(Encoding.UTF8.GetBytes(jsonConfig));
+
+		builder.Configuration.AddJsonStream(configStream);
 	}
 }

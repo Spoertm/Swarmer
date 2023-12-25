@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Swarmer.Domain.Database;
 
-[Keyless]
 public sealed class SwarmerDbConfig
 {
+	[Key]
+	public int Id { get; init; }
+
 	[MaxLength(1000)]
-	public required string JsonConfig { get; init; }
+	public required string JsonConfig { get; set; }
 }
