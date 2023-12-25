@@ -80,7 +80,6 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 			options.UseNpgsql(connectionString);
 		});
 
-		// TODO: Move the services registrations below to extension methods
 		builder.Services.AddSingleton<ITwitchAPI, TwitchAPI>(services =>
 		{
 			SwarmerConfig config = services.GetRequiredService<IOptions<SwarmerConfig>>().Value;
@@ -114,8 +113,8 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		WebApplication app = builder.Build();
 		app.Lifetime.ApplicationStopping.Register(() =>
 		{
-			// TODO: Use Task.Factory.StartNew() to do this async
-			app.Services.GetRequiredService<SwarmerDiscordClient>().StopAsync().ConfigureAwait(false);
+			SwarmerDiscordClient client = app.Services.GetRequiredService<SwarmerDiscordClient>();
+			Task.Run(() => client.StopAsync());
 		});
 
 		if (app.Environment.IsDevelopment())
