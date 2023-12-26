@@ -4,6 +4,7 @@ using Serilog;
 using Swarmer.Domain.Database;
 using Swarmer.Domain.Models;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
 using TwitchLib.Api.Interfaces;
@@ -88,4 +89,16 @@ public sealed class StreamRefresherService : RepeatingBackgroundService
 
 		return refreshTokenResponse;
 	}
+}
+
+internal record RefreshTokenResponse
+{
+	[JsonPropertyName("access_token")]
+	public required string AccessToken { get; init; }
+
+	[JsonPropertyName("expires_in")]
+	public required int ExpiresIn { get; init; }
+
+	[JsonPropertyName("token_type")]
+	public required string TokenType { get; init; }
 }
