@@ -25,7 +25,7 @@ public sealed class ConfigRepository
 			newConfig.AccessToken = newToken;
 			string serNewConfig = JsonSerializer.Serialize(newConfig);
 
-			SwarmerDbConfig currentDbConfig = await _appDbContext.SwarmerConfig.FirstAsync();
+			ConfigurationEntity currentDbConfig = await _appDbContext.SwarmerConfig.FirstAsync();
 			currentDbConfig.JsonConfig = serNewConfig;
 
 			await _appDbContext.SaveChangesAsync();

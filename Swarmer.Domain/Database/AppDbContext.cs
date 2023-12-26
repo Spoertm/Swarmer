@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Swarmer.Domain.Database;
 
@@ -14,10 +15,43 @@ public class AppDbContext : DbContext
 
 	public DbSet<GameChannel> GameChannels => Set<GameChannel>();
 	public DbSet<StreamMessage> StreamMessages => Set<StreamMessage>();
-	public DbSet<SwarmerDbConfig> SwarmerConfig => Set<SwarmerDbConfig>();
+	public DbSet<ConfigurationEntity> SwarmerConfig => Set<ConfigurationEntity>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.Entity<GameChannel>().HasKey(gc => new { gc.StreamChannelId, gc.TwitchGameId });
+		ConfigureGameChannel(modelBuilder.Entity<GameChannel>());
+		ConfigureStreamMessage(modelBuilder.Entity<StreamMessage>());
+		ConfigureConfigurationEntity(modelBuilder.Entity<ConfigurationEntity>());
+	}
+
+	private void ConfigureGameChannel(EntityTypeBuilder<GameChannel> builder)
+	{
+		builder.ToTable("GameChannels");
+		builder.HasKey(gc => new { gc.StreamChannelId, gc.TwitchGameId });
+	}
+
+	private void ConfigureStreamMessage(EntityTypeBuilder<StreamMessage> builder)
+	{
+		builder.ToTable("StreamMessages");
+		builder.HasKey(s => s.Id);
+		builder.Property(s => s.MessageId).IsRequired();
+		builder.Property(s => s.ChannelId).IsRequired();
+		builder.Property(s => s.IsLive).IsRequired();
+
+		builder.Property(s => s.StreamId)
+			.IsRequired()
+			.HasMaxLength(20);
+
+		builder.Property(s => s.OfflineThumbnailUrl).HasMaxLength(200);
+		builder.Property(s => s.AvatarUrl).HasMaxLength(200);
+	}
+
+	private void ConfigureConfigurationEntity(EntityTypeBuilder<ConfigurationEntity> builder)
+	{
+		builder.ToTable("SwarmerConfig");
+		builder.HasKey(s => s.Id);
+		builder.Property(s => s.JsonConfig)
+			.IsRequired()
+			.HasMaxLength(1000);
 	}
 }
