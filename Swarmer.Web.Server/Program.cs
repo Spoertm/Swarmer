@@ -35,7 +35,7 @@ internal static class Program
 			.ValidateOnStart();
 
 		Log.Logger = new LoggerConfiguration()
-			.MinimumLevel.Warning()
+			.MinimumLevel.Information()
 			.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u4}] {Message:lj}{NewLine}{Exception}")
 			.WriteTo.Sentry(o =>
 			{
