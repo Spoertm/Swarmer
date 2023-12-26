@@ -16,14 +16,14 @@ public record SwarmerConfig
 	[Required]
 	public required string ClientSecret { get; init; }
 
-	public required string[] BannedUserLogins { get; init; } = Array.Empty<string>();
+	public string[] BannedUserLogins { get; init; } = Array.Empty<string>();
 
 	public SwarmerConfig Copy() => new()
 	{
 		BotToken = BotToken,
 		ClientId = ClientId,
 		AccessToken = AccessToken,
-		ClientSecret = ClientId,
-		BannedUserLogins = BannedUserLogins,
+		ClientSecret = ClientSecret,
+		BannedUserLogins = BannedUserLogins.ToArray(),
 	};
 }
