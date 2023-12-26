@@ -10,7 +10,7 @@ using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Domain.Twitch;
 
-public sealed class StreamsPostingService : AbstractBackgroundService
+public sealed class StreamsPostingService : RepeatingBackgroundService
 {
 	private readonly IServiceScopeFactory _serviceScopeFactory;
 	private readonly ITwitchAPI _twitchApi;

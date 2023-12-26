@@ -10,7 +10,7 @@ using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Domain.Twitch;
 
-public sealed class StreamRefresherService : AbstractBackgroundService
+public sealed class StreamRefresherService : RepeatingBackgroundService
 {
 	private static readonly List<string> _twitchGameIds =
 	[

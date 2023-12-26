@@ -3,7 +3,7 @@ using Serilog;
 
 namespace Swarmer.Domain.Models;
 
-public abstract class AbstractBackgroundService : BackgroundService
+public abstract class RepeatingBackgroundService : BackgroundService
 {
 	protected abstract TimeSpan Interval { get; }
 
