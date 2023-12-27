@@ -76,7 +76,11 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		builder.Services.AddHostedService<KeepAppAliveService>();
 		builder.Services.AddDbContext<AppDbContext>(options =>
 		{
-			string connectionString = Environment.GetEnvironmentVariable("PostgresConnectionString") ?? throw new("Envvar PostgresConnectionString not found.");
+			const string key = "PostgresConnectionString";
+			string connectionString = builder.Environment.IsProduction()
+				? Environment.GetEnvironmentVariable(key) ?? throw new($"Envvar {key} not found.")
+				: builder.Configuration[key] ?? throw new($"{key} was not found in configuration.");
+
 			options.UseNpgsql(connectionString);
 		});
 
