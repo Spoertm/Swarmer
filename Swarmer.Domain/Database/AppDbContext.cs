@@ -15,7 +15,7 @@ public class AppDbContext : DbContext
 
 	public DbSet<GameChannel> GameChannels => Set<GameChannel>();
 	public DbSet<StreamMessage> StreamMessages => Set<StreamMessage>();
-	public DbSet<ConfigurationEntity> SwarmerConfig => Set<ConfigurationEntity>();
+	public DbSet<ConfigurationEntity> BotConfigurations => Set<ConfigurationEntity>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -49,8 +49,12 @@ public class AppDbContext : DbContext
 
 	private void ConfigureConfigurationEntity(EntityTypeBuilder<ConfigurationEntity> builder)
 	{
-		builder.ToTable("SwarmerConfig");
+		builder.ToTable("BotConfigurations");
 		builder.HasKey(s => s.Id);
+		builder.Property(s => s.BotName)
+			.IsRequired()
+			.HasMaxLength(50);
+
 		builder.Property(s => s.JsonConfig)
 			.IsRequired()
 			.HasMaxLength(1000);

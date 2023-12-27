@@ -169,7 +169,7 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 
 		await using AppDbContext appDbContext = new(options);
 
-		string jsonConfig = appDbContext.SwarmerConfig.AsNoTracking().First().JsonConfig;
+		string jsonConfig = appDbContext.BotConfigurations.AsNoTracking().First(c => c.BotName == "Swarmer").JsonConfig;
 		using MemoryStream configStream = new(Encoding.UTF8.GetBytes(jsonConfig));
 
 		builder.Configuration.AddJsonStream(configStream);
