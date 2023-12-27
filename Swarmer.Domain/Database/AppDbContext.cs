@@ -34,6 +34,7 @@ public class AppDbContext : DbContext
 	{
 		builder.ToTable("StreamMessages");
 		builder.HasKey(s => s.Id);
+		builder.Property(s => s.Id).ValueGeneratedOnAdd();
 		builder.Property(s => s.MessageId).IsRequired();
 		builder.Property(s => s.ChannelId).IsRequired();
 		builder.Property(s => s.IsLive).IsRequired();
