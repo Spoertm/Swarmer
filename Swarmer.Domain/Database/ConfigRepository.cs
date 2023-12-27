@@ -21,12 +21,12 @@ public sealed class ConfigRepository
 	{
 		try
 		{
-			SwarmerConfig newConfig = _config.Copy();
-			newConfig.AccessToken = newToken;
-			string serNewConfig = JsonSerializer.Serialize(newConfig);
+			SwarmerConfig newConfig = _config.Copy() with { AccessToken = newToken };
+			var configToSerialize = new { SwarmerConfig = newConfig }; // To keep object root name during serialization
+			string serializedConfig = JsonSerializer.Serialize(configToSerialize);
 
 			ConfigurationEntity currentDbConfig = await _appDbContext.BotConfigurations.FirstAsync(c => c.BotName == "Swarmer");
-			currentDbConfig.JsonConfig = serNewConfig;
+			currentDbConfig.JsonConfig = serializedConfig;
 
 			await _appDbContext.SaveChangesAsync();
 		}
