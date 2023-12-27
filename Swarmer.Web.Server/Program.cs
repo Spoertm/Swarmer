@@ -30,7 +30,7 @@ internal static class Program
 		}
 
 		builder.Services.AddOptions<SwarmerConfig>()
-			.Bind(builder.Configuration.GetSection("SwarmerConfig"))
+			.Bind(builder.Configuration.GetRequiredSection("SwarmerConfig"))
 			.ValidateDataAnnotations()
 			.ValidateOnStart();
 
