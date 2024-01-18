@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Swarmer.Domain.Discord;
+using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
 
 namespace Swarmer.Domain.Database;
@@ -10,18 +11,18 @@ public class SwarmerRepository
 	private readonly StreamProvider _streamProvider;
 	private readonly AppDbContext _appDbContext;
 	private readonly IDiscordService _discordService;
-	private readonly string[] _bannedUserLogins;
+	private readonly SwarmerConfig _config;
 
 	public SwarmerRepository(
 		AppDbContext appDbContext,
 		StreamProvider streamProvider,
 		IDiscordService discordService,
-		IConfiguration configuration)
+		IOptions<SwarmerConfig> options)
 	{
 		_streamProvider = streamProvider;
 		_appDbContext = appDbContext;
 		_discordService = discordService;
-		_bannedUserLogins = configuration.GetSection("BannedUserLogins").Get<string[]>() ?? Array.Empty<string>();
+		_config = options.Value;
 	}
 
 	public async Task<IEnumerable<StreamToPost>> GetStreamsToPostAsync()
@@ -31,7 +32,7 @@ public class SwarmerRepository
 
 		return from channel in gameChannels
 				join stream in _streamProvider.Streams on channel.TwitchGameId.ToString() equals stream.GameId
-				where !_bannedUserLogins.Contains(stream.UserLogin)
+				where !_config.BannedUserLogins.Contains(stream.UserLogin)
 				where !streamMessages.Any(os => os.StreamId == stream.UserId && os.ChannelId == channel.StreamChannelId)
 				select new StreamToPost(stream, channel);
 	}

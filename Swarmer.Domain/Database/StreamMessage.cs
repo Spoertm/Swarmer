@@ -1,25 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace Swarmer.Domain.Database;
 
-namespace Swarmer.Domain.Database;
-
-[Table("StreamMessages")]
 public sealed class StreamMessage
 {
-	[Key]
-	public int Id { get; set; }
+	public int Id { get; init; }
 
-	public ulong MessageId { get; set; }
+	public ulong MessageId { get; init; }
 
-	public ulong ChannelId { get; set; }
+	public ulong ChannelId { get; init; }
 
 	public bool IsLive { get; set; }
 
-	public string StreamId { get; set; } = null!;
+	public required string StreamId { get; init; }
 
-	public string? OfflineThumbnailUrl { get; set; }
+	public string? OfflineThumbnailUrl { get; init; }
 
-	public string? AvatarUrl { get; set; }
+	public string? AvatarUrl { get; init; }
 
 	public DateTimeOffset? LingeringSinceUtc { get; set; }
 

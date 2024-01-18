@@ -3,7 +3,7 @@ using Swarmer.Domain.Models;
 
 namespace Swarmer.Domain;
 
-public sealed class KeepAppAliveService : AbstractBackgroundService
+public sealed class KeepAppAliveService : RepeatingBackgroundService
 {
 	private readonly IHttpClientFactory _httpClientFactory;
 

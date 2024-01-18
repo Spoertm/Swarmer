@@ -10,7 +10,7 @@ using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Domain.Twitch;
 
-public sealed class StreamsPostingService : AbstractBackgroundService
+public sealed class StreamsPostingService : RepeatingBackgroundService
 {
 	private readonly IServiceScopeFactory _serviceScopeFactory;
 	private readonly ITwitchAPI _twitchApi;
@@ -60,7 +60,7 @@ public sealed class StreamsPostingService : AbstractBackgroundService
 
 		foreach (StreamToPost stp in await repo.GetStreamsToPostAsync())
 		{
-			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: new() { stp.Stream.UserId })).Users[0];
+			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: [stp.Stream.UserId])).Users[0];
 			Embed newStreamEmbed = new EmbedBuilder().Online(stp.Stream, twitchUser.ProfileImageUrl);
 
 			Result<IUserMessage> result = await _discordService.SendEmbedAsync(stp.Channel.StreamChannelId, newStreamEmbed);
