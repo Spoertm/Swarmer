@@ -191,7 +191,7 @@ public class SwarmerRepositoryTests
 		appDbContext.Add(streamMessage);
 		await appDbContext.SaveChangesAsync();
 
-		StreamProvider streamProvider = new() { Streams = Array.Empty<Stream>() };
+		StreamProvider streamProvider = new() { Streams = [] };
 		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _options);
 
 		await repository.HandleExistingStreamsAsync();
@@ -213,7 +213,7 @@ public class SwarmerRepositoryTests
 		appDbContext.Add(streamMessageBefore);
 		await appDbContext.SaveChangesAsync();
 
-		StreamProvider streamProvider = new() { Streams = Array.Empty<Stream>() };
+		StreamProvider streamProvider = new() { Streams = [] };
 		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _options);
 
 		await repository.HandleExistingStreamsAsync();
@@ -234,7 +234,7 @@ public class SwarmerRepositoryTests
 		appDbContext.Add(streamMessageBefore);
 		await appDbContext.SaveChangesAsync();
 
-		StreamProvider streamProvider = new() { Streams = Array.Empty<Stream>() };
+		StreamProvider streamProvider = new() { Streams = [] };
 		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock.Object, _options);
 
 		await repository.HandleExistingStreamsAsync();

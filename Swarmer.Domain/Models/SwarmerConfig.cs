@@ -16,7 +16,7 @@ public record SwarmerConfig
 	[Required]
 	public required string ClientSecret { get; init; }
 
-	public string[] BannedUserLogins { get; init; } = Array.Empty<string>();
+	public string[] BannedUserLogins { get; init; } = [];
 
 	public SwarmerConfig Copy() => new()
 	{
