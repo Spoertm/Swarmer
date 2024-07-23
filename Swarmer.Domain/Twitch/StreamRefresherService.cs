@@ -89,16 +89,16 @@ public sealed class StreamRefresherService : RepeatingBackgroundService
 
 		return refreshTokenResponse;
 	}
-}
 
-internal record RefreshTokenResponse
-{
-	[JsonPropertyName("access_token")]
-	public required string AccessToken { get; init; }
+	private record RefreshTokenResponse
+	{
+		[JsonPropertyName("access_token")]
+		public required string AccessToken { get; init; }
 
-	[JsonPropertyName("expires_in")]
-	public required int ExpiresIn { get; init; }
+		[JsonPropertyName("expires_in")]
+		public required int ExpiresIn { get; init; }
 
-	[JsonPropertyName("token_type")]
-	public required string TokenType { get; init; }
+		[JsonPropertyName("token_type")]
+		public required string TokenType { get; init; }
+	}
 }
