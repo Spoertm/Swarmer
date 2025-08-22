@@ -1,6 +1,6 @@
 ﻿namespace Swarmer.Domain.Database;
 
-public class GameChannel
+public sealed class GameChannel
 {
 	public int TwitchGameId { get; init; }
 

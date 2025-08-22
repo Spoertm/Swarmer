@@ -2,7 +2,7 @@
 
 namespace Swarmer.Domain.Models;
 
-public record SwarmerConfig
+public sealed record SwarmerConfig
 {
 	[Required]
 	public required string BotToken { get; init; }
@@ -24,6 +24,6 @@ public record SwarmerConfig
 		ClientId = ClientId,
 		AccessToken = AccessToken,
 		ClientSecret = ClientSecret,
-		BannedUserLogins = BannedUserLogins.ToArray(),
+		BannedUserLogins = BannedUserLogins.ToArray()
 	};
 }

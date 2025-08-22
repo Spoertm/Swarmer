@@ -1,19 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
 using Swarmer.Domain.Database;
 using Swarmer.Domain.Discord;
 using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Swarmer.UnitTests;
 
-public class SwarmerRepositoryTests
+public sealed class SwarmerRepositoryTests
 {
 	private readonly DbContextOptions<AppDbContext> _dbContextOptions;
 	private readonly Mock<IDiscordService> _discordServiceMock;
@@ -24,7 +24,7 @@ public class SwarmerRepositoryTests
 		Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
 
 		_dbContextOptions = new DbContextOptionsBuilder<AppDbContext>()
-			.UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+			.UseInMemoryDatabase(Guid.NewGuid().ToString())
 			.Options;
 
 		Mock<IDiscordService> discordServiceMock = new();
@@ -44,7 +44,7 @@ public class SwarmerRepositoryTests
 			BannedUserLogins = ["SomeBannedLogin"],
 			BotToken = "",
 			ClientId = "",
-			ClientSecret = "",
+			ClientSecret = ""
 		};
 
 		_options = Options.Create(config);
@@ -62,10 +62,7 @@ public class SwarmerRepositoryTests
 		MockStream stream1 = new("1", "userid1", gameId: "1");
 		MockStream stream2 = new("2", "userid2", gameId: "1");
 		MockStream bannedUserStream = new("3", "userid3", "SomeBannedLogin", gameId: "1");
-		StreamProvider streamProvider = new()
-		{
-			Streams = [stream1, stream2, bannedUserStream],
-		};
+		StreamProvider streamProvider = new() { Streams = [stream1, stream2, bannedUserStream] };
 
 		appDbContext.GameChannels.AddRange(gameChannel1, gameChannel2);
 		appDbContext.StreamMessages.Add(streamMessage);
@@ -83,7 +80,7 @@ public class SwarmerRepositoryTests
 	{
 		await using AppDbContext appDbContext = new(_dbContextOptions);
 
-		SwarmerRepository sut = new(appDbContext, new(), _discordServiceMock.Object, _options);
+		SwarmerRepository sut = new(appDbContext, new StreamProvider(), _discordServiceMock.Object, _options);
 
 		TimeSpan maxLingerTime = TimeSpan.FromMinutes(15);
 		DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -107,7 +104,8 @@ public class SwarmerRepositoryTests
 		Mock<AppDbContext> appDbContextMock = new();
 		StreamProvider streamProvider = new();
 
-		SwarmerRepository repository = new(appDbContextMock.Object, streamProvider, _discordServiceMock.Object, _options);
+		SwarmerRepository repository =
+			new(appDbContextMock.Object, streamProvider, _discordServiceMock.Object, _options);
 
 		await repository.HandleExistingStreamsAsync();
 
@@ -139,7 +137,8 @@ public class SwarmerRepositoryTests
 	}
 
 	[Fact]
-	public async Task HandleExistingStreamsAsync_StreamIsLiveOnTwitch_DiscordMessageIsNotLiveOrLingering_RemovesStreamMessage()
+	public async Task
+		HandleExistingStreamsAsync_StreamIsLiveOnTwitch_DiscordMessageIsNotLiveOrLingering_RemovesStreamMessage()
 	{
 		const string streamId = "SomeId";
 		StreamMessage streamMessage = new() { Id = It.IsAny<int>(), StreamId = streamId, IsLive = false, LingeringSinceUtc = null };
@@ -158,7 +157,8 @@ public class SwarmerRepositoryTests
 	}
 
 	[Fact]
-	public async Task HandleExistingStreamsAsync_StreamIsLiveOnTwitch_DiscordMessageIsNotLiveAndLingering_UpdatesAndLingersMessage()
+	public async Task
+		HandleExistingStreamsAsync_StreamIsLiveOnTwitch_DiscordMessageIsNotLiveAndLingering_UpdatesAndLingersMessage()
 	{
 		const string streamId = "SomeId";
 		DateTimeOffset utcNow = DateTimeOffset.UtcNow;
@@ -202,11 +202,13 @@ public class SwarmerRepositoryTests
 	}
 
 	[Fact]
-	public async Task HandleExistingStreamsAsync_StreamIsOfflineOnTwitch_DiscordMessageIsOfflineAndLingering_DoesNothing()
+	public async Task
+		HandleExistingStreamsAsync_StreamIsOfflineOnTwitch_DiscordMessageIsOfflineAndLingering_DoesNothing()
 	{
 		const string streamId = "SomeId";
 		DateTimeOffset utcNow = DateTimeOffset.UtcNow;
-		StreamMessage streamMessageBefore = new() { Id = 1, StreamId = streamId, IsLive = false, LingeringSinceUtc = utcNow };
+		StreamMessage streamMessageBefore =
+			new() { Id = 1, StreamId = streamId, IsLive = false, LingeringSinceUtc = utcNow };
 
 		await using AppDbContext appDbContext = new(_dbContextOptions);
 		appDbContext.Add(streamMessageBefore);
@@ -224,7 +226,8 @@ public class SwarmerRepositoryTests
 	}
 
 	[Fact]
-	public async Task HandleExistingStreamsAsync_StreamIsOfflineOnTwitch_DiscordMessageIsNotLiveOrLingering_RemovesStreamMessage()
+	public async Task
+		HandleExistingStreamsAsync_StreamIsOfflineOnTwitch_DiscordMessageIsNotLiveOrLingering_RemovesStreamMessage()
 	{
 		const string streamId = "SomeId";
 		StreamMessage streamMessageBefore = new() { Id = It.IsAny<int>(), StreamId = streamId, IsLive = false, LingeringSinceUtc = null };
@@ -246,7 +249,7 @@ public class SwarmerRepositoryTests
 	{
 		await using AppDbContext appDbContext = new(_dbContextOptions);
 
-		SwarmerRepository repository = new(appDbContext, new(), _discordServiceMock.Object, _options);
+		SwarmerRepository repository = new(appDbContext, new StreamProvider(), _discordServiceMock.Object, _options);
 
 		StreamMessage streamMessage = new() { Id = It.IsAny<int>(), StreamId = "SomeId" };
 		await repository.InsertStreamMessageAsync(streamMessage);
@@ -263,7 +266,7 @@ public class SwarmerRepositoryTests
 		appDbContext.Add(streamMessage);
 		await appDbContext.SaveChangesAsync();
 
-		SwarmerRepository repository = new(appDbContext, new(), _discordServiceMock.Object, _options);
+		SwarmerRepository repository = new(appDbContext, new StreamProvider(), _discordServiceMock.Object, _options);
 		await repository.RemoveStreamMessageAsync(streamMessage);
 
 		Assert.Empty(appDbContext.StreamMessages.ToList());

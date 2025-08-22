@@ -7,10 +7,7 @@ public sealed class KeepAppAliveService : RepeatingBackgroundService
 {
 	private readonly IHttpClientFactory _httpClientFactory;
 
-	public KeepAppAliveService(IHttpClientFactory httpClientFactory)
-	{
-		_httpClientFactory = httpClientFactory;
-	}
+	public KeepAppAliveService(IHttpClientFactory httpClientFactory) => _httpClientFactory = httpClientFactory;
 
 	protected override TimeSpan Interval => TimeSpan.FromMinutes(5);
 

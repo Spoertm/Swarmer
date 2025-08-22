@@ -14,7 +14,9 @@ public class AppDbContext : DbContext
 	}
 
 	public DbSet<GameChannel> GameChannels => Set<GameChannel>();
+
 	public DbSet<StreamMessage> StreamMessages => Set<StreamMessage>();
+
 	public DbSet<ConfigurationEntity> BotConfigurations => Set<ConfigurationEntity>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,13 +26,13 @@ public class AppDbContext : DbContext
 		ConfigureConfigurationEntity(modelBuilder.Entity<ConfigurationEntity>());
 	}
 
-	private void ConfigureGameChannel(EntityTypeBuilder<GameChannel> builder)
+	private static void ConfigureGameChannel(EntityTypeBuilder<GameChannel> builder)
 	{
 		builder.ToTable("GameChannels");
 		builder.HasKey(gc => new { gc.StreamChannelId, gc.TwitchGameId });
 	}
 
-	private void ConfigureStreamMessage(EntityTypeBuilder<StreamMessage> builder)
+	private static void ConfigureStreamMessage(EntityTypeBuilder<StreamMessage> builder)
 	{
 		builder.ToTable("StreamMessages");
 		builder.HasKey(s => s.Id);
@@ -47,7 +49,7 @@ public class AppDbContext : DbContext
 		builder.Property(s => s.AvatarUrl).HasMaxLength(200);
 	}
 
-	private void ConfigureConfigurationEntity(EntityTypeBuilder<ConfigurationEntity> builder)
+	private static void ConfigureConfigurationEntity(EntityTypeBuilder<ConfigurationEntity> builder)
 	{
 		builder.ToTable("BotConfigurations");
 		builder.HasKey(s => s.Id);

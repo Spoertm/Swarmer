@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Swarmer.Domain.Models;
-using System.Text.Json;
 
 namespace Swarmer.Domain.Database;
 
@@ -22,10 +22,12 @@ public sealed class ConfigRepository
 		try
 		{
 			SwarmerConfig newConfig = _config.Copy() with { AccessToken = newToken };
-			var configToSerialize = new { SwarmerConfig = newConfig }; // To keep object root name during serialization
+			var configToSerialize =
+				new { SwarmerConfig = newConfig }; // To keep the object root name during serialization
 			string serializedConfig = JsonSerializer.Serialize(configToSerialize);
 
-			ConfigurationEntity currentDbConfig = await _appDbContext.BotConfigurations.FirstAsync(c => c.BotName == "Swarmer");
+			ConfigurationEntity currentDbConfig =
+				await _appDbContext.BotConfigurations.FirstAsync(c => c.BotName == "Swarmer");
 			currentDbConfig.JsonConfig = serializedConfig;
 
 			await _appDbContext.SaveChangesAsync();
@@ -35,11 +37,10 @@ public sealed class ConfigRepository
 			string errorMessage = ex switch
 			{
 				DbUpdateException => "Failed to update application configuration in the database",
-				_                 => "Failed to update application configuration",
+				_ => "Failed to update application configuration",
 			};
 
 			Log.Error(ex, "{ErrorMessage}", errorMessage);
-			throw;
 		}
 	}
 }

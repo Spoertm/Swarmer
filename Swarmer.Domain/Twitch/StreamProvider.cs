@@ -1,6 +1,6 @@
 ﻿namespace Swarmer.Domain.Twitch;
 
-public class StreamProvider
+public sealed class StreamProvider
 {
 	public Stream[]? Streams { get; set; }
 }

@@ -18,9 +18,9 @@ public sealed class StreamMessage
 
 	public DateTimeOffset? LingeringSinceUtc { get; set; }
 
+	public bool IsLingering => LingeringSinceUtc.HasValue;
+
 	public void Linger() => LingeringSinceUtc = DateTimeOffset.UtcNow;
 
 	public void StopLingering() => LingeringSinceUtc = null;
-
-	public bool IsLingering => LingeringSinceUtc.HasValue;
 }

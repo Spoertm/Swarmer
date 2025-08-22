@@ -52,7 +52,7 @@ public sealed class StreamsPostingService : RepeatingBackgroundService
 
 	private async Task PostCompletelyNewStreamsAndAddToDb(SwarmerRepository repo)
 	{
-		// Provider hasn't initialised Streams yet
+		// Provider hasn't initialized Streams yet
 		if (_streamProvider.Streams is not { Length: > 0 })
 		{
 			return;
@@ -60,10 +60,11 @@ public sealed class StreamsPostingService : RepeatingBackgroundService
 
 		foreach (StreamToPost stp in await repo.GetStreamsToPostAsync())
 		{
-			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync(ids: [stp.Stream.UserId])).Users[0];
+			User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync([stp.Stream.UserId])).Users[0];
 			Embed newStreamEmbed = new EmbedBuilder().Online(stp.Stream, twitchUser.ProfileImageUrl);
 
-			Result<IUserMessage> result = await _discordService.SendEmbedAsync(stp.Channel.StreamChannelId, newStreamEmbed);
+			Result<IUserMessage> result =
+				await _discordService.SendEmbedAsync(stp.Channel.StreamChannelId, newStreamEmbed);
 			if (result.IsFailure)
 			{
 				continue;
@@ -75,14 +76,17 @@ public sealed class StreamsPostingService : RepeatingBackgroundService
 				IsLive = true,
 				ChannelId = stp.Channel.StreamChannelId,
 				MessageId = result.Value.Id,
-				AvatarUrl = string.IsNullOrWhiteSpace(twitchUser.ProfileImageUrl) ? null : twitchUser.ProfileImageUrl,
-				OfflineThumbnailUrl = string.IsNullOrWhiteSpace(twitchUser.OfflineImageUrl) ? null : twitchUser.OfflineImageUrl,
+				AvatarUrl =
+					string.IsNullOrWhiteSpace(twitchUser.ProfileImageUrl) ? null : twitchUser.ProfileImageUrl,
+				OfflineThumbnailUrl =
+					string.IsNullOrWhiteSpace(twitchUser.OfflineImageUrl) ? null : twitchUser.OfflineImageUrl,
 				LingeringSinceUtc = DateTime.UtcNow,
 			};
 
 			await repo.InsertStreamMessageAsync(newDbStreamMessage);
 
-			await Task.Delay(TimeSpan.FromSeconds(1)); // Wait 1s between actions to not get rate-limited by Discord's API
+			await Task.Delay(TimeSpan
+				.FromSeconds(1)); // Wait 1s between actions to not get rate-limited by Discord's API
 		}
 
 		await repo.SaveChangesAsync();
