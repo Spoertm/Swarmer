@@ -24,6 +24,6 @@ public sealed record SwarmerConfig
 		ClientId = ClientId,
 		AccessToken = AccessToken,
 		ClientSecret = ClientSecret,
-		BannedUserLogins = BannedUserLogins.ToArray()
+		BannedUserLogins = BannedUserLogins.ToArray(),
 	};
 }
