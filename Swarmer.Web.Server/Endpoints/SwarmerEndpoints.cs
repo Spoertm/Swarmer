@@ -10,16 +10,14 @@ public static class SwarmerEndpoints
 	public const string DdEndpointParamName = "devil daggers";
 	public const string HdEndpointParamName = "hyper demon";
 
-	public static void RegisterSwarmerEndpoints(this WebApplication app)
-	{
+	public static void RegisterSwarmerEndpoints(this WebApplication app) =>
 		app.MapGet("streams", DdTwitchStreams).WithTags("Streams");
-	}
 
 	[SwaggerOperation(description:
 		$"""
-		Returns streams for all games if nothing is specified;
-		otherwise the streams for a specific game (can only be "{DdEndpointParamName}" or "{HdEndpointParamName}").
-		"""
+		 Returns streams for all games if nothing is specified;
+		 otherwise the streams for a specific game (can only be "{DdEndpointParamName}" or "{HdEndpointParamName}").
+		 """
 	)]
 	public static Stream[]? DdTwitchStreams([FromServices] StreamProvider provider, string? gameName = null)
 	{
@@ -30,9 +28,11 @@ public static class SwarmerEndpoints
 
 		return gameName.ToLower() switch
 		{
-			DdEndpointParamName => Array.FindAll(provider.Streams, stream => stream.GameName.Equals(DdEndpointParamName, StringComparison.OrdinalIgnoreCase)),
-			HdEndpointParamName => Array.FindAll(provider.Streams, stream => stream.GameName.Equals(HdEndpointParamName, StringComparison.OrdinalIgnoreCase)),
-			_                   => provider.Streams,
+			DdEndpointParamName => Array.FindAll(provider.Streams,
+				stream => stream.GameName.Equals(DdEndpointParamName, StringComparison.OrdinalIgnoreCase)),
+			HdEndpointParamName => Array.FindAll(provider.Streams,
+				stream => stream.GameName.Equals(HdEndpointParamName, StringComparison.OrdinalIgnoreCase)),
+			_ => provider.Streams
 		};
 	}
 }

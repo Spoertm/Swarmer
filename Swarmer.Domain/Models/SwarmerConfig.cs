@@ -2,7 +2,7 @@
 
 namespace Swarmer.Domain.Models;
 
-public record SwarmerConfig
+public sealed record SwarmerConfig
 {
 	[Required]
 	public required string BotToken { get; init; }

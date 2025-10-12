@@ -1,6 +1,10 @@
+using System.Globalization;
+using System.Text;
 using Discord;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using Swarmer.Domain;
@@ -9,8 +13,6 @@ using Swarmer.Domain.Discord;
 using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
 using Swarmer.Web.Server.Endpoints;
-using System.Globalization;
-using System.Text;
 using TwitchLib.Api;
 using TwitchLib.Api.Interfaces;
 
@@ -57,12 +59,15 @@ internal static class Program
 		builder.Services.AddSwaggerGen(options =>
 		{
 			options.EnableAnnotations();
-			options.SwaggerDoc("Main", new()
+			options.SwaggerDoc("Main", new OpenApiInfo
 			{
 				Version = "Main",
 				Title = "Swarmer API",
-				Description = @"This API serves as a replacement for Twitch's, in case one is unable/unwilling to deal with the latter.
-However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
+				Description =
+					"""
+					This API serves as a replacement for Twitch's, in case one is unable/unwilling to deal with the latter.
+					However only Devil Daggers and HYPER DEMON Twitch streams can be requested.
+					"""
 			});
 		});
 
@@ -78,8 +83,8 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		{
 			const string key = "PostgresConnectionString";
 			string connectionString = builder.Environment.IsProduction()
-				? Environment.GetEnvironmentVariable(key) ?? throw new($"Envvar {key} not found.")
-				: builder.Configuration[key] ?? throw new($"{key} was not found in configuration.");
+				? Environment.GetEnvironmentVariable(key) ?? throw new Exception($"Envvar {key} not found.")
+				: builder.Configuration[key] ?? throw new Exception($"{key} was not found in configuration.");
 
 			options.UseNpgsql(connectionString);
 		});
@@ -87,24 +92,17 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 		builder.Services.AddSingleton<ITwitchAPI, TwitchAPI>(services =>
 		{
 			SwarmerConfig config = services.GetRequiredService<IOptions<SwarmerConfig>>().Value;
-			TwitchAPI api = new()
-			{
-				Settings =
-				{
-					AccessToken = config.AccessToken,
-					ClientId = config.ClientId,
-					Secret = config.ClientSecret,
-				},
-			};
+			TwitchAPI api = new() { Settings = { AccessToken = config.AccessToken, ClientId = config.ClientId, Secret = config.ClientSecret } };
 
 			return api;
 		});
 
 		builder.Services.AddSingleton<SwarmerDiscordClient>(services =>
 		{
-			const GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites & ~GatewayIntents.GuildScheduledEvents;
+			const GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites &
+			                                      ~GatewayIntents.GuildScheduledEvents;
 			IOptions<SwarmerConfig> options = services.GetRequiredService<IOptions<SwarmerConfig>>();
-			SwarmerDiscordClient client = new(options, new() { GatewayIntents = gatewayIntents });
+			SwarmerDiscordClient client = new(options, new DiscordSocketConfig { GatewayIntents = gatewayIntents });
 
 			return client;
 		});
@@ -163,8 +161,12 @@ However only Devil Daggers and HYPER DEMON Twitch streams can be requested.",
 
 	private static async Task SetConfigFromDb(WebApplicationBuilder builder)
 	{
+		string connectionString = Environment.GetEnvironmentVariable("PostgresConnectionString")
+		                          ?? throw new InvalidOperationException(
+			                          "Environment variable 'PostgresConnectionString' is not set.");
+
 		DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
-			.UseNpgsql(Environment.GetEnvironmentVariable("PostgresConnectionString") ?? throw new("Envvar PostgresConnectionString not found."))
+			.UseNpgsql(connectionString)
 			.Options;
 
 		await using AppDbContext appDbContext = new(options);

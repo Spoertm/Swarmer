@@ -6,14 +6,11 @@ using Swarmer.Domain.Models;
 
 namespace Swarmer.Domain.Discord;
 
-public class DiscordService : IDiscordService
+public sealed class DiscordService : IDiscordService
 {
 	private readonly SwarmerDiscordClient _discordClient;
 
-	public DiscordService(SwarmerDiscordClient discordClient)
-	{
-		_discordClient = discordClient;
-	}
+	public DiscordService(SwarmerDiscordClient discordClient) => _discordClient = discordClient;
 
 	public async Task<Result<IUserMessage>> SendEmbedAsync(ulong channelId, Embed embed)
 	{
@@ -23,7 +20,8 @@ public class DiscordService : IDiscordService
 			return Result.Failure<IUserMessage>($"Discord channel {channelId} doesn't exist.")!;
 		}
 
-		bool canSendInChannel = (await channel.GetUserAsync(_discordClient.CurrentUser.Id)).GetPermissions(channel).SendMessages;
+		bool canSendInChannel = (await channel.GetUserAsync(_discordClient.CurrentUser.Id)).GetPermissions(channel)
+			.SendMessages;
 		if (!canSendInChannel)
 		{
 			Log.Error("Lacking permissions to send messages in channel {ChannelId}", channelId);
@@ -44,7 +42,7 @@ public class DiscordService : IDiscordService
 		}
 
 		Embed newEmbed = new EmbedBuilder().Offline(message.Embeds.First(), streamMessage.OfflineThumbnailUrl);
-		await message.ModifyAsync(m => m.Embeds = new([newEmbed]));
+		await message.ModifyAsync(m => m.Embeds = new Optional<Embed[]>([newEmbed]));
 	}
 
 	public async Task GoOnlineAgainAsync(StreamMessage streamMessage, Stream ongoingStream)
@@ -56,6 +54,6 @@ public class DiscordService : IDiscordService
 		}
 
 		Embed streamEmbed = new EmbedBuilder().Online(ongoingStream, streamMessage.AvatarUrl);
-		await message.ModifyAsync(m => m.Embeds = new([streamEmbed]));
+		await message.ModifyAsync(m => m.Embeds = new Optional<Embed[]>([streamEmbed]));
 	}
 }

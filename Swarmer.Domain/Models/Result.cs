@@ -4,18 +4,19 @@ public class Result
 {
 	protected Result(bool isSuccess, string errorMsg)
 	{
-		if (isSuccess && errorMsg != string.Empty)
+		if ((isSuccess && errorMsg.Length > 0) || (!isSuccess && errorMsg.Length == 0))
+		{
 			throw new InvalidOperationException();
-
-		if (!isSuccess && errorMsg == string.Empty)
-			throw new InvalidOperationException();
+		}
 
 		IsSuccess = isSuccess;
 		ErrorMsg = errorMsg;
 	}
 
 	public bool IsSuccess { get; }
+
 	public string ErrorMsg { get; }
+
 	public bool IsFailure => !IsSuccess;
 
 	public static Result Failure(string message) => new(false, message);
@@ -27,13 +28,11 @@ public class Result
 	public static Result<T> Success<T>(T value) => new(value, true, string.Empty);
 }
 
-public class Result<T> : Result
+public sealed class Result<T> : Result
 {
-	protected internal Result(T value, bool isSuccess, string errorMsg)
-		: base(isSuccess, errorMsg)
-	{
+	internal Result(T value, bool isSuccess, string errorMsg)
+		: base(isSuccess, errorMsg) =>
 		Value = value;
-	}
 
 	public T Value { get; }
 }

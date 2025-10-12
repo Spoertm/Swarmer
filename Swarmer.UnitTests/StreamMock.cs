@@ -2,15 +2,15 @@
 
 namespace Swarmer.UnitTests;
 
-public class MockStream : Stream
+public sealed class MockStream : Stream
 {
 	public MockStream(
 		string id,
-		string userId = null!,
-		string userLogin = null!,
-		string userName = null!,
-		string gameId = null!,
-		string gameName = null!)
+		string? userId = null,
+		string? userLogin = null,
+		string? userName = null,
+		string? gameId = null,
+		string? gameName = null)
 	{
 		Id = id;
 		UserId = userId;
