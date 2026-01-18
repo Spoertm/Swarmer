@@ -1,28 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<LangVersion>13</LangVersion>
+		<LangVersion>14</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Discord.Net" Version="3.18.0"/>
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.9" />
-		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.9" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
-		<PackageReference Include="Npgsql" Version="9.0.4" />
-		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.2"/>
+		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.9"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2"/>
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2"/>
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2"/>
+		<PackageReference Include="Npgsql" Version="10.0.1"/>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0"/>
 		<PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Sentry.Serilog" Version="6.0.0" />
+		<PackageReference Include="Sentry.Serilog" Version="6.0.0"/>
 		<PackageReference Include="Serilog" Version="4.3.0"/>
-		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0"/>
 		<PackageReference Include="SonarAnalyzer.CSharp" Version="10.18.0.131500">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -31,7 +31,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="TwitchLib.Api" Version="3.10.2" />
+		<PackageReference Include="TwitchLib.Api" Version="3.10.2"/>
 	</ItemGroup>
 
 </Project>
