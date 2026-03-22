@@ -113,13 +113,13 @@ Swarmer.UnitTests/
 ### Build the Solution
 
 ```bash
-dotnet build Swarmer.sln
+dotnet build Swarmer.slnx
 ```
 
 ### Run Tests
 
 ```bash
-dotnet test Swarmer.sln
+dotnet test Swarmer.slnx
 ```
 
 ### Run the Application (Development)
