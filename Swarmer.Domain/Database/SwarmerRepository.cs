@@ -31,7 +31,7 @@ public sealed class SwarmerRepository
 		List<StreamMessage> streamMessages = await _appDbContext.StreamMessages.AsNoTracking().ToListAsync();
 
 		return from channel in gameChannels
-			   join stream in _streamProvider.Streams on channel.TwitchGameId.ToString() equals stream.GameId
+			   join stream in _streamProvider.Streams ?? [] on channel.TwitchGameId.ToString() equals stream.GameId
 			   where !_config.BannedUserLogins.Contains(stream.UserLogin)
 			   where !streamMessages.Any(streamMessage =>
 				   streamMessage.StreamId == stream.UserId && streamMessage.ChannelId == channel.StreamChannelId)
