@@ -12,7 +12,4 @@ public sealed class SwarmerConfig
 
 	[Required]
 	public required string ClientSecret { get; init; }
-
-	[Required]
-	public required string AccessToken { get; set; }
 }

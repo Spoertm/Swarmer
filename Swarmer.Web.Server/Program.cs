@@ -84,7 +84,7 @@ public class Program
 		builder.Services.AddSingleton<ITwitchAPI, TwitchAPI>(services =>
 		{
 			SwarmerConfig config = services.GetRequiredService<IOptions<SwarmerConfig>>().Value;
-			TwitchAPI api = new() { Settings = { AccessToken = config.AccessToken, ClientId = config.ClientId, Secret = config.ClientSecret } };
+			TwitchAPI api = new() { Settings = { ClientId = config.ClientId, Secret = config.ClientSecret } };
 
 			return api;
 		});
