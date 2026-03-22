@@ -43,6 +43,7 @@ public class Program
 			.CreateLogger();
 
 		builder.Logging.ClearProviders();
+		builder.Logging.AddSerilog();
 
 		Log.Information("Starting application");
 
