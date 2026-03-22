@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-
 using NSubstitute;
 using Swarmer.Domain.Database;
 using Swarmer.Domain.Discord;
-using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
 using Xunit;
 
