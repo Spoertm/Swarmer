@@ -17,8 +17,6 @@ public class AppDbContext : DbContext
 
 	public DbSet<StreamMessage> StreamMessages => Set<StreamMessage>();
 
-	public DbSet<ConfigurationEntity> BotConfigurations => Set<ConfigurationEntity>();
-
 	public DbSet<BannedUser> BannedUsers => Set<BannedUser>();
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)

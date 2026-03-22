@@ -26,11 +26,6 @@ public class Program
 
 		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-		if (builder.Environment.IsProduction())
-		{
-			await SetConfigFromDb(builder);
-		}
-
 		builder.Services.AddOptions<SwarmerConfig>()
 			.Bind(builder.Configuration.GetRequiredSection("SwarmerConfig"))
 			.ValidateDataAnnotations()
@@ -157,23 +152,5 @@ public class Program
 			Log.Information("Shut-down complete");
 			await Log.CloseAndFlushAsync();
 		}
-	}
-
-	private static async Task SetConfigFromDb(WebApplicationBuilder builder)
-	{
-		string connectionString = Environment.GetEnvironmentVariable("PostgresConnectionString")
-								  ?? throw new InvalidOperationException(
-									  "Environment variable 'PostgresConnectionString' is not set.");
-
-		DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
-			.UseNpgsql(connectionString)
-			.Options;
-
-		await using AppDbContext appDbContext = new(options);
-
-		string jsonConfig = appDbContext.BotConfigurations.AsNoTracking().First(c => c.BotName == "Swarmer").JsonConfig;
-		using MemoryStream configStream = new(Encoding.UTF8.GetBytes(jsonConfig));
-
-		builder.Configuration.AddJsonStream(configStream);
 	}
 }
