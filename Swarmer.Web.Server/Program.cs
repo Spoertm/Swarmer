@@ -18,7 +18,7 @@ using TwitchLib.Api.Interfaces;
 
 namespace Swarmer.Web.Server;
 
-internal static class Program
+public class Program
 {
 	public static async Task Main(string[] args)
 	{

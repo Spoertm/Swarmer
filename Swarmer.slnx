@@ -7,6 +7,6 @@
     </Project>
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="Swarmer.UnitTests/Swarmer.UnitTests.csproj" />
+    <Project Path="Swarmer.Tests/Swarmer.Tests.csproj" />
   </Folder>
 </Solution>

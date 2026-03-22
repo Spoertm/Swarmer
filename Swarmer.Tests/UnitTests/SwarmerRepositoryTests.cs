@@ -11,7 +11,7 @@ using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
 using Xunit;
 
-namespace Swarmer.UnitTests;
+namespace Swarmer.Tests.UnitTests;
 
 public sealed class SwarmerRepositoryTests
 {
