@@ -92,11 +92,13 @@
                     <div class="w-8 h-8 rounded-lg hover:bg-[#636363] flex items-center justify-center mr-3 cursor-pointer transition-colors flex-shrink-0">
                         <i class="fas fa-plus text-[#b5bac1]"></i>
                     </div>
-                    <span class="text-[#6d6f78] select-none flex-1">Message #twitch-streams</span>
+                    <span class="text-[#6d6f78] select-none flex-1 truncate">Message #twitch-streams</span>
                     <div class="flex items-center space-x-3 text-[#b5bac1]">
                         <i class="fas fa-gift text-lg cursor-pointer hover:text-white transition-colors"></i>
-                        <span class="font-bold text-sm cursor-pointer hover:text-white transition-colors">GIF</span>
-                        <i class="fas fa-note-sticky text-lg cursor-pointer hover:text-white transition-colors"></i>
+                        <span class="hidden sm:block font-bold text-sm cursor-pointer hover:text-white transition-colors">GIF</span>
+                        <span class="hidden sm:block">
+                            <i class="fas fa-note-sticky text-lg cursor-pointer hover:text-white transition-colors"></i>
+                        </span>
                         <i class="far fa-smile text-lg cursor-pointer hover:text-white transition-colors"></i>
                         <i class="fas fa-shapes text-lg cursor-pointer hover:text-white transition-colors"></i>
                     </div>
@@ -400,7 +402,7 @@
                                 <img src="${thumbnailUrl}" alt="Stream thumbnail" class="w-20 h-12 object-cover rounded stream-thumbnail">
                             </div>
                         </div>
-                        <span class="offline-notification text-green-400 text-sm font-semibold opacity-0 transition-opacity duration-500 whitespace-nowrap">stream went offline!</span>
+                        <span class="offline-notification text-green-400 text-sm font-semibold opacity-0 max-h-0 overflow-hidden transition-all duration-500 whitespace-nowrap">stream went offline!</span>
                     </div>
                     <span class="edited-marker text-[#72767d] text-xs mt-0.5 hidden">(edited)</span>
                 </div>
@@ -443,9 +445,11 @@
 
         // Show "stream went offline!" notification
         if (offlineNotification) {
-            offlineNotification.classList.remove('opacity-0');
+            offlineNotification.classList.remove('opacity-0', 'max-h-0');
+            offlineNotification.classList.add('max-h-10');
             setTimeout(() => {
-                offlineNotification.classList.add('opacity-0');
+                offlineNotification.classList.add('opacity-0', 'max-h-0');
+                offlineNotification.classList.remove('max-h-10');
             }, 2000);
         }
     }
