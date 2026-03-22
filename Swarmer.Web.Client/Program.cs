@@ -11,7 +11,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddSingleton<DarkModeManager>();
+builder.Services.AddScoped<DarkModeManager>();
 
 WebAssemblyHost app = builder.Build();
 
