@@ -25,6 +25,21 @@
 			"type": "process",
 			"args": ["clean", "${workspaceFolder}/Swarmer.slnx"],
 			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "ef database update",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"ef",
+				"database",
+				"update",
+				"--project",
+				"${workspaceFolder}/Swarmer.Domain/Swarmer.Domain.csproj",
+				"--startup-project",
+				"${workspaceFolder}/Swarmer.Web.Server/Swarmer.Web.Server.csproj"
+			],
+			"problemMatcher": []
 		}
 	]
 }
