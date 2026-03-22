@@ -34,6 +34,10 @@
 			"cwd": "${workspaceFolder}",
 			"env": {
 				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+			"serverReadyAction": {
+				"action": "openExternally",
+				"pattern": "\\bNow listening on:\\s+(https?://\\S+)"
 			}
 		}
 	]
