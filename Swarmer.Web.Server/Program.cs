@@ -97,8 +97,10 @@ public class Program
 
 		builder.Services.AddSingleton<SwarmerDiscordClient>(services =>
 		{
-			const GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites &
-			                                      ~GatewayIntents.GuildScheduledEvents;
+			const GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged &
+												~GatewayIntents.GuildInvites &
+												~GatewayIntents.GuildScheduledEvents;
+
 			IOptions<SwarmerConfig> options = services.GetRequiredService<IOptions<SwarmerConfig>>();
 			SwarmerDiscordClient client = new(options, new DiscordSocketConfig { GatewayIntents = gatewayIntents });
 
@@ -160,8 +162,8 @@ public class Program
 	private static async Task SetConfigFromDb(WebApplicationBuilder builder)
 	{
 		string connectionString = Environment.GetEnvironmentVariable("PostgresConnectionString")
-		                          ?? throw new InvalidOperationException(
-			                          "Environment variable 'PostgresConnectionString' is not set.");
+								  ?? throw new InvalidOperationException(
+									  "Environment variable 'PostgresConnectionString' is not set.");
 
 		DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
 			.UseNpgsql(connectionString)
