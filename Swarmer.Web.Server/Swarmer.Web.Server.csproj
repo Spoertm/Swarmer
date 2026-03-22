@@ -9,17 +9,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4"/>
-		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.4"/>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.5" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.5" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Swarmer.Domain\Swarmer.Domain.csproj"/>
-		<ProjectReference Include="..\Swarmer.Web.Client\Swarmer.Web.Client.csproj"/>
+		<ProjectReference Include="..\Swarmer.Domain\Swarmer.Domain.csproj" />
+		<ProjectReference Include="..\Swarmer.Web.Client\Swarmer.Web.Client.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

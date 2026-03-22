@@ -8,15 +8,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.3"/>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0"/>
-		<PackageReference Include="NSubstitute" Version="5.3.0"/>
-		<PackageReference Include="xunit" Version="2.9.3"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.5" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+		<PackageReference Include="NSubstitute" Version="5.3.0" />
+		<PackageReference Include="xunit" Version="2.9.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Swarmer.Domain\Swarmer.Domain.csproj"/>
-		<ProjectReference Include="..\Swarmer.Web.Server\Swarmer.Web.Server.csproj"/>
+		<ProjectReference Include="..\Swarmer.Domain\Swarmer.Domain.csproj" />
+		<ProjectReference Include="..\Swarmer.Web.Server\Swarmer.Web.Server.csproj" />
 	</ItemGroup>
 
 </Project>
