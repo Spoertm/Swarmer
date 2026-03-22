@@ -83,7 +83,7 @@
                 </div>
 
                 <!-- Discord Messages Container -->
-                <div id="discord-messages" class="p-4 space-y-2 h-[35rem] overflow-hidden">
+                <div id="discord-messages" class="p-4 space-y-2 h-[38rem] overflow-hidden">
                     <!-- Messages will be injected here by JavaScript -->
                 </div>
 
@@ -320,13 +320,16 @@
     const discordMessages = document.getElementById('discord-messages');
     const streamers = [
         { name: 'Chupacabra', game: 'Devil Daggers', avatar: 'C' },
-        { name: 'SpeedRunner99', game: 'Devil Daggers', avatar: 'S' },
+        { name: 'smuppet', game: 'Devil Daggers', avatar: 'S' },
         { name: 'DaggerMaster', game: 'HYPER DEMON', avatar: 'D' },
         { name: 'SorathFan', game: 'Devil Daggers', avatar: 'S' },
         { name: 'HyperPlayer', game: 'HYPER DEMON', avatar: 'H' },
     ];
 
     const colors = ['#1abc9c', '#2ecc71', '#3498db', '#9b59b6', '#e91e63', '#f1c40f', '#e67e22', '#e74c3c'];
+
+    // Track active stream messages by streamer name
+    const activeStreams = new Map();
 
     function getRandomStreamer() {
         return streamers[Math.floor(Math.random() * streamers.length)];
@@ -336,31 +339,27 @@
         return colors[Math.floor(Math.random() * colors.length)];
     }
 
-    const streamTitles = [
-        "almost pb...",
-        "DD PB attempts",
-        "HYPER DEMON",
-        "praccing",
-        "HYPER DEMON grinds",
-        "Casual DD stream",
-        "Going for 500 subs!"
-    ];
-
     function getRandomTitle() {
+        const streamTitles = [
+            "almost pb...",
+            "DD PB attempts",
+            "HYPER DEMON",
+            "praccing",
+            "HYPER DEMON grinds",
+            "Casual DD stream",
+            "Going for 500 subs!"
+        ];
         return streamTitles[Math.floor(Math.random() * streamTitles.length)];
     }
 
-    function createDiscordMessage(streamer, isLive) {
-        const statusText = isLive ? 'Live' : 'Offline';
-        const thumbnailUrl = 'https://static-cdn.jtvnw.net/ttv-static/404_preview-440x248.jpg'
+    function createStreamMessage(streamer) {
         const avatarColor = getRandomColor();
-        const borderClass = isLive ? 'border-l-[#6441a4]' : 'border-l-[#000000]';
         const titleText = getRandomTitle();
         const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const thumbnailUrl = 'https://static-cdn.jtvnw.net/ttv-static/404_preview-440x248.jpg';
 
         const messageHtml = `
-            <div class="flex items-start gap-3 py-2 transition-colors duration-100 group">
-                
+            <div class="flex items-start gap-3 py-2 transition-colors duration-100" data-streamer="${streamer.name}">
                 <!-- Left: Swarmer Bot Avatar -->
                 <img src="/images/Swarmer.png"
                     alt="Swarmer"
@@ -368,7 +367,6 @@
 
                 <!-- Right: Header + Message content -->
                 <div class="flex flex-col gap-1 min-w-0">
-                    
                     <!-- Header row: bot name + APP tag + timestamp -->
                     <div class="flex items-center gap-2">
                         <span class="font-semibold text-white text-sm hover:underline cursor-pointer">Swarmer</span>
@@ -376,34 +374,35 @@
                         <span class="text-[#72767d] font-semibold text-xs">${timeString}</span>
                     </div>
 
-                    <!-- The stream embed message -->
-                    <div class="discord-message w-fit flex items-center px-3 py-2 rounded-sm bg-[#242429] border border-[#323237] border-l-4 ${borderClass}">
-                        
-                        <!-- Left component: avatar+name row, then status row -->
-                        <div class="flex flex-col flex-1 min-w-0 gap-1">
-                            <!-- Row 1: avatar + name -->
-                            <div class="flex items-center gap-2">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${streamer.name}&backgroundColor=${avatarColor.replace('#', '')}"
-                                    alt="${streamer.name}"
-                                    class="w-8 h-8 rounded-full flex-shrink-0 object-cover">
-                                <span class="font-semibold text-white text-sm">${streamer.name}</span>
+                    <!-- Stream embed with side notification (stacked on mobile, side on md+) -->
+                    <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                        <div class="stream-embed discord-message w-fit flex items-center px-3 py-2 rounded-sm bg-[#242429] border border-[#323237] border-l-4 border-l-[#6441a4]">
+                            <!-- Left component: avatar+name row, then status row -->
+                            <div class="flex flex-col flex-1 min-w-0 gap-1">
+                                <!-- Row 1: avatar + name -->
+                                <div class="flex items-center gap-2">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${streamer.name}&backgroundColor=${avatarColor.replace('#', '')}"
+                                        alt="${streamer.name}"
+                                        class="w-8 h-8 rounded-full flex-shrink-0 object-cover">
+                                    <span class="font-semibold text-white text-sm streamer-name">${streamer.name}</span>
+                                </div>
+                                <!-- Row 2: status -->
+                                <div class="flex items-center gap-0.5 stream-status">
+                                    <span class="text-xs leading-none status-icon">🔴</span>
+                                    <span class="text-[#dcddde] text-sm truncate">
+                                        <span class="status-text">Live</span>| <span class="stream-title">${titleText}</span>
+                                    </span>
+                                </div>
                             </div>
-                            <!-- Row 2: status -->
-                            <div class="flex items-center gap-0.5">
-                                <span class="text-xs leading-none">${isLive ? '🔴' : '⚫'}</span>
-                                <span class="text-[#dcddde] text-sm truncate">
-                                    <span>${statusText}</span>| ${titleText}
-                                </span>
+
+                            <!-- Right component: thumbnail -->
+                            <div class="flex-shrink-0 ml-4">
+                                <img src="${thumbnailUrl}" alt="Stream thumbnail" class="w-20 h-12 object-cover rounded stream-thumbnail">
                             </div>
                         </div>
-
-                        <!-- Right component: thumbnail -->
-                        <div class="flex-shrink-0 ml-4">
-                            <img src="${thumbnailUrl}" alt="Stream thumbnail" class="w-20 h-12 object-cover rounded">
-                        </div>
-
+                        <span class="offline-notification text-green-400 text-sm font-semibold opacity-0 transition-opacity duration-500 whitespace-nowrap">stream went offline!</span>
                     </div>
-                    ${!isLive ? `<span class="text-[#72767d] text-xs mt-0.5">(edited)</span>` : ''}
+                    <span class="edited-marker text-[#72767d] text-xs mt-0.5 hidden">(edited)</span>
                 </div>
             </div>
         `;
@@ -412,28 +411,95 @@
         tempDiv.innerHTML = messageHtml;
         const messageEl = tempDiv.firstElementChild;
 
-        // Add to container
+        // Simple fade-in animation for new message only
+        messageEl.style.opacity = '0';
+        messageEl.style.transition = 'opacity 300ms ease-out';
+
         discordMessages.appendChild(messageEl);
 
-        // Remove old messages if too many - just remove immediately without transition
-        while (discordMessages.children.length > 4) {
-            discordMessages.firstElementChild?.remove();
+        // Trigger animation
+        requestAnimationFrame(() => {
+            messageEl.style.opacity = '1';
+        });
+
+        enforceMessageLimit();
+
+        return messageEl;
+    }
+
+    function markStreamOffline(messageEl) {
+        const embed = messageEl.querySelector('.stream-embed');
+        const statusIcon = messageEl.querySelector('.status-icon');
+        const statusText = messageEl.querySelector('.status-text');
+        const editedMarker = messageEl.querySelector('.edited-marker');
+        const offlineNotification = messageEl.querySelector('.offline-notification');
+
+        // Update to offline appearance
+        embed.classList.remove('border-l-[#6441a4]');
+        embed.classList.add('border-l-[#000000]');
+        statusIcon.textContent = '⚫';
+        statusText.textContent = 'Offline';
+        editedMarker.classList.remove('hidden');
+
+        // Show "stream went offline!" notification
+        if (offlineNotification) {
+            offlineNotification.classList.remove('opacity-0');
+            setTimeout(() => {
+                offlineNotification.classList.add('opacity-0');
+            }, 2000);
         }
+    }
+
+    function enforceMessageLimit() {
+        while (discordMessages.children.length > 4) {
+            const oldestMessage = discordMessages.firstElementChild;
+            if (!oldestMessage) break;
+
+            const streamerName = oldestMessage.dataset.streamer;
+            if (streamerName) {
+                activeStreams.delete(streamerName);
+            }
+
+            oldestMessage.remove();
+        }
+    }
+
+    function getAvailableStreamer() {
+        const available = streamers.filter(s => !activeStreams.has(s.name));
+        if (available.length === 0) {
+            return null;
+        }
+        return available[Math.floor(Math.random() * available.length)];
+    }
+
+    function startNewStream() {
+        const streamer = getAvailableStreamer();
+        if (!streamer) {
+            return;
+        }
+
+        const messageEl = createStreamMessage(streamer);
+        activeStreams.set(streamer.name, messageEl);
+
+        // Schedule going offline (3-8 seconds)
+        const offlineDelay = 3000 + Math.random() * 5000;
+        setTimeout(() => {
+            markStreamOffline(messageEl);
+            activeStreams.delete(streamer.name);
+        }, offlineDelay);
     }
 
     // Start the simulation
     function startSimulation() {
-        // Initial messages
-        setTimeout(() => createDiscordMessage(getRandomStreamer(), true), 500);
-        setTimeout(() => createDiscordMessage(getRandomStreamer(), false), 1500);
-        setTimeout(() => createDiscordMessage(getRandomStreamer(), true), 2500);
+        // Initial streams with staggered start times
+        setTimeout(() => startNewStream(), 500);
+        setTimeout(() => startNewStream(), 1500);
+        setTimeout(() => startNewStream(), 2500);
 
-        // Continue adding messages
+        // Continue spawning new streams
         setInterval(() => {
-            const streamer = getRandomStreamer();
-            const isLive = Math.random() > 0.4; // 60% chance of live
-            createDiscordMessage(streamer, isLive);
-        }, 3500);
+            startNewStream();
+        }, 4000);
     }
 
     // Start when page loads
