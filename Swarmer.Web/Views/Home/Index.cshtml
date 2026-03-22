@@ -83,7 +83,7 @@
                 </div>
 
                 <!-- Discord Messages Container -->
-                <div id="discord-messages" class="p-4 space-y-2 h-[38rem] overflow-hidden">
+                <div id="discord-messages" class="p-4 space-y-2 h-[38rem] overflow-hidden" style="overflow-anchor: none;">
                     <!-- Messages will be injected here by JavaScript -->
                 </div>
 
@@ -355,6 +355,10 @@
     }
 
     function createStreamMessage(streamer) {
+        // Save scroll position to prevent page jump
+        const scrollX = window.scrollX;
+        const scrollY = window.scrollY;
+
         const avatarColor = getRandomColor();
         const titleText = getRandomTitle();
         const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -425,6 +429,9 @@
         });
 
         enforceMessageLimit();
+
+        // Restore scroll position to prevent page jump
+        window.scrollTo(scrollX, scrollY);
 
         return messageEl;
     }
