@@ -32,6 +32,9 @@ public class Program
 
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel.Information()
+			.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+			.MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+			.MinimumLevel.Override("System", LogEventLevel.Warning)
 			.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u4}] {Message:lj}{NewLine}{Exception}")
 			.WriteTo.Sentry(o =>
 			{
