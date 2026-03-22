@@ -38,6 +38,7 @@ public sealed class StreamRefresherService(
 		{
 			RefreshTokenResponse refreshTokenResponse = await RequestTokenAsync().ConfigureAwait(false);
 			twitchApi.Settings.AccessToken = refreshTokenResponse.AccessToken;
+			twitchApi.Settings.ClientId = _config.ClientId;
 		}
 
 		try
@@ -50,6 +51,7 @@ public sealed class StreamRefresherService(
 			Log.Warning(ex, "Twitch API request failed due to an expired access token. Refreshing token...");
 			RefreshTokenResponse tokenRefreshResponse = await RequestTokenAsync();
 			twitchApi.Settings.AccessToken = tokenRefreshResponse.AccessToken;
+			twitchApi.Settings.ClientId = _config.ClientId;
 
 			Log.Information(
 				"Updated Twitch access token. The new token is valid for {ExpirationSeconds} seconds, expiring on {ExpirationDate} UTC",
