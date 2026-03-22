@@ -81,10 +81,8 @@ public class Program
 		builder.Services.AddHostedService<KeepAppAliveService>();
 		builder.Services.AddDbContext<AppDbContext>(options =>
 		{
-			const string key = "PostgresConnectionString";
-			string connectionString = builder.Environment.IsProduction()
-				? Environment.GetEnvironmentVariable(key) ?? throw new Exception($"Envvar {key} not found.")
-				: builder.Configuration[key] ?? throw new Exception($"{key} was not found in configuration.");
+			string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+				?? throw new InvalidOperationException("Connection string 'DefaultConnection' is not set.");
 
 			options.UseNpgsql(connectionString);
 		});
