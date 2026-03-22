@@ -21,9 +21,10 @@ public class AppDbContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		modelBuilder.HasDefaultSchema("swarmer");
+
 		ConfigureGameChannel(modelBuilder.Entity<GameChannel>());
 		ConfigureStreamMessage(modelBuilder.Entity<StreamMessage>());
-		ConfigureConfigurationEntity(modelBuilder.Entity<ConfigurationEntity>());
 		ConfigureBannedUser(modelBuilder.Entity<BannedUser>());
 	}
 
@@ -61,18 +62,5 @@ public class AppDbContext : DbContext
 
 		builder.Property(s => s.OfflineThumbnailUrl).HasMaxLength(200);
 		builder.Property(s => s.AvatarUrl).HasMaxLength(200);
-	}
-
-	private static void ConfigureConfigurationEntity(EntityTypeBuilder<ConfigurationEntity> builder)
-	{
-		builder.ToTable("BotConfigurations");
-		builder.HasKey(s => s.Id);
-		builder.Property(s => s.BotName)
-			.IsRequired()
-			.HasMaxLength(50);
-
-		builder.Property(s => s.JsonConfig)
-			.IsRequired()
-			.HasMaxLength(1000);
 	}
 }

@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
