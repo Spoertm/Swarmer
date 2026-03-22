@@ -1,8 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="Swarmer.Domain/Swarmer.Domain.csproj" />
-    <Project Path="Swarmer.Web.Client/Swarmer.Web.Client.csproj" />
-    <Project Path="Swarmer.Web.Server/Swarmer.Web.Server.csproj">
+    <Project Path="Swarmer.Web/Swarmer.Web.csproj">
       <BuildDependency Project="Swarmer.Domain/Swarmer.Domain.csproj" />
     </Project>
   </Folder>

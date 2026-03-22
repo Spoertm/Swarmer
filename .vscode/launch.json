@@ -2,13 +2,13 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Launch Server",
+			"name": "Launch Web",
 			"type": "coreclr",
 			"request": "launch",
 			"preLaunchTask": "build",
-			"program": "${workspaceFolder}/Swarmer.Web.Server/bin/Debug/net10.0/Swarmer.Web.Server.dll",
+			"program": "${workspaceFolder}/Swarmer.Web/bin/Debug/net10.0/Swarmer.Web.dll",
 			"args": [],
-			"cwd": "${workspaceFolder}/Swarmer.Web.Server",
+			"cwd": "${workspaceFolder}/Swarmer.Web",
 			"stopAtEntry": false,
 			"serverReadyAction": {
 				"action": "openExternally",
@@ -22,14 +22,14 @@
 			}
 		},
 		{
-			"name": "Launch Server (watch)",
+			"name": "Launch Web (watch)",
 			"type": "coreclr",
 			"request": "launch",
 			"program": "dotnet",
 			"args": [
 				"watch",
 				"--project",
-				"${workspaceFolder}/Swarmer.Web.Server/Swarmer.Web.Server.csproj"
+				"${workspaceFolder}/Swarmer.Web/Swarmer.Web.csproj"
 			],
 			"cwd": "${workspaceFolder}",
 			"env": {
@@ -39,6 +39,28 @@
 				"action": "openExternally",
 				"pattern": "\\bNow listening on:\\s+(https?://\\S+)"
 			}
+		},
+		{
+			"name": "Launch Web + Tailwind",
+			"type": "coreclr",
+			"request": "launch",
+			"program": "dotnet",
+			"args": [
+				"watch",
+				"run",
+				"--project",
+				"${workspaceFolder}/Swarmer.Web/Swarmer.Web.csproj",
+				"--non-interactive"
+			],
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+			"serverReadyAction": {
+				"action": "openExternally",
+				"pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+			},
+			"preLaunchTask": "tailwind-watch"
 		}
 	]
 }

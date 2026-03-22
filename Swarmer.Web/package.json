@@ -1,0 +1,13 @@
+{
+  "name": "swarmer-web",
+  "version": "1.0.0",
+  "description": "Swarmer Discord Bot Website",
+  "scripts": {
+    "build-css": "tailwindcss -i ./Styles/input.css -o ./wwwroot/css/site.css --watch",
+    "build-css-prod": "tailwindcss -i ./Styles/input.css -o ./wwwroot/css/site.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "tailwindcss": "^4.1.8"
+  }
+}

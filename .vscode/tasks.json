@@ -9,6 +9,24 @@
 			"problemMatcher": "$msCompile"
 		},
 		{
+			"label": "tailwind-watch",
+			"command": "npx",
+			"type": "process",
+			"args": [
+				"@tailwindcss/cli",
+				"-i",
+				"./Styles/input.css",
+				"-o",
+				"./wwwroot/css/site.css",
+				"--watch"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/Swarmer.Web"
+			},
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
 			"label": "test",
 			"command": "dotnet",
 			"type": "process",
@@ -37,7 +55,7 @@
 				"--project",
 				"${workspaceFolder}/Swarmer.Domain/Swarmer.Domain.csproj",
 				"--startup-project",
-				"${workspaceFolder}/Swarmer.Web.Server/Swarmer.Web.Server.csproj"
+				"${workspaceFolder}/Swarmer.Web/Swarmer.Web.csproj"
 			],
 			"problemMatcher": []
 		}

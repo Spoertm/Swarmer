@@ -1,0 +1,34 @@
+{
+  "profiles": {
+    "Swarmer.Web": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    },
+    "Swarmer.Web (watch)": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "workingDirectory": "$(ProjectDir)",
+      "commandLineArgs": "watch run --non-interactive",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    },
+    "Swarmer.Web + Tailwind": {
+      "commandName": "Executable",
+      "executablePath": "cmd",
+      "workingDirectory": "$(ProjectDir)",
+      "commandLineArgs": "/c start \"Tailwind\" npx @tailwindcss/cli -i ./Styles/input.css -o ./wwwroot/css/site.css --watch && dotnet watch run --non-interactive",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    }
+  }
+}

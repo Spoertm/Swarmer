@@ -11,16 +11,16 @@ This project was originally created by Angrevol#3416 and has been completely rew
 - **Framework**: .NET 10.0
 - **Language**: C# 14.0
 - **Database**: PostgreSQL with Entity Framework Core 10.0
-- **Frontend**: Blazor WebAssembly with Tailwind CSS
-- **API Documentation**: Swagger (Swashbuckle)
+- **Frontend**: ASP.NET MVC with Razor views and Tailwind CSS
+- **API Documentation**: Scalar (modern Swagger alternative)
 - **Discord Integration**: Discord.Net 3.19
 - **Twitch Integration**: TwitchLib.Api 3.10
-- **Logging**: Serilog with Sentry integration
+- **Logging**: Serilog
 - **Testing**: xUnit with NSubstitute for mocking
 
 ## Project Structure
 
-The solution follows [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) with four projects:
+The solution follows [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) with three projects:
 
 ### 1. Swarmer.Domain (Class Library)
 
@@ -35,7 +35,6 @@ Swarmer.Domain/
 │   ├── ConfigurationEntity.cs
 │   ├── BannedUser.cs
 │   ├── SwarmerRepository.cs
-│   ├── ConfigRepository.cs
 │   └── Migrations/     # EF Core migrations
 ├── Discord/            # Discord bot integration
 │   ├── DiscordService.cs
@@ -55,54 +54,42 @@ Swarmer.Domain/
     └── StreamToPost.cs
 ```
 
-### 2. Swarmer.Web.Server (ASP.NET Core Web)
+### 2. Swarmer.Web.Client (ASP.NET Core MVC)
 
-Entry point of the application. Hosts the Blazor WebAssembly client and exposes REST API endpoints.
-
-```
-Swarmer.Web.Server/
-├── Program.cs              # Application bootstrap and DI configuration
-├── Endpoints/
-│   └── SwarmerEndpoints.cs # API endpoint definitions
-├── appsettings.json        # Configuration (connection strings, tokens)
-├── appsettings.Development.json
-├── Dockerfile              # Docker deployment configuration
-└── wwwroot/swagger-ui/     # Swagger UI custom styling
-```
-
-### 3. Swarmer.Web.Client (Blazor WebAssembly)
-
-Client-side UI built with Blazor and Tailwind CSS.
+Entry point of the application. Serves the web UI using ASP.NET MVC with Razor views and exposes REST API endpoints.
 
 ```
 Swarmer.Web.Client/
-├── Program.cs
-├── App.razor
-├── _Imports.razor
-├── Pages/
-│   └── Index.razor         # Landing page
-├── Shared/
-│   ├── MainLayout.razor
-│   ├── NavBar.razor
-│   ├── LinkButton.razor
-│   └── ReloadLink.razor
-├── Services/
-│   └── DarkModeManager.cs  # Dark mode state management
+├── Controllers/
+│   └── HomeController.cs     # MVC controllers
+├── Views/
+│   ├── Home/
+│   │   ├── Index.cshtml      # Landing page with hero, features, API demo
+│   │   └── Privacy.cshtml    # Privacy policy
+│   ├── Shared/
+│   │   └── _Layout.cshtml    # Main layout with nav, footer, dark mode
+│   ├── _ViewImports.cshtml
+│   └── _ViewStart.cshtml
 ├── Styles/
-│   └── app.css             # Source CSS for Tailwind
+│   └── input.css             # Tailwind source styles
 ├── wwwroot/
-│   ├── index.html
-│   ├── app.css             # Generated Tailwind CSS
-│   └── Assets/             # Images and logos
-└── tailwind.config.js      # Tailwind configuration
+│   ├── css/
+│   │   └── site.css          # Generated Tailwind CSS
+│   └── images/               # Logo and assets
+├── Program.cs                # Application bootstrap and DI configuration
+├── appsettings.json          # Configuration (connection strings, tokens)
+├── appsettings.Development.json
+├── package.json              # npm scripts for Tailwind
+├── tailwind.config.js        # Tailwind configuration
+└── Dockerfile                # Docker deployment configuration
 ```
 
-### 4. Swarmer.UnitTests (xUnit Test Project)
+### 3. Swarmer.Tests (xUnit Test Project)
 
 Unit tests for the domain layer.
 
 ```
-Swarmer.UnitTests/
+Swarmer.Tests/
 ├── SwarmerRepositoryTests.cs
 ├── SwarmerEndpointsTests.cs
 ├── StreamMock.cs
@@ -125,19 +112,34 @@ dotnet test Swarmer.slnx
 
 ### Run the Application (Development)
 
+**Option 1: Just run the app (CSS must be pre-built)**
 ```bash
-cd Swarmer.Web.Server
+cd Swarmer.Web.Client
 dotnet run
+```
+
+**Option 2: With CSS hot reload (recommended for UI development)**
+
+Terminal 1 - Watch and rebuild CSS on changes:
+```bash
+cd Swarmer.Web.Client
+npm run build-css
+```
+
+Terminal 2 - Run the app with hot reload:
+```bash
+cd Swarmer.Web.Client
+dotnet watch run
 ```
 
 The application will be available at:
 - Web UI: https://localhost:5001 or http://localhost:5000
-- Swagger API docs: https://localhost:5001/swagger
+- Scalar API docs: https://localhost:5001/scalar/v1
 
 ### Docker Build
 
 ```bash
-cd Swarmer.Web.Server
+cd Swarmer.Web.Client
 docker build -f Dockerfile -t swarmer ..
 ```
 
@@ -146,7 +148,7 @@ docker build -f Dockerfile -t swarmer ..
 Since the project uses EF Core Migrations, you may need to apply them:
 
 ```bash
-cd Swarmer.Web.Server
+cd Swarmer.Web.Client
 dotnet ef database update
 ```
 
@@ -154,8 +156,39 @@ To create a new migration:
 
 ```bash
 cd Swarmer.Domain
-dotnet ef migrations add <MigrationName> --startup-project ../Swarmer.Web.Server
+dotnet ef migrations add <MigrationName> --startup-project ../Swarmer.Web.Client
 ```
+
+## Frontend Development
+
+### Tailwind CSS Workflow
+
+The project uses Tailwind CSS v4 with npm-based processing:
+
+1. **Development** - Watch mode with hot reload:
+   ```bash
+   npm run build-css
+   ```
+
+2. **Production** - Minified build:
+   ```bash
+   npm run build-css-prod
+   ```
+
+### Key UI Features
+
+- **Dark Mode**: Class-based (`dark:`) with localStorage persistence
+- **Discord Simulation**: Animated stream notifications in the hero section
+- **Responsive Design**: Mobile-first with Tailwind breakpoints
+- **Font Awesome**: Icons via CDN
+- **Inter Font**: Google Fonts
+
+### File Locations
+
+- **Tailwind source**: `Styles/input.css`
+- **Generated CSS**: `wwwroot/css/site.css` (do not edit directly)
+- **Views**: `Views/` folder with `.cshtml` files
+- **Config**: `tailwind.config.js`
 
 ## Code Style Guidelines
 
@@ -268,15 +301,10 @@ Banned Twitch user logins are stored in the `BannedUsers` database table. Stream
 ### Repository Pattern
 Data access is abstracted through repository classes:
 - `SwarmerRepository` - Stream message and game channel operations
-- `ConfigRepository` - Bot configuration management
-
-### Discord Integration
-- `SwarmerDiscordClient` - Custom Discord socket client wrapper
-- `DiscordService` - Service for sending embeds and managing stream messages
 
 ### API Endpoints
-REST API is defined in `SwarmerEndpoints.cs` using Minimal API pattern:
-- `GET /streams` - Get all streams or filter by game name
+REST API is defined in `Program.cs` using Minimal API pattern:
+- `GET /streams` - Get all streams or filter by game name (e.g., `?game=devil+daggers`)
 
 ## Security Considerations
 
@@ -286,19 +314,13 @@ REST API is defined in `SwarmerEndpoints.cs` using Minimal API pattern:
   - Environment variables (`PostgresConnectionString`)
   - Database configuration (JSON config stored in PostgreSQL)
 
-### Sentry Integration
-Error tracking is configured with Sentry (DSN is hardcoded in Program.cs). This captures:
-- Exceptions
-- Information-level logs
-- 50% of transactions (performance tracing)
-
 ### CORS
 The API allows any origin (`AllowAnyOrigin`) for the `/streams` endpoint.
 
 ## Deployment
 
 ### Docker
-The Dockerfile is located in `Swarmer.Web.Server/Dockerfile`:
+The Dockerfile is located in `Swarmer.Web.Client/Dockerfile`:
 - Uses multi-stage build
 - Based on `mcr.microsoft.com/dotnet/aspnet:10.0`
 - Exposes ports 80 and 443
@@ -311,14 +333,14 @@ PostgreSQL is required. The application uses EF Core migrations for schema manag
 1. Make changes to the codebase
 2. Run tests: `dotnet test`
 3. Build: `dotnet build`
-4. For UI changes, Tailwind CSS may need regeneration (the executable is included)
+4. For UI changes, run Tailwind watch: `npm run build-css`
 5. Create migrations if database schema changes
-6. Test locally with `dotnet run`
+6. Test locally with `dotnet watch run`
 
 ## Useful Notes
 
 - The project uses file-scoped namespaces (C# 10+)
 - Nullable reference types are enabled across all projects
 - Implicit usings are enabled
-- The Web Client includes a pre-built `tailwindcss-windows-x64.exe` for CSS generation
 - Dark mode is supported in the UI and persists via local storage
+- The Discord simulation on the home page uses vanilla JavaScript for animations
