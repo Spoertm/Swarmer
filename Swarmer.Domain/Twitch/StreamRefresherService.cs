@@ -1,9 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
-using Swarmer.Domain.Database;
 using Swarmer.Domain.Models;
 using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
@@ -14,8 +12,7 @@ namespace Swarmer.Domain.Twitch;
 public sealed class StreamRefresherService(
 	ITwitchAPI twitchApi,
 	StreamProvider streamProvider,
-	IOptions<SwarmerConfig> options,
-	IServiceScopeFactory serviceScopeFactory)
+	IOptions<SwarmerConfig> options)
 	: RepeatingBackgroundService
 {
 	private static readonly List<string> _twitchGameIds =
@@ -37,6 +34,12 @@ public sealed class StreamRefresherService(
 			return;
 		}
 
+		if (twitchApi.Settings.AccessToken is null)
+		{
+			RefreshTokenResponse refreshTokenResponse = await RequestTokenAsync().ConfigureAwait(false);
+			twitchApi.Settings.AccessToken = refreshTokenResponse.AccessToken;
+		}
+
 		try
 		{
 			GetStreamsResponse streamResponse = await twitchApi.Helix.Streams.GetStreamsAsync(first: 100, gameIds: _twitchGameIds);
@@ -46,11 +49,6 @@ public sealed class StreamRefresherService(
 		{
 			Log.Warning(ex, "Twitch API request failed due to an expired access token. Refreshing token...");
 			RefreshTokenResponse tokenRefreshResponse = await RequestTokenAsync();
-
-			await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
-			ConfigRepository repo = scope.ServiceProvider.GetRequiredService<ConfigRepository>();
-			await repo.UpdateAccessToken(tokenRefreshResponse.AccessToken);
-
 			twitchApi.Settings.AccessToken = tokenRefreshResponse.AccessToken;
 
 			Log.Information(

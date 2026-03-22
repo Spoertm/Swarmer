@@ -102,7 +102,6 @@ public class Program
 		});
 
 		builder.Services.AddScoped<SwarmerRepository>();
-		builder.Services.AddScoped<ConfigRepository>();
 
 		builder.Services.AddHttpClient();
 

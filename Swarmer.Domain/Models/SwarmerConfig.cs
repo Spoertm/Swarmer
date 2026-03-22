@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Swarmer.Domain.Models;
 
-public sealed record SwarmerConfig
+public sealed class SwarmerConfig
 {
 	[Required]
 	public required string BotToken { get; init; }
@@ -11,16 +11,8 @@ public sealed record SwarmerConfig
 	public required string ClientId { get; init; }
 
 	[Required]
-	public required string AccessToken { get; set; }
-
-	[Required]
 	public required string ClientSecret { get; init; }
 
-	public SwarmerConfig Copy() => new()
-	{
-		BotToken = BotToken,
-		ClientId = ClientId,
-		AccessToken = AccessToken,
-		ClientSecret = ClientSecret,
-	};
+	[Required]
+	public required string AccessToken { get; set; }
 }
