@@ -19,11 +19,27 @@ public class AppDbContext : DbContext
 
 	public DbSet<ConfigurationEntity> BotConfigurations => Set<ConfigurationEntity>();
 
+	public DbSet<BannedUser> BannedUsers => Set<BannedUser>();
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		ConfigureGameChannel(modelBuilder.Entity<GameChannel>());
 		ConfigureStreamMessage(modelBuilder.Entity<StreamMessage>());
 		ConfigureConfigurationEntity(modelBuilder.Entity<ConfigurationEntity>());
+		ConfigureBannedUser(modelBuilder.Entity<BannedUser>());
+	}
+
+	private static void ConfigureBannedUser(EntityTypeBuilder<BannedUser> builder)
+	{
+		builder.ToTable("BannedUsers");
+		builder.HasKey(b => b.Id);
+		builder.Property(b => b.Id).ValueGeneratedOnAdd();
+
+		builder.Property(b => b.UserLogin)
+			.IsRequired()
+			.HasMaxLength(50);
+
+		builder.HasIndex(b => b.UserLogin).IsUnique();
 	}
 
 	private static void ConfigureGameChannel(EntityTypeBuilder<GameChannel> builder)

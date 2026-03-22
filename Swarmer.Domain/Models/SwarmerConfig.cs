@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Swarmer.Domain.Models;
 
@@ -16,14 +16,11 @@ public sealed record SwarmerConfig
 	[Required]
 	public required string ClientSecret { get; init; }
 
-	public string[] BannedUserLogins { get; init; } = [];
-
 	public SwarmerConfig Copy() => new()
 	{
 		BotToken = BotToken,
 		ClientId = ClientId,
 		AccessToken = AccessToken,
 		ClientSecret = ClientSecret,
-		BannedUserLogins = BannedUserLogins.ToArray(),
 	};
 }

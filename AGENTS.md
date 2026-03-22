@@ -33,6 +33,7 @@ Swarmer.Domain/
 │   ├── GameChannel.cs
 │   ├── StreamMessage.cs
 │   ├── ConfigurationEntity.cs
+│   ├── BannedUser.cs
 │   ├── SwarmerRepository.cs
 │   ├── ConfigRepository.cs
 │   └── Migrations/     # EF Core migrations
@@ -231,8 +232,7 @@ Tests use `appsettings.Testing.json` for configuration with dummy values for API
     "BotToken": "discord-bot-token",
     "ClientId": "twitch-client-id",
     "AccessToken": "twitch-access-token",
-    "ClientSecret": "twitch-client-secret",
-    "BannedUserLogins": ["user1", "user2"]
+    "ClientSecret": "twitch-client-secret"
   }
 }
 ```
@@ -261,6 +261,9 @@ All background services inherit from `RepeatingBackgroundService` which provides
 - Periodic execution with `PeriodicTimer`
 - Exception handling and logging
 - Graceful cancellation
+
+### Banned Users
+Banned Twitch user logins are stored in the `BannedUsers` database table. Streams from banned users are filtered out before being posted to Discord. To ban a user, insert their Twitch login into the `BannedUsers` table.
 
 ### Repository Pattern
 Data access is abstracted through repository classes:

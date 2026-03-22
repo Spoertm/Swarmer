@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+
 using NSubstitute;
 using Swarmer.Domain.Database;
 using Swarmer.Domain.Discord;
@@ -17,7 +17,6 @@ public sealed class SwarmerRepositoryTests
 {
 	private readonly DbContextOptions<AppDbContext> _dbContextOptions;
 	private readonly IDiscordService _discordServiceMock;
-	private readonly IOptions<SwarmerConfig> _options;
 
 	public SwarmerRepositoryTests()
 	{
@@ -37,17 +36,6 @@ public sealed class SwarmerRepositoryTests
 			.Returns(Task.CompletedTask);
 
 		_discordServiceMock = discordServiceMock;
-
-		SwarmerConfig config = new()
-		{
-			AccessToken = "",
-			BannedUserLogins = ["SomeBannedLogin"],
-			BotToken = "",
-			ClientId = "",
-			ClientSecret = ""
-		};
-
-		_options = Options.Create(config);
 	}
 
 	[Fact]
@@ -66,9 +54,10 @@ public sealed class SwarmerRepositoryTests
 
 		appDbContext.GameChannels.AddRange(gameChannel1, gameChannel2);
 		appDbContext.StreamMessages.Add(streamMessage);
+		appDbContext.BannedUsers.Add(new BannedUser { UserLogin = "SomeBannedLogin" });
 		await appDbContext.SaveChangesAsync();
 
-		SwarmerRepository sut = new(appDbContext, streamProvider, _discordServiceMock, _options);
+		SwarmerRepository sut = new(appDbContext, streamProvider, _discordServiceMock);
 		List<StreamToPost> result = (await sut.GetStreamsToPostAsync()).ToList();
 
 		Assert.Single(result);
@@ -80,7 +69,7 @@ public sealed class SwarmerRepositoryTests
 	{
 		await using AppDbContext appDbContext = new(_dbContextOptions);
 
-		SwarmerRepository sut = new(appDbContext, new StreamProvider(), _discordServiceMock, _options);
+		SwarmerRepository sut = new(appDbContext, new StreamProvider(), _discordServiceMock);
 
 		TimeSpan maxLingerTime = TimeSpan.FromMinutes(15);
 		DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -105,7 +94,7 @@ public sealed class SwarmerRepositoryTests
 		StreamProvider streamProvider = new();
 
 		SwarmerRepository repository =
-			new(appDbContextMock, streamProvider, _discordServiceMock, _options);
+			new(appDbContextMock, streamProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 
 		await repository.HandleExistingStreamsAsync(cooldownPeriod);
@@ -128,7 +117,7 @@ public sealed class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = [stream] };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 
 		await repository.HandleExistingStreamsAsync(cooldownPeriod);
@@ -153,7 +142,7 @@ public sealed class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = [stream] };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 
 		await repository.HandleExistingStreamsAsync(cooldownPeriod);
@@ -176,7 +165,7 @@ public sealed class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = [stream] };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 
 		await repository.HandleExistingStreamsAsync(cooldownPeriod);
@@ -198,7 +187,7 @@ public sealed class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = [] };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 
 		await repository.HandleExistingStreamsAsync(cooldownPeriod);
@@ -223,7 +212,7 @@ public sealed class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = [] };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 
 		await repository.HandleExistingStreamsAsync(cooldownPeriod);
@@ -247,7 +236,7 @@ public sealed class SwarmerRepositoryTests
 		await appDbContext.SaveChangesAsync();
 
 		StreamProvider streamProvider = new() { Streams = [] };
-		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, streamProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 
 		await repository.HandleExistingStreamsAsync(cooldownPeriod);
@@ -260,7 +249,7 @@ public sealed class SwarmerRepositoryTests
 	{
 		await using AppDbContext appDbContext = new(_dbContextOptions);
 
-		SwarmerRepository repository = new(appDbContext, new StreamProvider(), _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, new StreamProvider(), _discordServiceMock);
 
 		StreamMessage streamMessage = new() { Id = 0, StreamId = "SomeId" };
 		await repository.InsertStreamMessageAsync(streamMessage);
@@ -277,7 +266,7 @@ public sealed class SwarmerRepositoryTests
 		appDbContext.Add(streamMessage);
 		await appDbContext.SaveChangesAsync();
 
-		SwarmerRepository repository = new(appDbContext, new StreamProvider(), _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, new StreamProvider(), _discordServiceMock);
 		await repository.RemoveStreamMessageAsync(streamMessage);
 
 		Assert.Empty(appDbContext.StreamMessages.ToList());
@@ -285,7 +274,7 @@ public sealed class SwarmerRepositoryTests
 
 	/// <summary>
 	/// Tests that the symmetric cooldown prevents Discord message flip-flopping when Twitch API is inconsistent.
-	/// When a stream flaps (online→offline→online rapidly), the Discord message should NOT be modified
+	/// When a stream flaps (online?offline?online rapidly), the Discord message should NOT be modified
 	/// until the cooldown period has passed.
 	/// </summary>
 	[Fact]
@@ -310,12 +299,12 @@ public sealed class SwarmerRepositoryTests
 
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 
-		// Simulate the stream flapping 3 times (online→offline→online→offline→online)
+		// Simulate the stream flapping 3 times (online?offline?online?offline?online)
 		// Each cycle represents Twitch API inconsistency
 
 		// Cycle 1: Stream goes offline (Twitch API doesn't return it)
 		StreamProvider offlineProvider1 = new() { Streams = [] };
-		SwarmerRepository repository1 = new(appDbContext, offlineProvider1, _discordServiceMock, _options);
+		SwarmerRepository repository1 = new(appDbContext, offlineProvider1, _discordServiceMock);
 		await repository1.HandleExistingStreamsAsync(cooldownPeriod);
 
 		// With cooldown: GoOfflineAsync should NOT be called (we're within cooldown)
@@ -327,7 +316,7 @@ public sealed class SwarmerRepositoryTests
 
 		// Cycle 1: Stream comes back online
 		StreamProvider onlineProvider1 = new() { Streams = [stream] };
-		SwarmerRepository repository2 = new(appDbContext, onlineProvider1, _discordServiceMock, _options);
+		SwarmerRepository repository2 = new(appDbContext, onlineProvider1, _discordServiceMock);
 		await repository2.HandleExistingStreamsAsync(cooldownPeriod);
 
 		// GoOnlineAgainAsync should NOT be called (message was never set to offline due to cooldown)
@@ -339,7 +328,7 @@ public sealed class SwarmerRepositoryTests
 
 		// Cycle 2: Stream goes offline again
 		StreamProvider offlineProvider2 = new() { Streams = [] };
-		SwarmerRepository repository3 = new(appDbContext, offlineProvider2, _discordServiceMock, _options);
+		SwarmerRepository repository3 = new(appDbContext, offlineProvider2, _discordServiceMock);
 		await repository3.HandleExistingStreamsAsync(cooldownPeriod);
 
 		// GoOfflineAsync should still NOT be called (still within cooldown)
@@ -347,7 +336,7 @@ public sealed class SwarmerRepositoryTests
 
 		// Cycle 2: Stream comes back online again
 		StreamProvider onlineProvider2 = new() { Streams = [stream] };
-		SwarmerRepository repository4 = new(appDbContext, onlineProvider2, _discordServiceMock, _options);
+		SwarmerRepository repository4 = new(appDbContext, onlineProvider2, _discordServiceMock);
 		await repository4.HandleExistingStreamsAsync(cooldownPeriod);
 
 		// GoOnlineAgainAsync should still NOT be called
@@ -389,7 +378,7 @@ public sealed class SwarmerRepositoryTests
 
 		// Stream goes offline (within cooldown)
 		StreamProvider offlineProvider = new() { Streams = [] };
-		SwarmerRepository repository1 = new(appDbContext, offlineProvider, _discordServiceMock, _options);
+		SwarmerRepository repository1 = new(appDbContext, offlineProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 		await repository1.HandleExistingStreamsAsync(cooldownPeriod);
 
@@ -401,7 +390,7 @@ public sealed class SwarmerRepositoryTests
 
 		// Stream comes back online (still within cooldown)
 		StreamProvider onlineProvider = new() { Streams = [stream] };
-		SwarmerRepository repository2 = new(appDbContext, onlineProvider, _discordServiceMock, _options);
+		SwarmerRepository repository2 = new(appDbContext, onlineProvider, _discordServiceMock);
 		await repository2.HandleExistingStreamsAsync(cooldownPeriod);
 
 		// IDEAL BEHAVIOR: GoOnlineAgainAsync should NOT be called (message never went offline)
@@ -438,7 +427,7 @@ public sealed class SwarmerRepositoryTests
 
 		// Stream goes offline within the cooldown period
 		StreamProvider offlineProvider = new() { Streams = [] };
-		SwarmerRepository repository = new(appDbContext, offlineProvider, _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, offlineProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 		await repository.HandleExistingStreamsAsync(cooldownPeriod);
 
@@ -477,7 +466,7 @@ public sealed class SwarmerRepositoryTests
 
 		// Stream goes offline after cooldown period
 		StreamProvider offlineProvider = new() { Streams = [] };
-		SwarmerRepository repository = new(appDbContext, offlineProvider, _discordServiceMock, _options);
+		SwarmerRepository repository = new(appDbContext, offlineProvider, _discordServiceMock);
 		TimeSpan cooldownPeriod = TimeSpan.FromMinutes(15);
 		await repository.HandleExistingStreamsAsync(cooldownPeriod);
 
@@ -491,3 +480,4 @@ public sealed class SwarmerRepositoryTests
 		Assert.True(messageAfter?.LingeringSinceUtc > initialLingeringTime);
 	}
 }
+
