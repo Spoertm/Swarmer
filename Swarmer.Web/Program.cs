@@ -1,5 +1,6 @@
 using Discord;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 using Serilog;
@@ -49,7 +50,8 @@ public static class Program
 			IConfigurationSection configSection = builder.Configuration.GetSection(nameof(SwarmerConfig));
 			builder.Services
 				.Configure<SwarmerConfig>(configSection)
-				.AddDbContext<AppDbContext>()
+				.AddDbContext<AppDbContext>(options =>
+					options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
 				.AddScoped<SwarmerRepository>()
 				.AddSingleton(new DiscordSocketConfig
 				{
