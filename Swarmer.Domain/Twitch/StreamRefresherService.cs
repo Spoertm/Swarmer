@@ -19,10 +19,10 @@ public sealed class StreamRefresherService(
 	: RepeatingBackgroundService
 {
 	private static readonly List<string> _twitchGameIds =
-		[
-			"490905", // Devil Daggers
-			"1350012934" // HYPER DEMON
-		];
+	[
+		"490905", // Devil Daggers
+		"1350012934" // HYPER DEMON
+	];
 
 	private readonly Uri _reqUrl = new("https://id.twitch.tv/oauth2/token");
 
