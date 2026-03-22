@@ -165,6 +165,9 @@ dotnet_diagnostic.SA1101.severity = none
 # Disable SA1402: File may only contain a single type
 dotnet_diagnostic.SA1402.severity = none
 
+# Disable SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none
+
 [src/libraries/System.Net.Http/src/System/Net/Http/{SocketsHttpHandler/Http3RequestStream.cs,BrowserHttpHandler/BrowserHttpHandler.cs}]
 # disable CA2025, the analyzer throws a NullReferenceException when processing this file: https://github.com/dotnet/roslyn-analyzers/issues/7652
 dotnet_diagnostic.CA2025.severity = none
