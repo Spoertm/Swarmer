@@ -39,10 +39,8 @@ public sealed class StreamRefresherService(
 
 		try
 		{
-			GetStreamsResponse streamResponse =
-				await twitchApi.Helix.Streams.GetStreamsAsync(first: 100, gameIds: _twitchGameIds);
-			Stream[] twitchStreams = streamResponse.Streams;
-			streamProvider.Streams = twitchStreams;
+			GetStreamsResponse streamResponse = await twitchApi.Helix.Streams.GetStreamsAsync(first: 100, gameIds: _twitchGameIds);
+			streamProvider.Streams = streamResponse.Streams;
 		}
 		catch (BadScopeException ex)
 		{
@@ -67,18 +65,17 @@ public sealed class StreamRefresherService(
 		using HttpClient client = new();
 		Dictionary<string, string> postValues = new()
 		{
-			{ "client_id", _config.ClientId }, { "client_secret", _config.ClientSecret }, { "grant_type", "client_credentials" }
+			{ "client_id", _config.ClientId },
+			{ "client_secret", _config.ClientSecret },
+			{ "grant_type", "client_credentials" },
 		};
 
 		HttpResponseMessage response = await client.PostAsync(ReqUrl, new FormUrlEncodedContent(postValues));
 		response.EnsureSuccessStatusCode();
 
 		System.IO.Stream stream = await response.Content.ReadAsStreamAsync();
-		RefreshTokenResponse refreshTokenResponse = await JsonSerializer.DeserializeAsync<RefreshTokenResponse>(stream)
-		                                            ?? throw new InvalidOperationException(
-			                                            "Access token deserialization resulted in null.");
-
-		return refreshTokenResponse;
+		return await JsonSerializer.DeserializeAsync<RefreshTokenResponse>(stream)
+			?? throw new InvalidOperationException("Access token deserialization resulted in null.");
 	}
 
 	private sealed record RefreshTokenResponse
