@@ -31,11 +31,11 @@ public sealed class SwarmerRepository
 		List<StreamMessage> streamMessages = await _appDbContext.StreamMessages.AsNoTracking().ToListAsync();
 
 		return from channel in gameChannels
-			join stream in _streamProvider.Streams on channel.TwitchGameId.ToString() equals stream.GameId
-			where !_config.BannedUserLogins.Contains(stream.UserLogin)
-			where !streamMessages.Any(streamMessage =>
-				streamMessage.StreamId == stream.UserId && streamMessage.ChannelId == channel.StreamChannelId)
-			select new StreamToPost(stream, channel);
+			   join stream in _streamProvider.Streams on channel.TwitchGameId.ToString() equals stream.GameId
+			   where !_config.BannedUserLogins.Contains(stream.UserLogin)
+			   where !streamMessages.Any(streamMessage =>
+				   streamMessage.StreamId == stream.UserId && streamMessage.ChannelId == channel.StreamChannelId)
+			   select new StreamToPost(stream, channel);
 	}
 
 	public async Task UpdateLingeringStreamMessages(TimeSpan maxLingerTime)
@@ -53,13 +53,15 @@ public sealed class SwarmerRepository
 		await SaveChangesAsync();
 	}
 
-	public async Task HandleExistingStreamsAsync()
+	public async Task HandleExistingStreamsAsync(TimeSpan cooldownPeriod)
 	{
 		// Provider hasn't initialized Streams yet
 		if (_streamProvider.Streams is null)
 		{
 			return;
 		}
+
+		DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
 		foreach (StreamMessage streamMessage in await _appDbContext.StreamMessages.ToListAsync())
 		{
@@ -79,6 +81,13 @@ public sealed class SwarmerRepository
 					continue;
 				}
 
+				// Cooldown check: don't go online again if we're still within the cooldown period
+				// This prevents Discord message flip-flopping due to Twitch API inconsistency
+				if (utcNow - streamMessage.LingeringSinceUtc < cooldownPeriod)
+				{
+					continue;
+				}
+
 				await _discordService.GoOnlineAgainAsync(streamMessage, ongoingStream);
 				streamMessage.IsLive = true;
 				streamMessage.Linger();
@@ -90,6 +99,13 @@ public sealed class SwarmerRepository
 				// The Discord message is live (stream just went offline)
 				if (streamMessage.IsLive)
 				{
+					// Cooldown check: don't go offline if we're still within the cooldown period
+					// This prevents Discord message flip-flopping due to Twitch API inconsistency
+					if (utcNow - streamMessage.LingeringSinceUtc < cooldownPeriod)
+					{
+						continue;
+					}
+
 					await _discordService.GoOfflineAsync(streamMessage);
 					streamMessage.IsLive = false;
 					streamMessage.Linger();

@@ -47,7 +47,7 @@ public sealed class StreamsPostingService : RepeatingBackgroundService
 
 		await PostCompletelyNewStreamsAndAddToDb(repo);
 
-		await repo.HandleExistingStreamsAsync();
+		await repo.HandleExistingStreamsAsync(_maxLingeringTime);
 	}
 
 	private async Task PostCompletelyNewStreamsAndAddToDb(SwarmerRepository repo)
