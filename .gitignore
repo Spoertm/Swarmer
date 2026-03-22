@@ -388,6 +388,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Config files
-appsettings.json
-appsettings.Development.json
-Swarmer.UnitTests/appsettings.Testing.json
+**/*appsettings*.json
