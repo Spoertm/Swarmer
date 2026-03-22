@@ -18,13 +18,13 @@ public sealed class StreamRefresherService(
 	IServiceScopeFactory serviceScopeFactory)
 	: RepeatingBackgroundService
 {
-	private const string ReqUrl = "https://id.twitch.tv/oauth2/token";
-
 	private static readonly List<string> _twitchGameIds =
-	[
-		"490905", // Devil Daggers
-		"1350012934" // HYPER DEMON
-	];
+		[
+			"490905", // Devil Daggers
+			"1350012934" // HYPER DEMON
+		];
+
+	private readonly Uri _reqUrl = new("https://id.twitch.tv/oauth2/token");
 
 	private readonly SwarmerConfig _config = options.Value;
 
@@ -70,7 +70,7 @@ public sealed class StreamRefresherService(
 			{ "grant_type", "client_credentials" },
 		};
 
-		HttpResponseMessage response = await client.PostAsync(ReqUrl, new FormUrlEncodedContent(postValues));
+		HttpResponseMessage response = await client.PostAsync(_reqUrl, new FormUrlEncodedContent(postValues));
 		response.EnsureSuccessStatusCode();
 
 		System.IO.Stream stream = await response.Content.ReadAsStreamAsync();
