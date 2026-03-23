@@ -25,5 +25,9 @@ RUN dotnet publish "Swarmer.Web.csproj" -c Release -o /app/publish /p:UseAppHost
 
 FROM base AS final
 WORKDIR /app
+
+# Install Kerberos libraries required by Npgsql
+RUN apt-get update && apt-get install -y libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
+
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Swarmer.Web.dll"]
