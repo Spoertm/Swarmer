@@ -51,7 +51,12 @@ public static class Program
 			builder.Services
 				.Configure<SwarmerConfig>(configSection)
 				.AddDbContext<AppDbContext>(options =>
-					options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
+				{
+					string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+						?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+					options.UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "swarmer"));
+				})
 				.AddScoped<SwarmerRepository>()
 				.AddSingleton(new DiscordSocketConfig
 				{
