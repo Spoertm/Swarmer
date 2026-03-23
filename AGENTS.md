@@ -11,11 +11,11 @@ This project was originally created by Angrevol#3416 and has been completely rew
 - **Framework**: .NET 10.0
 - **Language**: C# 14.0
 - **Database**: PostgreSQL with Entity Framework Core 10.0
-- **Frontend**: ASP.NET MVC with Razor views and Tailwind CSS
+- **Frontend**: ASP.NET MVC with Razor views and Tailwind CSS v4
 - **API Documentation**: Scalar (modern Swagger alternative)
 - **Discord Integration**: Discord.Net 3.19
 - **Twitch Integration**: TwitchLib.Api 3.10
-- **Logging**: Serilog
+- **Logging**: Serilog with Sentry integration
 - **Testing**: xUnit with NSubstitute for mocking
 
 ## Project Structure
@@ -28,60 +28,64 @@ Core business logic and external integrations.
 
 ```
 Swarmer.Domain/
-├── Database/           # Entity Framework Core context and repositories
+├── Data/                 # Entity Framework Core context and repositories
 │   ├── AppDbContext.cs
+│   ├── BannedUser.cs
 │   ├── GameChannel.cs
 │   ├── StreamMessage.cs
-│   ├── ConfigurationEntity.cs
-│   ├── BannedUser.cs
 │   ├── SwarmerRepository.cs
-│   └── Migrations/     # EF Core migrations
-├── Discord/            # Discord bot integration
+│   └── Migrations/       # EF Core migrations
+├── Discord/              # Discord bot integration
 │   ├── DiscordService.cs
 │   ├── IDiscordService.cs
 │   └── SwarmerDiscordClient.cs
-├── Extensions/         # Extension methods
+├── Extensions/           # Extension methods
 │   ├── EmbedExtensions.cs
 │   └── StringExtensions.cs
-├── Models/             # Domain models
+├── Models/               # Domain models
 │   ├── SwarmerConfig.cs
 │   ├── Result.cs
 │   └── RepeatingBackgroundService.cs
-└── Twitch/             # Twitch API integration
-    ├── StreamProvider.cs
-    ├── StreamRefresherService.cs
-    ├── StreamsPostingService.cs
-    └── StreamToPost.cs
+├── Twitch/               # Twitch API integration
+│   ├── StreamProvider.cs
+│   ├── StreamRefresherService.cs
+│   ├── StreamsPostingService.cs
+│   └── StreamToPost.cs
+├── KeepAppAliveService.cs
+└── Swarmer.Domain.csproj
 ```
 
-### 2. Swarmer.Web.Client (ASP.NET Core MVC)
+### 2. Swarmer.Web (ASP.NET Core MVC)
 
 Entry point of the application. Serves the web UI using ASP.NET MVC with Razor views and exposes REST API endpoints.
 
 ```
-Swarmer.Web.Client/
+Swarmer.Web/
 ├── Controllers/
-│   └── HomeController.cs     # MVC controllers
+│   └── HomeController.cs       # MVC controllers
 ├── Views/
 │   ├── Home/
-│   │   ├── Index.cshtml      # Landing page with hero, features, API demo
-│   │   └── Privacy.cshtml    # Privacy policy
+│   │   ├── Index.cshtml        # Landing page with hero, features, API demo
+│   │   └── Privacy.cshtml      # Privacy policy
 │   ├── Shared/
-│   │   └── _Layout.cshtml    # Main layout with nav, footer, dark mode
+│   │   └── _Layout.cshtml      # Main layout with nav, footer, dark mode
 │   ├── _ViewImports.cshtml
 │   └── _ViewStart.cshtml
 ├── Styles/
-│   └── input.css             # Tailwind source styles
+│   └── input.css               # Tailwind source styles
 ├── wwwroot/
 │   ├── css/
-│   │   └── site.css          # Generated Tailwind CSS
-│   └── images/               # Logo and assets
-├── Program.cs                # Application bootstrap and DI configuration
-├── appsettings.json          # Configuration (connection strings, tokens)
+│   │   └── site.css            # Generated Tailwind CSS
+│   └── images/                 # Logo and assets
+├── Properties/
+│   └── launchSettings.json
+├── Program.cs                  # Application bootstrap and DI configuration
 ├── appsettings.Development.json
-├── package.json              # npm scripts for Tailwind
-├── tailwind.config.js        # Tailwind configuration
-└── Dockerfile                # Docker deployment configuration
+├── appsettings.Production.json
+├── package.json                # npm scripts for Tailwind
+├── tailwind.config.js          # Tailwind configuration
+├── Dockerfile                  # Docker deployment configuration
+└── Swarmer.Web.csproj
 ```
 
 ### 3. Swarmer.Tests (xUnit Test Project)
@@ -90,10 +94,11 @@ Unit tests for the domain layer.
 
 ```
 Swarmer.Tests/
-├── SwarmerRepositoryTests.cs
-├── SwarmerEndpointsTests.cs
-├── StreamMock.cs
-└── appsettings.Testing.json
+├── UnitTests/
+│   ├── StreamMock.cs
+│   └── SwarmerRepositoryTests.cs
+├── appsettings.Testing.json
+└── Swarmer.Tests.csproj
 ```
 
 ## Build and Test Commands
@@ -112,9 +117,9 @@ dotnet test Swarmer.slnx
 
 ### Run the Application (Development)
 
-**Option 1: Just run the app (CSS must be pre-built)**
+**Option 1: Just run the app (CSS is built automatically during build)**
 ```bash
-cd Swarmer.Web.Client
+cd Swarmer.Web
 dotnet run
 ```
 
@@ -122,13 +127,13 @@ dotnet run
 
 Terminal 1 - Watch and rebuild CSS on changes:
 ```bash
-cd Swarmer.Web.Client
+cd Swarmer.Web
 npm run build-css
 ```
 
 Terminal 2 - Run the app with hot reload:
 ```bash
-cd Swarmer.Web.Client
+cd Swarmer.Web
 dotnet watch run
 ```
 
@@ -139,7 +144,7 @@ The application will be available at:
 ### Docker Build
 
 ```bash
-cd Swarmer.Web.Client
+cd Swarmer.Web
 docker build -f Dockerfile -t swarmer ..
 ```
 
@@ -148,7 +153,7 @@ docker build -f Dockerfile -t swarmer ..
 Since the project uses EF Core Migrations, you may need to apply them:
 
 ```bash
-cd Swarmer.Web.Client
+cd Swarmer.Web
 dotnet ef database update
 ```
 
@@ -156,14 +161,14 @@ To create a new migration:
 
 ```bash
 cd Swarmer.Domain
-dotnet ef migrations add <MigrationName> --startup-project ../Swarmer.Web.Client
+dotnet ef migrations add <MigrationName> --startup-project ../Swarmer.Web
 ```
 
 ## Frontend Development
 
 ### Tailwind CSS Workflow
 
-The project uses Tailwind CSS v4 with npm-based processing:
+The project uses **Tailwind CSS v4** with npm-based processing:
 
 1. **Development** - Watch mode with hot reload:
    ```bash
@@ -175,13 +180,13 @@ The project uses Tailwind CSS v4 with npm-based processing:
    npm run build-css-prod
    ```
 
+CSS is also automatically built during the .NET build process via the `BuildTailwind` MSBuild target in `Swarmer.Web.csproj`.
+
 ### Key UI Features
 
 - **Dark Mode**: Class-based (`dark:`) with localStorage persistence
 - **Discord Simulation**: Animated stream notifications in the hero section
 - **Responsive Design**: Mobile-first with Tailwind breakpoints
-- **Font Awesome**: Icons via CDN
-- **Inter Font**: Google Fonts
 
 ### File Locations
 
@@ -195,7 +200,7 @@ The project uses Tailwind CSS v4 with npm-based processing:
 The project uses `.editorconfig` with the following key conventions:
 
 ### Indentation
-- **Tab** indentation (size 4)
+- **Space** indentation (size 4)
 - Generated code (Migrations, AssemblyInfo) is excluded from analysis
 
 ### Naming Conventions
@@ -217,6 +222,8 @@ The project uses `.editorconfig` with the following key conventions:
 - SA1209: Using alias directives should be placed after other using directives
 - SA1101: Prefix local calls with this
 - SA1402: File may only contain a single type
+- SA1600: Elements should be documented
+- SA0001: XML comment analysis is disabled due to project configuration
 
 ### Static Analysis
 The project includes several analyzers:
@@ -230,6 +237,7 @@ The project includes several analyzers:
 - **xUnit** for test framework
 - **NSubstitute** for mocking
 - **EF Core InMemory** for database testing
+- **ASP.NET Core MVC Testing** for integration tests
 
 ### Running Tests
 
@@ -259,21 +267,23 @@ Tests use `appsettings.Testing.json` for configuration with dummy values for API
 ```json
 {
   "ConnectionStrings": {
-    "Default": "Host=localhost;Database=postgres;Username=postgres;Password=postgres"
+    "DefaultConnection": "Host=localhost;Database=postgres;Username=postgres;Password=postgres"
   },
   "SwarmerConfig": {
     "BotToken": "discord-bot-token",
     "ClientId": "twitch-client-id",
-    "AccessToken": "twitch-access-token",
     "ClientSecret": "twitch-client-secret"
   }
 }
 ```
 
-### Environment Variables (Production)
+The Twitch Access Token is automatically requested via OAuth2 client credentials flow on startup - it does not need to be configured manually.
 
-In production, the following environment variables are required:
-- `PostgresConnectionString` - PostgreSQL connection string
+### Environment-Specific Files
+
+- **Development**: `appsettings.Development.json` - Local development settings
+- **Production**: `appsettings.Production.json` - Production deployment settings
+- **Testing**: `appsettings.Testing.json` - Test configuration with dummy values
 
 ### Twitch Games Monitored
 
@@ -286,8 +296,8 @@ The bot monitors Twitch streams for:
 ### Background Services
 The application uses three hosted background services:
 
-1. **StreamRefresherService** - Polls Twitch API every minute to refresh stream data
-2. **StreamsPostingService** - Posts new streams to Discord and manages stream state transitions
+1. **StreamRefresherService** - Polls Twitch API every minute to refresh stream data and obtain OAuth tokens
+2. **StreamsPostingService** - Posts new streams to Discord and manages stream state transitions (30-second interval)
 3. **KeepAppAliveService** - Keeps the application alive (for hosting platforms that require activity)
 
 All background services inherit from `RepeatingBackgroundService` which provides:
@@ -309,10 +319,8 @@ REST API is defined in `Program.cs` using Minimal API pattern:
 ## Security Considerations
 
 ### Sensitive Configuration
-- **Never commit real API tokens** - The `appsettings.json` in the repository contains example/dummy values
-- In production, tokens are loaded from:
-  - Environment variables (`PostgresConnectionString`)
-  - Database configuration (JSON config stored in PostgreSQL)
+- **Never commit real API tokens** - The `appsettings.Development.json` and `appsettings.Production.json` contain real tokens but are gitignored from public repositories
+- In production, tokens are loaded from environment-specific configuration files
 
 ### CORS
 The API allows any origin (`AllowAnyOrigin`) for the `/streams` endpoint.
@@ -320,13 +328,13 @@ The API allows any origin (`AllowAnyOrigin`) for the `/streams` endpoint.
 ## Deployment
 
 ### Docker
-The Dockerfile is located in `Swarmer.Web.Client/Dockerfile`:
+The Dockerfile is located in `Swarmer.Web/Dockerfile`:
 - Uses multi-stage build
 - Based on `mcr.microsoft.com/dotnet/aspnet:10.0`
 - Exposes ports 80 and 443
 
 ### Database
-PostgreSQL is required. The application uses EF Core migrations for schema management.
+PostgreSQL is required. The application uses EF Core migrations for schema management. Migrations history is stored in the `swarmer` schema (`__EFMigrationsHistory` table).
 
 ## Development Workflow
 
@@ -334,7 +342,7 @@ PostgreSQL is required. The application uses EF Core migrations for schema manag
 2. Run tests: `dotnet test`
 3. Build: `dotnet build`
 4. For UI changes, run Tailwind watch: `npm run build-css`
-5. Create migrations if database schema changes
+5. Create migrations if database schema changes: `dotnet ef migrations add <Name> --startup-project ../Swarmer.Web`
 6. Test locally with `dotnet watch run`
 
 ## Useful Notes
@@ -344,3 +352,6 @@ PostgreSQL is required. The application uses EF Core migrations for schema manag
 - Implicit usings are enabled
 - Dark mode is supported in the UI and persists via local storage
 - The Discord simulation on the home page uses vanilla JavaScript for animations
+- The `BannedUser` entity stores `UserLogin` (Twitch login name) for filtering banned streamers
+- Stream messages in Discord use embeds that transition between "online" and "offline" states
+- A "lingering" mechanism prevents rapid Discord message flip-flopping when Twitch API returns inconsistent data
