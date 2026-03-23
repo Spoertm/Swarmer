@@ -22,7 +22,8 @@
   </ItemGroup>
 
   <Target Name="BuildTailwind" BeforeTargets="Build">
-    <Exec Command="cmd /c &quot;npx @tailwindcss/cli -i ./Styles/input.css -o ./wwwroot/css/site.css&quot;" WorkingDirectory="$(ProjectDir)" />
+    <Exec Command="npx @tailwindcss/cli -i ./Styles/input.css -o ./wwwroot/css/site.css" WorkingDirectory="$(ProjectDir)" Condition="'$(OS)' != 'Windows_NT'" />
+    <Exec Command="cmd /c &quot;npx @tailwindcss/cli -i ./Styles/input.css -o ./wwwroot/css/site.css&quot;" WorkingDirectory="$(ProjectDir)" Condition="'$(OS)' == 'Windows_NT'" />
   </Target>
 
 </Project>
