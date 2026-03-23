@@ -1,16 +1,17 @@
 using Discord;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
+using Swarmer.Domain;
+using Swarmer.Domain.Data;
 using Swarmer.Domain.Discord;
 using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
 using TwitchLib.Api;
 using TwitchLib.Api.Interfaces;
-using Swarmer.Domain.Data;
 
 namespace Swarmer.Web;
 
@@ -68,7 +69,12 @@ public static class Program
 				.AddSingleton<StreamProvider>()
 				.AddSingleton<ITwitchAPI, TwitchAPI>()
 				.AddHostedService<StreamRefresherService>()
-				.AddHostedService<StreamsPostingService>();
+				.AddHostedService<StreamsPostingService>()
+				.AddHostedService<KeepAppAliveService>()
+				.AddHttpClient("KeepAlive", c =>
+				{
+					c.Timeout = TimeSpan.FromSeconds(10);
+				});
 
 			WebApplication app = builder.Build();
 
