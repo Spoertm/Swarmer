@@ -55,6 +55,24 @@
 			"problemMatcher": "$msCompile"
 		},
 		{
+			"label": "ef migrations add",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"ef",
+				"migrations",
+				"add",
+				"${input:migrationName}",
+				"--output-dir",
+				"Data/Migrations",
+				"--project",
+				"${workspaceFolder}/Swarmer.Domain/Swarmer.Domain.csproj",
+				"--startup-project",
+				"${workspaceFolder}/Swarmer.Web/Swarmer.Web.csproj"
+			],
+			"problemMatcher": []
+		},
+		{
 			"label": "ef database update",
 			"command": "dotnet",
 			"type": "process",
@@ -86,6 +104,14 @@
 			"path": "Swarmer.Web",
 			"group": "build",
 			"problemMatcher": []
+		}
+	],
+	"inputs": [
+		{
+			"id": "migrationName",
+			"type": "promptString",
+			"description": "Name of the migration",
+			"default": "MigrationName"
 		}
 	]
 }
