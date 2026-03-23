@@ -2,5 +2,5 @@
 
 public sealed class StreamProvider
 {
-	public Stream[]? Streams { get; set; }
+    public Stream[]? Streams { get; set; }
 }

@@ -1,9 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
-using Swarmer.Domain.Database;
 using Swarmer.Domain.Models;
 using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
@@ -12,84 +10,83 @@ using TwitchLib.Api.Interfaces;
 namespace Swarmer.Domain.Twitch;
 
 public sealed class StreamRefresherService(
-	ITwitchAPI twitchApi,
-	StreamProvider streamProvider,
-	IOptions<SwarmerConfig> options,
-	IServiceScopeFactory serviceScopeFactory)
-	: RepeatingBackgroundService
+    ITwitchAPI twitchApi,
+    StreamProvider streamProvider,
+    IOptions<SwarmerConfig> options)
+    : RepeatingBackgroundService
 {
-	private const string ReqUrl = "https://id.twitch.tv/oauth2/token";
+    private static readonly List<string> _twitchGameIds =
+    [
+        "490905", // Devil Daggers
+        "1350012934" // HYPER DEMON
+    ];
 
-	private static readonly List<string> _twitchGameIds =
-	[
-		"490905", // Devil Daggers
-		"1350012934" // HYPER DEMON
-	];
+    private readonly Uri _reqUrl = new("https://id.twitch.tv/oauth2/token");
 
-	private readonly SwarmerConfig _config = options.Value;
+    private readonly SwarmerConfig _config = options.Value;
 
-	protected override TimeSpan Interval => TimeSpan.FromMinutes(1);
+    protected override TimeSpan Interval => TimeSpan.FromMinutes(1);
 
-	protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
-	{
-		if (stoppingToken.IsCancellationRequested)
-		{
-			return;
-		}
+    protected override async Task ExecuteTaskAsync(CancellationToken stoppingToken)
+    {
+        if (stoppingToken.IsCancellationRequested)
+        {
+            return;
+        }
 
-		try
-		{
-			GetStreamsResponse streamResponse =
-				await twitchApi.Helix.Streams.GetStreamsAsync(first: 100, gameIds: _twitchGameIds);
-			Stream[] twitchStreams = streamResponse.Streams;
-			streamProvider.Streams = twitchStreams;
-		}
-		catch (BadScopeException ex)
-		{
-			Log.Warning(ex, "Twitch API request failed due to an expired access token. Refreshing token...");
-			RefreshTokenResponse tokenRefreshResponse = await RequestTokenAsync();
+        if (twitchApi.Settings.AccessToken is null)
+        {
+            RefreshTokenResponse refreshTokenResponse = await RequestTokenAsync().ConfigureAwait(false);
+            twitchApi.Settings.AccessToken = refreshTokenResponse.AccessToken;
+            twitchApi.Settings.ClientId = _config.ClientId;
+        }
 
-			await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
-			ConfigRepository repo = scope.ServiceProvider.GetRequiredService<ConfigRepository>();
-			await repo.UpdateAccessToken(tokenRefreshResponse.AccessToken);
+        try
+        {
+            GetStreamsResponse streamResponse = await twitchApi.Helix.Streams.GetStreamsAsync(first: 100, gameIds: _twitchGameIds);
+            streamProvider.Streams = streamResponse.Streams;
+        }
+        catch (BadScopeException ex)
+        {
+            Log.Warning(ex, "Twitch API request failed due to an expired access token. Refreshing token...");
+            RefreshTokenResponse tokenRefreshResponse = await RequestTokenAsync();
+            twitchApi.Settings.AccessToken = tokenRefreshResponse.AccessToken;
+            twitchApi.Settings.ClientId = _config.ClientId;
 
-			twitchApi.Settings.AccessToken = tokenRefreshResponse.AccessToken;
+            Log.Information(
+                "Updated Twitch access token. The new token is valid for {ExpirationSeconds} seconds, expiring on {ExpirationDate} UTC",
+                tokenRefreshResponse.ExpiresIn,
+                DateTimeOffset.UtcNow.AddSeconds(tokenRefreshResponse.ExpiresIn).ToString("dd/MM/yyyy"));
+        }
+    }
 
-			Log.Information(
-				"Updated Twitch access token. The new token is valid for {ExpirationSeconds} seconds, expiring on {ExpirationDate} UTC",
-				tokenRefreshResponse.ExpiresIn,
-				DateTimeOffset.UtcNow.AddSeconds(tokenRefreshResponse.ExpiresIn).ToString("dd/MM/yyyy"));
-		}
-	}
+    private async Task<RefreshTokenResponse> RequestTokenAsync()
+    {
+        using HttpClient client = new();
+        Dictionary<string, string> postValues = new()
+        {
+            { "client_id", _config.ClientId },
+            { "client_secret", _config.ClientSecret },
+            { "grant_type", "client_credentials" },
+        };
 
-	private async Task<RefreshTokenResponse> RequestTokenAsync()
-	{
-		using HttpClient client = new();
-		Dictionary<string, string> postValues = new()
-		{
-			{ "client_id", _config.ClientId }, { "client_secret", _config.ClientSecret }, { "grant_type", "client_credentials" }
-		};
+        HttpResponseMessage response = await client.PostAsync(_reqUrl, new FormUrlEncodedContent(postValues));
+        response.EnsureSuccessStatusCode();
 
-		HttpResponseMessage response = await client.PostAsync(ReqUrl, new FormUrlEncodedContent(postValues));
-		response.EnsureSuccessStatusCode();
+        System.IO.Stream stream = await response.Content.ReadAsStreamAsync();
+        return await JsonSerializer.DeserializeAsync<RefreshTokenResponse>(stream)
+            ?? throw new InvalidOperationException("Access token deserialization resulted in null.");
+    }
 
-		System.IO.Stream stream = await response.Content.ReadAsStreamAsync();
-		RefreshTokenResponse refreshTokenResponse = await JsonSerializer.DeserializeAsync<RefreshTokenResponse>(stream)
-		                                            ?? throw new InvalidOperationException(
-			                                            "Access token deserialization resulted in null.");
+    private sealed record RefreshTokenResponse
+    {
+        [JsonPropertyName("access_token")]
+        public required string AccessToken { get; init; }
 
-		return refreshTokenResponse;
-	}
+        [JsonPropertyName("expires_in")]
+        public required int ExpiresIn { get; init; }
 
-	private sealed record RefreshTokenResponse
-	{
-		[JsonPropertyName("access_token")]
-		public required string AccessToken { get; init; }
-
-		[JsonPropertyName("expires_in")]
-		public required int ExpiresIn { get; init; }
-
-		[JsonPropertyName("token_type")]
-		public required string TokenType { get; init; }
-	}
+        [JsonPropertyName("token_type")]
+        public required string TokenType { get; init; }
+    }
 }

@@ -1,0 +1,29 @@
+{
+    // Enable full solution analysis
+    "dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "fullSolution",
+    "dotnet.backgroundAnalysis.compilerDiagnosticsScope": "fullSolution",
+
+    // Organize imports on format (C# Dev Kit)
+    "dotnet.formatting.organizeImportsOnFormat": true,
+
+    // Format on save
+    "editor.formatOnSave": true,
+
+    // Trim trailing whitespace & ensure newline at EOF
+    // (also in .editorconfig, but kept here as a global editor default)
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+
+    "formatFiles.excludePattern": "**/obj/**,**/bin/**,**/Migrations/**",
+
+    // Use C# Dev Kit formatter for C# files (Prettier doesn't support C#)
+    "[csharp]": {
+        "editor.defaultFormatter": "ms-dotnettools.csharp",
+        "editor.indentStyle": "space",
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+
+    // Ensure EditorConfig is respected
+    "editor.detectIndentation": false
+}

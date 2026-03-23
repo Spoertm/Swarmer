@@ -1,4 +1,4 @@
-﻿using Swarmer.Domain.Database;
+﻿using Swarmer.Domain.Data;
 
 namespace Swarmer.Domain.Twitch;
 

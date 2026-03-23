@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="Swarmer.Domain/Swarmer.Domain.csproj" />
+    <Project Path="Swarmer.Web/Swarmer.Web.csproj">
+      <BuildDependency Project="Swarmer.Domain/Swarmer.Domain.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="Swarmer.Tests/Swarmer.Tests.csproj" />
+  </Folder>
+</Solution>

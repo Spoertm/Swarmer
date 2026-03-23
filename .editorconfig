@@ -7,7 +7,7 @@ root = true
 # A newline ending every file
 [*]
 insert_final_newline = true
-indent_style = tab
+indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
@@ -128,7 +128,6 @@ csharp_space_after_dot = false
 csharp_space_after_keywords_in_control_flow_statements = true
 csharp_space_after_semicolon_in_for_statement = true
 csharp_space_around_binary_operators = before_and_after
-csharp_space_around_declaration_statements = do_not_ignore
 csharp_space_before_colon_in_inheritance_clause = true
 csharp_space_before_comma = false
 csharp_space_before_dot = false
@@ -143,9 +142,6 @@ csharp_space_between_method_declaration_name_and_open_parenthesis = false
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
-
-# Enable trailing commas
-dotnet_style_allow_trailing_comma = true
 
 # Disable SA1633: File should have header
 dotnet_diagnostic.SA1633.severity = none
@@ -165,9 +161,11 @@ dotnet_diagnostic.SA1101.severity = none
 # Disable SA1402: File may only contain a single type
 dotnet_diagnostic.SA1402.severity = none
 
-[src/libraries/System.Net.Http/src/System/Net/Http/{SocketsHttpHandler/Http3RequestStream.cs,BrowserHttpHandler/BrowserHttpHandler.cs}]
-# disable CA2025, the analyzer throws a NullReferenceException when processing this file: https://github.com/dotnet/roslyn-analyzers/issues/7652
-dotnet_diagnostic.CA2025.severity = none
+# Disable SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none
+
+# Disable SA0001: XML comment analysis is disabled due to project configuration
+dotnet_diagnostic.SA0001.severity = none
 
 # C++ Files
 [*.{cpp,h,in}]
