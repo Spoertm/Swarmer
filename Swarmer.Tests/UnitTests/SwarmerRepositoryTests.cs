@@ -56,7 +56,7 @@ public sealed class SwarmerRepositoryTests
         await appDbContext.SaveChangesAsync();
 
         SwarmerRepository sut = new(appDbContext, streamProvider, _discordServiceMock);
-        List<StreamToPost> result = (await sut.GetStreamsToPostAsync()).ToList();
+        List<StreamToPost> result = [.. await sut.GetStreamsToPostAsync()];
 
         Assert.Single(result);
         Assert.Equal(stream2, result[0].Stream);
