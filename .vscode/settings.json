@@ -1,3 +1,7 @@
 {
-	"dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "fullSolution"
+	"omnisharp.enableRoslynAnalyzers": true,
+	"omnisharp.analyzeOpenDocumentsOnly": false,
+	"omnisharp.enableEditorConfigSupport": true,
+	"dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "fullSolution",
+	"dotnet.backgroundAnalysis.compilerDiagnosticsScope": "fullSolution"
 }
