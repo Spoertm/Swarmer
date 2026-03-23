@@ -59,11 +59,6 @@ public static class Program
                     options.UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "swarmer"));
                 })
                 .AddScoped<SwarmerRepository>()
-                .AddSingleton(new DiscordSocketConfig
-                {
-                    DefaultRetryMode = RetryMode.AlwaysRetry,
-                    UseInteractionSnowflakeDate = false,
-                })
                 .AddSingleton<IDiscordService, DiscordService>()
                 .AddSingleton<SwarmerDiscordClient>()
                 .AddSingleton<StreamProvider>()

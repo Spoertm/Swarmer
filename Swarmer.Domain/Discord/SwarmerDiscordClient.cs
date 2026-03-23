@@ -8,10 +8,19 @@ namespace Swarmer.Domain.Discord;
 
 public sealed class SwarmerDiscordClient : DiscordSocketClient
 {
+    private static readonly DiscordSocketConfig _socketConfig = new()
+    {
+        DefaultRetryMode = RetryMode.AlwaysRetry,
+        UseInteractionSnowflakeDate = false,
+        GatewayIntents = GatewayIntents.Guilds |
+                             GatewayIntents.GuildMessages |
+                             GatewayIntents.MessageContent,
+    };
+
     private readonly SwarmerConfig _config;
 
-    public SwarmerDiscordClient(IOptions<SwarmerConfig> options, DiscordSocketConfig socketConfig)
-        : base(socketConfig)
+    public SwarmerDiscordClient(IOptions<SwarmerConfig> options)
+        : base(_socketConfig)
     {
         _config = options.Value;
 
