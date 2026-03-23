@@ -24,7 +24,17 @@
 				"cwd": "${workspaceFolder}/Swarmer.Web"
 			},
 			"isBackground": true,
-			"problemMatcher": []
+			"problemMatcher": {
+				"pattern": {
+					"regexp": ".*",
+					"message": 0
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "^\\s*\\btailwindcss\\b",
+					"endsPattern": "^(Done|Changed|Created|Removed|Watching)"
+				}
+			}
 		},
 		{
 			"label": "test",
@@ -57,6 +67,24 @@
 				"--startup-project",
 				"${workspaceFolder}/Swarmer.Web/Swarmer.Web.csproj"
 			],
+			"problemMatcher": []
+		},
+		{
+			"label": "npm: build-css",
+			"detail": "tailwindcss -i ./Styles/input.css -o ./wwwroot/css/site.css --watch",
+			"type": "npm",
+			"script": "build-css",
+			"path": "Swarmer.Web",
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "npm: build-css-prod",
+			"detail": "tailwindcss -i ./Styles/input.css -o ./wwwroot/css/site.css --minify",
+			"type": "npm",
+			"script": "build-css-prod",
+			"path": "Swarmer.Web",
+			"group": "build",
 			"problemMatcher": []
 		}
 	]
