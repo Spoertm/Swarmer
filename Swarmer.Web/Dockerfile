@@ -5,6 +5,13 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
+
+# Install Node.js (required for Tailwind CSS build)
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY ["Swarmer.Web/Swarmer.Web.csproj", "Swarmer.Web/"]
 COPY ["Swarmer.Domain/Swarmer.Domain.csproj", "Swarmer.Domain/"]
 RUN dotnet restore "Swarmer.Web/Swarmer.Web.csproj"
