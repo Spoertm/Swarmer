@@ -17,6 +17,7 @@ COPY ["Swarmer.Domain/Swarmer.Domain.csproj", "Swarmer.Domain/"]
 RUN dotnet restore "Swarmer.Web/Swarmer.Web.csproj"
 COPY . .
 WORKDIR "/src/Swarmer.Web"
+RUN npm install
 RUN dotnet build "Swarmer.Web.csproj" -c Release -o /app/build
 
 FROM build AS publish
