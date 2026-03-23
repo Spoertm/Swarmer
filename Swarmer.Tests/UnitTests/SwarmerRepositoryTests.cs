@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
-using Swarmer.Domain.Database;
+using Swarmer.Domain.Data;
 using Swarmer.Domain.Discord;
 using Swarmer.Domain.Twitch;
 using Xunit;

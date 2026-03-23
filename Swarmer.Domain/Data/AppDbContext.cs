@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Swarmer.Domain.Database;
+namespace Swarmer.Domain.Data;
 
 public class AppDbContext : DbContext
 {

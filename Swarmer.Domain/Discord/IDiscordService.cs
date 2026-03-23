@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Swarmer.Domain.Database;
+using Swarmer.Domain.Data;
 using Swarmer.Domain.Models;
 
 namespace Swarmer.Domain.Discord;

@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
-using Swarmer.Domain.Database;
 using Swarmer.Domain.Discord;
 using Swarmer.Domain.Models;
 using Swarmer.Domain.Twitch;
 using TwitchLib.Api;
 using TwitchLib.Api.Interfaces;
+using Swarmer.Domain.Data;
 
 namespace Swarmer.Web;
 

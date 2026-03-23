@@ -1,4 +1,4 @@
-﻿namespace Swarmer.Domain.Database;
+﻿namespace Swarmer.Domain.Data;
 
 public sealed class GameChannel
 {

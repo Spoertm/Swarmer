@@ -1,7 +1,7 @@
 ﻿global using Stream = TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream;
 using Discord;
 using Microsoft.Extensions.DependencyInjection;
-using Swarmer.Domain.Database;
+using Swarmer.Domain.Data;
 using Swarmer.Domain.Discord;
 using Swarmer.Domain.Extensions;
 using Swarmer.Domain.Models;

@@ -2,7 +2,7 @@
 using Swarmer.Domain.Discord;
 using Swarmer.Domain.Twitch;
 
-namespace Swarmer.Domain.Database;
+namespace Swarmer.Domain.Data;
 
 public sealed class SwarmerRepository
 {

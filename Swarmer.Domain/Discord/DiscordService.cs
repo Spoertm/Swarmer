@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Serilog;
-using Swarmer.Domain.Database;
+using Swarmer.Domain.Data;
 using Swarmer.Domain.Extensions;
 using Swarmer.Domain.Models;
 
