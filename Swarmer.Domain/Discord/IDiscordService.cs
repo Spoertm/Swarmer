@@ -6,6 +6,8 @@ namespace Swarmer.Domain.Discord;
 
 public interface IDiscordService
 {
+    ConnectionState GetConnectionState();
+
     Task<Result<IUserMessage>> SendEmbedAsync(ulong channelId, Embed embed);
 
     Task GoOfflineAsync(StreamMessage streamMessage);

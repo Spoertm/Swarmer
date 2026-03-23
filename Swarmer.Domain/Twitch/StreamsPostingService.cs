@@ -40,6 +40,12 @@ public sealed class StreamsPostingService : RepeatingBackgroundService
             return;
         }
 
+        // Discord client is not ready
+        if (_discordService.GetConnectionState() != ConnectionState.Connected)
+        {
+            return;
+        }
+
         await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         SwarmerRepository repo = scope.ServiceProvider.GetRequiredService<SwarmerRepository>();
 

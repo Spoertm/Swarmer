@@ -17,7 +17,7 @@ namespace Swarmer.Web;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         try
         {
@@ -77,6 +77,9 @@ public static class Program
                 });
 
             WebApplication app = builder.Build();
+
+            SwarmerDiscordClient discordClient = app.Services.GetRequiredService<SwarmerDiscordClient>();
+            await discordClient.InitAsync();
 
             if (app.Environment.IsDevelopment())
             {

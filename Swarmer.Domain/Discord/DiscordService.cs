@@ -12,6 +12,8 @@ public sealed class DiscordService : IDiscordService
 
     public DiscordService(SwarmerDiscordClient discordClient) => _discordClient = discordClient;
 
+    public ConnectionState GetConnectionState() => _discordClient.ConnectionState;
+
     public async Task<Result<IUserMessage>> SendEmbedAsync(ulong channelId, Embed embed)
     {
         if (await _discordClient.GetChannelAsync(channelId) is not ITextChannel channel)
