@@ -2,6 +2,8 @@
 
 A Discord bot that notifies when [Devil Daggers](https://store.steampowered.com/app/422970/Devil_Daggers/) and [HYPER DEMON](https://store.steampowered.com/app/1743850/HYPER_DEMON/) streams go live on Twitch.
 
+<video src="https://github.com/user-attachments/assets/e1d716db-db3d-4a30-86b8-fc90d52ce336" autoplay loop muted playsinline></video>
+
 ## Quick Start
 
 ```bash
