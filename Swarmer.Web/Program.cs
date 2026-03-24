@@ -1,5 +1,3 @@
-using Discord;
-using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
