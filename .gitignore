@@ -391,4 +391,10 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Config files
-**/*appsettings*.json
+# Ignore actual config files (contain secrets)
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+
+# But allow example templates
+!*.Example.json

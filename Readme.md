@@ -1,22 +1,50 @@
 # Swarmer[^1]
 
-A Discord bot that notifies when [Devil Daggers](https://store.steampowered.com/app/422970/Devil_Daggers/) streams go live.
+A Discord bot that notifies when [Devil Daggers](https://store.steampowered.com/app/422970/Devil_Daggers/) and [HYPER DEMON](https://store.steampowered.com/app/1743850/HYPER_DEMON/) streams go live on Twitch.
 
-### Framework
-- .NET 10.0
+## Quick Start
 
-### Language
-- C# 14.0
+```bash
+# Build
+dotnet build Swarmer.slnx
 
-### Architecture
-There was an attempt at following [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html), where:
+# Test
+dotnet test
 
-* [Swarmer.Domain](Swarmer.Domain) represents the core logic of the application, this includes communication with Discord, Twitch API, and the database.
+# Run (requires PostgreSQL + API credentials)
+cd Swarmer.Web
+dotnet run
+```
 
+The app will be available at `http://localhost:5000` (or `https://localhost:5001`).
 
-* [Swarmer.Web.Client](Swarmer.Web.Client) represents the Web/UI part that the user interacts with. It is a Blazor WebAssembly project built with [tailwindcss](https://tailwindcss.com/).
+## API
 
+Query live streams without hitting Twitch's API directly:
 
-* [Swarmer.Web.Server](Swarmer.Web.Server) is where the API is defined and can be regarded as the entry point of the application.
+```
+GET /streams?game=devil+daggers
+```
+
+Returns active streams for Devil Daggers or HYPER DEMON.
+
+## Architecture
+
+| Project          | Purpose                                      |
+| ---------------- | -------------------------------------------- |
+| `Swarmer.Domain` | Core logic—Discord bot, Twitch API, database |
+| `Swarmer.Web`    | ASP.NET MVC frontend + REST API entry point  |
+| `Swarmer.Tests`  | Unit tests                                   |
+
+Built with .NET 10, C# 14, EF Core + PostgreSQL, Tailwind CSS.
+
+## Prerequisites
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- PostgreSQL
+- [Discord bot token](https://discord.com/developers/applications)
+- [Twitch API credentials](https://dev.twitch.tv/)
+
+Copy `Swarmer.Web/appsettings.Example.json` → `Swarmer.Web/appsettings.Development.json` and fill in real credentials.
 
 [^1]: This bot was originally made by Angrevol#3416 and this project is a complete rewrite in C#.
