@@ -19,9 +19,9 @@ public sealed class KeepAppAliveService(IHttpClientFactory httpClientFactory) : 
         try
         {
             HttpClient client = httpClientFactory.CreateClient("KeepAlive");
-            using var request = new HttpRequestMessage(HttpMethod.Head, $"https://{appUrl}");
-            using HttpResponseMessage response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, stoppingToken);
-            response.EnsureSuccessStatusCode();
+            using HttpResponseMessage response = await client
+                .SendAsync(new(HttpMethod.Head, $"https://{appUrl}"), HttpCompletionOption.ResponseHeadersRead, stoppingToken)
+                .ConfigureAwait(false);
         }
         catch (Exception e)
         {
