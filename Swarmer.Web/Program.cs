@@ -28,6 +28,7 @@ public static class Program
                     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
                     .MinimumLevel.Override("System", LogEventLevel.Warning)
+                    .MinimumLevel.Override("TwitchLib.Api.Core.HttpCallHandlers", LogEventLevel.Warning)
                     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u4}] {Message:lj}{NewLine}{Exception}")
                     .WriteTo.Sentry(o =>
                     {
