@@ -69,9 +69,9 @@ public sealed class StreamsPostingService : RepeatingBackgroundService
             User twitchUser = (await _twitchApi.Helix.Users.GetUsersAsync([stp.Stream.UserId])).Users[0];
             Embed newStreamEmbed = new EmbedBuilder().Online(stp.Stream, twitchUser.ProfileImageUrl);
 
-            Result<IUserMessage> result =
+            IUserMessage? message =
                 await _discordService.SendEmbedAsync(stp.Channel.StreamChannelId, newStreamEmbed);
-            if (result.IsFailure)
+            if (message is null)
             {
                 continue;
             }
@@ -81,7 +81,7 @@ public sealed class StreamsPostingService : RepeatingBackgroundService
                 StreamId = stp.Stream.UserId,
                 IsLive = true,
                 ChannelId = stp.Channel.StreamChannelId,
-                MessageId = result.Value.Id,
+                MessageId = message.Id,
                 AvatarUrl =
                     string.IsNullOrWhiteSpace(twitchUser.ProfileImageUrl) ? null : twitchUser.ProfileImageUrl,
                 OfflineThumbnailUrl =

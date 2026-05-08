@@ -2,7 +2,6 @@
 using Serilog;
 using Swarmer.Domain.Data;
 using Swarmer.Domain.Extensions;
-using Swarmer.Domain.Models;
 
 namespace Swarmer.Domain.Discord;
 
@@ -14,12 +13,12 @@ public sealed class DiscordService : IDiscordService
 
     public ConnectionState GetConnectionState() => _discordClient.ConnectionState;
 
-    public async Task<Result<IUserMessage>> SendEmbedAsync(ulong channelId, Embed embed)
+    public async Task<IUserMessage?> SendEmbedAsync(ulong channelId, Embed embed)
     {
         if (await _discordClient.GetChannelAsync(channelId) is not ITextChannel channel)
         {
             Log.Error("Registered channel with ID {ChannelId} doesn't exist", channelId);
-            return Result.Failure<IUserMessage>($"Discord channel {channelId} doesn't exist.")!;
+            return null;
         }
 
         bool canSendInChannel = (await channel.GetUserAsync(_discordClient.CurrentUser.Id)).GetPermissions(channel)
@@ -27,11 +26,10 @@ public sealed class DiscordService : IDiscordService
         if (!canSendInChannel)
         {
             Log.Error("Lacking permissions to send messages in channel {ChannelId}", channelId);
-            return Result.Failure<IUserMessage>($"Lacking permissions to send messages in channel {channelId}")!;
+            return null;
         }
 
-        IUserMessage message = await channel.SendMessageAsync(embed: embed);
-        return Result.Success(message);
+        return await channel.SendMessageAsync(embed: embed);
     }
 
     public async Task GoOfflineAsync(StreamMessage streamMessage)
