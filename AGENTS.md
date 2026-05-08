@@ -44,7 +44,6 @@ Swarmer.Domain/
 │   └── StringExtensions.cs
 ├── Models/               # Domain models
 │   ├── SwarmerConfig.cs
-│   ├── Result.cs
 │   └── RepeatingBackgroundService.cs
 ├── Twitch/               # Twitch API integration
 │   ├── StreamProvider.cs
