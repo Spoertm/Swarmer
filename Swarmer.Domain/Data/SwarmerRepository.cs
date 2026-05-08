@@ -4,39 +4,28 @@ using Swarmer.Domain.Twitch;
 
 namespace Swarmer.Domain.Data;
 
-public sealed class SwarmerRepository
+public sealed class SwarmerRepository(
+    AppDbContext appDbContext,
+    StreamProvider streamProvider,
+    IDiscordService discordService)
 {
-    private readonly StreamProvider _streamProvider;
-    private readonly AppDbContext _appDbContext;
-    private readonly IDiscordService _discordService;
-
-    public SwarmerRepository(
-        AppDbContext appDbContext,
-        StreamProvider streamProvider,
-        IDiscordService discordService)
-    {
-        _streamProvider = streamProvider;
-        _appDbContext = appDbContext;
-        _discordService = discordService;
-    }
-
     public async Task<IEnumerable<StreamToPost>> GetStreamsToPostAsync()
     {
-        List<GameChannel> gameChannels = await _appDbContext.GameChannels
+        List<GameChannel> gameChannels = await appDbContext.GameChannels
             .AsNoTracking()
             .ToListAsync();
 
-        List<StreamMessage> streamMessages = await _appDbContext.StreamMessages
+        List<StreamMessage> streamMessages = await appDbContext.StreamMessages
             .AsNoTracking()
             .ToListAsync();
 
-        List<string> bannedUserLogins = await _appDbContext.BannedUsers
+        List<string> bannedUserLogins = await appDbContext.BannedUsers
             .AsNoTracking()
             .Select(b => b.UserLogin)
             .ToListAsync();
 
         return from channel in gameChannels
-               join stream in _streamProvider.Streams ?? [] on channel.TwitchGameId.ToString() equals stream.GameId
+               join stream in streamProvider.Streams ?? [] on channel.TwitchGameId.ToString() equals stream.GameId
                where !bannedUserLogins.Contains(stream.UserLogin)
                where !streamMessages.Any(streamMessage =>
                    streamMessage.StreamId == stream.UserId && streamMessage.ChannelId == channel.StreamChannelId)
@@ -47,7 +36,7 @@ public sealed class SwarmerRepository
     {
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        foreach (StreamMessage sm in await _appDbContext.StreamMessages.ToListAsync())
+        foreach (StreamMessage sm in await appDbContext.StreamMessages.ToListAsync())
         {
             if (utcNow - sm.LingeringSinceUtc >= maxLingerTime)
             {
@@ -61,16 +50,16 @@ public sealed class SwarmerRepository
     public async Task HandleExistingStreamsAsync(TimeSpan cooldownPeriod)
     {
         // Provider hasn't initialized Streams yet
-        if (_streamProvider.Streams is null)
+        if (streamProvider.Streams is null)
         {
             return;
         }
 
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        foreach (StreamMessage streamMessage in await _appDbContext.StreamMessages.ToListAsync())
+        foreach (StreamMessage streamMessage in await appDbContext.StreamMessages.ToListAsync())
         {
-            Stream? ongoingStream = Array.Find(_streamProvider.Streams, s => s.UserId == streamMessage.StreamId);
+            Stream? ongoingStream = Array.Find(streamProvider.Streams, s => s.UserId == streamMessage.StreamId);
 
             // Stream is live on Twitch
             if (ongoingStream is not null)
@@ -93,7 +82,7 @@ public sealed class SwarmerRepository
                     continue;
                 }
 
-                await _discordService.GoOnlineAgainAsync(streamMessage, ongoingStream);
+                await discordService.GoOnlineAgainAsync(streamMessage, ongoingStream);
                 streamMessage.IsLive = true;
                 streamMessage.Linger();
             }
@@ -111,7 +100,7 @@ public sealed class SwarmerRepository
                         continue;
                     }
 
-                    await _discordService.GoOfflineAsync(streamMessage);
+                    await discordService.GoOfflineAsync(streamMessage);
                     streamMessage.IsLive = false;
                     streamMessage.Linger();
                 }
@@ -134,16 +123,16 @@ public sealed class SwarmerRepository
 
     public async Task InsertStreamMessageAsync(StreamMessage streamMessage)
     {
-        await _appDbContext.StreamMessages.AddAsync(streamMessage);
+        await appDbContext.StreamMessages.AddAsync(streamMessage);
         await SaveChangesAsync();
     }
 
     public async Task RemoveStreamMessageAsync(StreamMessage streamMessage)
     {
-        _appDbContext.StreamMessages.Remove(streamMessage);
+        appDbContext.StreamMessages.Remove(streamMessage);
         await SaveChangesAsync();
     }
 
     public async Task SaveChangesAsync()
-        => await _appDbContext.SaveChangesAsync();
+        => await appDbContext.SaveChangesAsync();
 }
