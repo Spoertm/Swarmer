@@ -9,21 +9,21 @@
 
 	<ItemGroup>
 		<PackageReference Include="Discord.Net" Version="3.19.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.9" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.7" />
 		<PackageReference Include="Npgsql" Version="10.0.2" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
 		<PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Sentry.Serilog" Version="6.2.0" />
+		<PackageReference Include="Sentry.Serilog" Version="6.5.0" />
 		<PackageReference Include="Serilog" Version="4.3.1" />
 		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-		<PackageReference Include="SonarAnalyzer.CSharp" Version="10.21.0.135717">
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="10.25.0.139117">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
