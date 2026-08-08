@@ -45,6 +45,15 @@ public static class Program
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
             builder.Services.AddOpenApi();
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
             // Add Swarmer services
             IConfigurationSection configSection = builder.Configuration.GetSection(nameof(SwarmerConfig));
@@ -82,6 +91,7 @@ public static class Program
 
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseCors();
 
             app.MapRazorPages();
             app.MapControllers();
